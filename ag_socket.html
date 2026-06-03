@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FormHelperWidget - User Guide</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+      id="prism-theme-link"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+            colors: {
+              primary: "#FF5722",
+              primaryDark: "#E64A19",
+              bgLight: "#F3F4F6",
+              bgDark: "#111827",
+              cardLight: "#FFFFFF",
+              cardDark: "#1F2937",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      :root {
+        --text-main: #1f2937;
+        --text-muted: #6b7280;
+        --border-color: #e5e7eb;
+      }
+
+      html.dark {
+        --text-main: #f9fafb;
+        --text-muted: #9ca3af;
+        --border-color: #374151;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 4px;
+      }
+      html.dark ::-webkit-scrollbar-thumb {
+        background: #4b5563;
+      }
+
+      .glass-header {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-color);
+      }
+      html.dark .glass-header {
+        background: rgba(31, 41, 55, 0.8);
+      }
+
+      pre[class*="language-"],
+      code[class*="language-"] {
+        background-color: transparent !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        font-family: "JetBrains Mono", monospace !important;
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+        text-shadow: none !important;
+      }
+
+      pre.line-numbers {
+        position: relative !important;
+        padding: 1.5rem !important;
+        padding-left: 3.5rem !important;
+      }
+      .line-numbers .line-numbers-rows {
+        top: 0rem !important;
+        left: -58px !important;
+        width: 3rem !important;
+        border-right: 1px solid var(--border-color) !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .line-numbers-rows > span:before {
+        color: var(--text-muted) !important;
+        padding-right: 0.8em !important;
+      }
+
+      .fade-enter-active,
+      .fade-leave-active {
+        transition: opacity 0.3s, transform 0.3s;
+      }
+      .fade-enter,
+      .fade-leave-to {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      .sidebar-link {
+        transition: all 0.2s ease;
+      }
+      .sidebar-link:hover,
+      .sidebar-link.active {
+        background-color: rgba(255, 87, 34, 0.1);
+        color: #ff5722;
+        border-right: 3px solid #ff5722;
+      }
+      html.dark .sidebar-link.active {
+        background-color: rgba(255, 87, 34, 0.2);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-bgLight dark:bg-bgDark antialiased min-h-screen overflow-hidden"
+  >
+    <div id="app" class="flex flex-col h-screen">
+      <nav
+        class="glass-header z-20 px-6 py-4 flex justify-between items-center fixed w-full top-0"
+      >
+        <div class="flex items-center gap-4">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-primary to-orange-400 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg shadow-orange-500/30"
+          >
+            F
+          </div>
+          <div>
+            <h1 class="text-xl font-bold tracking-tight">
+              {{ appInfo.title }}
+            </h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              {{ appInfo.version }}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <button
+            @click="toggleTheme"
+            class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          >
+            <i class="fa-solid fa-moon" v-if="!isDarkMode"></i>
+            <i class="fa-solid fa-sun" v-else></i>
+          </button>
+        </div>
+      </nav>
+
+      <div class="flex pt-[73px] h-full">
+        <aside
+          class="w-72 bg-white dark:bg-cardDark border-r border-gray-200 dark:border-gray-700 flex flex-col h-full z-10 overflow-y-auto pb-20 shadow-sm"
+        >
+          <div class="p-5 border-b border-gray-100 dark:border-gray-800">
+            <h2
+              class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2"
+            >
+              Pusat Bantuan
+            </h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ appInfo.description }}
+            </p>
+          </div>
+
+          <div class="p-3">
+            <div
+              v-for="(group, groupName) in groupedComponents"
+              :key="groupName"
+              class="mb-4"
+            >
+              <h3
+                class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 px-3"
+              >
+                {{ groupName }}
+              </h3>
+              <ul>
+                <li v-for="comp in group" :key="comp.id">
+                  <button
+                    @click="selectComponent(comp)"
+                    :class="['w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium sidebar-link mb-1 flex items-center gap-3', activeComponent && activeComponent.id === comp.id ? 'active' : 'text-gray-600 dark:text-gray-300']"
+                  >
+                    <i :class="comp.icon + ' w-4 text-center opacity-70'"></i>
+                    {{ comp.name }}
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto p-8 relative scroll-smooth pb-32">
+          <transition name="fade" mode="out-in" @after-enter="triggerHighlight">
+            <div
+              v-if="activeComponent"
+              :key="activeComponent.id"
+              class="max-w-5xl mx-auto"
+            >
+              <div class="mb-8">
+                <div class="flex items-center gap-3 mb-2">
+                  <span
+                    class="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-primary font-semibold text-xs rounded-full border border-orange-200 dark:border-orange-800/50"
+                  >
+                    Widget
+                  </span>
+                  <h2
+                    class="text-3xl font-extrabold text-gray-900 dark:text-white"
+                  >
+                    {{ activeComponent.group }} {{ activeComponent.name }}
+                  </h2>
+                </div>
+                <p
+                  class="text-lg text-gray-600 dark:text-gray-300 mt-4 leading-relaxed"
+                >
+                  {{ activeComponent.description }}
+                </p>
+              </div>
+
+              <div
+                v-if="activeComponent.specialNotes && activeComponent.specialNotes.length > 0"
+                class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-2xl p-6 mb-8"
+              >
+                <h3
+                  class="text-amber-800 dark:text-amber-400 font-bold mb-3 flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-triangle-exclamation"></i> Catatan
+                  Penting
+                </h3>
+                <ul
+                  class="list-disc list-inside text-amber-700 dark:text-amber-200/80 space-y-1 ml-1 text-sm leading-relaxed"
+                >
+                  <li
+                    v-for="(note, index) in activeComponent.specialNotes"
+                    :key="index"
+                  >
+                    {{ note }}
+                  </li>
+                </ul>
+              </div>
+
+              <div
+                v-if="activeComponent.additionalInfo && Object.keys(activeComponent.additionalInfo).length > 0"
+                class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 rounded-2xl p-6 mb-8"
+              >
+                <h3
+                  class="text-indigo-800 dark:text-indigo-300 font-bold mb-4 flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-circle-info"></i>
+                  Informasi Tambahan & Metadata
+                </h3>
+
+                <div class="space-y-5">
+                  <div
+                    v-for="(value, key) in activeComponent.additionalInfo"
+                    :key="key"
+                    v-if="value !== null && value !== ''"
+                  >
+                    <h4
+                      class="font-semibold text-indigo-900 dark:text-indigo-200 mb-2 capitalize"
+                    >
+                      {{ formatInfoKey(key) }}
+                    </h4>
+
+                    <div
+                      v-if="Array.isArray(value)"
+                      class="ml-4 bg-white/60 dark:bg-black/20 rounded-xl p-4 border border-indigo-100/50 dark:border-indigo-800/30"
+                    >
+                      <ul class="space-y-4">
+                        <li
+                          v-for="(item, idx) in value"
+                          :key="idx"
+                          class="flex flex-col border-b border-indigo-100 dark:border-indigo-800/50 pb-4 last:border-0 last:pb-0"
+                        >
+                          <template
+                            v-if="typeof item === 'object' && item !== null"
+                          >
+                            <div
+                              class="flex items-baseline gap-2 flex-wrap mb-1"
+                            >
+                              <code
+                                v-if="item.name"
+                                class="text-indigo-700 dark:text-indigo-300 font-bold text-sm"
+                                >{{ item.name }}</code
+                              >
+                              <span
+                                v-if="item.type"
+                                class="text-xs text-indigo-500/80 font-mono"
+                                >{{ item.type }}</span
+                              >
+                              <span
+                                v-if="item.default && item.default !== 'null' && item.default !== ''"
+                                class="text-[10px] px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700/50"
+                              >
+                                default: {{ item.default }}
+                              </span>
+                            </div>
+                            <p
+                              v-if="item.desc"
+                              class="text-sm text-indigo-600 dark:text-indigo-200/80 mt-1 leading-relaxed"
+                            >
+                              {{ item.desc }}
+                            </p>
+                          </template>
+
+                          <template v-else>
+                            <span
+                              class="text-sm text-indigo-700 dark:text-indigo-200/80 flex items-center gap-2"
+                            >
+                              <i
+                                class="fa-solid fa-check text-indigo-400 text-xs"
+                              ></i>
+                              {{ item }}
+                            </span>
+                          </template>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div
+                      v-else-if="typeof value === 'object' && value !== null"
+                      class="ml-4 bg-white/60 dark:bg-black/20 rounded-xl p-4 border border-indigo-100/50 dark:border-indigo-800/30"
+                    >
+                      <ul class="space-y-2">
+                        <li
+                          v-for="(objValue, objKey) in value"
+                          :key="objKey"
+                          class="text-sm text-indigo-700 dark:text-indigo-200/80 flex items-start gap-2"
+                        >
+                          <i
+                            class="fa-solid fa-chevron-right text-indigo-400 text-[10px] mt-1.5"
+                          ></i>
+                          <span
+                            ><strong>{{ objKey }}:</strong> {{ objValue }}</span
+                          >
+                        </li>
+                      </ul>
+                    </div>
+
+                    <p
+                      v-else
+                      class="text-sm text-indigo-700 dark:text-indigo-200/80 leading-relaxed ml-4 border-l-2 border-indigo-300 dark:border-indigo-700 pl-3"
+                    >
+                      {{ value }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                v-if="activeComponent.install && (activeComponent.install.pubspec || activeComponent.install.androidPermission)"
+                class="mb-8"
+              >
+                <h3
+                  class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-wrench text-sm text-gray-500"></i>
+                  Instalasi & Setup
+                </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div
+                    v-if="activeComponent.install.pubspec"
+                    class="rounded-xl overflow-hidden bg-white dark:bg-[#1d1f21] border border-gray-200 dark:border-gray-700"
+                  >
+                    <div
+                      class="bg-gray-100 dark:bg-[#2d2d2d] px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-xs font-mono text-gray-600 dark:text-gray-400"
+                    >
+                      pubspec.yaml
+                    </div>
+                    <pre
+                      class="m-0 border-0 language-yaml"
+                    ><code class="language-yaml">{{ activeComponent.install.pubspec.trim() }}</code></pre>
+                  </div>
+                  <div
+                    v-if="activeComponent.install.androidPermission"
+                    class="rounded-xl overflow-hidden bg-white dark:bg-[#1d1f21] border border-gray-200 dark:border-gray-700"
+                  >
+                    <div
+                      class="bg-gray-100 dark:bg-[#2d2d2d] px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-xs font-mono text-gray-600 dark:text-gray-400"
+                    >
+                      AndroidManifest.xml
+                    </div>
+                    <pre
+                      class="m-0 border-0 language-xml"
+                    ><code class="language-xml">{{ activeComponent.install.androidPermission.trim() }}</code></pre>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div
+                  class="bg-white dark:bg-cardDark rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+                >
+                  <h3
+                    class="text-lg font-bold mb-4 flex items-center gap-2 text-red-500"
+                  >
+                    <i class="fa-solid fa-asterisk text-sm"></i> Properti Wajib
+                    (Required)
+                  </h3>
+                  <ul
+                    v-if="activeComponent.mandatoryProps && activeComponent.mandatoryProps.length > 0"
+                    class="space-y-3"
+                  >
+                    <li
+                      v-for="prop in activeComponent.mandatoryProps"
+                      :key="prop.name"
+                      class="flex flex-col border-b border-gray-100 dark:border-gray-800 pb-3 last:border-0"
+                    >
+                      <div class="flex items-baseline gap-2 flex-wrap">
+                        <code
+                          class="text-red-500 dark:text-red-400 font-bold text-sm"
+                          >{{ prop.name }}</code
+                        >
+                        <span class="text-xs text-gray-500 font-mono"
+                          >{{ prop.type }}</span
+                        >
+                        <span
+                          v-if="prop.default && prop.default !== 'null' && prop.default !== ''"
+                          class="text-[10px] px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 border border-gray-200 dark:border-gray-700"
+                        >
+                          default: {{ prop.default }}
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        {{ prop.desc }}
+                      </p>
+                    </li>
+                  </ul>
+                  <p v-else class="text-sm text-gray-500 italic">
+                    Tidak ada properti wajib. Dapat dipanggil secara langsung
+                    tanpa parameter khusus.
+                  </p>
+                </div>
+
+                <div
+                  class="bg-white dark:bg-cardDark rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+                >
+                  <h3
+                    class="text-lg font-bold mb-4 flex items-center gap-2 text-blue-500"
+                  >
+                    <i class="fa-solid fa-sliders text-sm"></i> Properti
+                    Spesifik (Opsional)
+                  </h3>
+                  <ul
+                    v-if="activeComponent.optionalProps && activeComponent.optionalProps.length > 0"
+                    class="space-y-3"
+                  >
+                    <li
+                      v-for="prop in activeComponent.optionalProps"
+                      :key="prop.name"
+                      class="flex flex-col border-b border-gray-100 dark:border-gray-800 pb-3 last:border-0"
+                    >
+                      <div class="flex items-baseline gap-2 flex-wrap">
+                        <code
+                          class="text-blue-600 dark:text-blue-400 font-bold text-sm"
+                          >{{ prop.name }}</code
+                        >
+                        <span class="text-xs text-gray-500 font-mono"
+                          >{{ prop.type }}</span
+                        >
+                        <span
+                          v-if="prop.default && prop.default !== 'null' && prop.default !== ''"
+                          class="text-[10px] px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 border border-gray-200 dark:border-gray-700"
+                        >
+                          default: {{ prop.default }}
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        {{ prop.desc }}
+                      </p>
+                    </li>
+                  </ul>
+                  <p v-else class="text-sm text-gray-500 italic">
+                    Tidak ada properti opsional.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                v-if="activeComponent.behaviors && activeComponent.behaviors.length > 0"
+                class="bg-white dark:bg-cardDark rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-8"
+              >
+                <h3
+                  class="text-lg font-bold mb-4 flex items-center gap-2 text-green-600 dark:text-green-400"
+                >
+                  <i class="fa-solid fa-bolt text-sm"></i> Behaviors & Lifecycle
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div
+                    v-for="bhv in activeComponent.behaviors"
+                    :key="bhv.name"
+                    class="flex flex-col border-b border-gray-100 dark:border-gray-800 pb-3"
+                  >
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                      <code
+                        class="text-green-600 dark:text-green-400 font-medium text-sm"
+                        >{{ bhv.name }}</code
+                      >
+                      <span class="text-xs text-gray-400 font-mono"
+                        >{{ bhv.type }}</span
+                      >
+                    </div>
+                    <p
+                      class="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed"
+                    >
+                      {{ bhv.desc }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                v-if="compMethods.length > 0"
+                class="bg-white dark:bg-cardDark rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-8"
+              >
+                <h3
+                  class="text-lg font-bold mb-4 flex items-center gap-2 text-purple-600 dark:text-purple-400"
+                >
+                  <i class="fa-solid fa-code text-sm"></i> Methods / Actions
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div
+                    v-for="method in compMethods"
+                    :key="method.name"
+                    class="flex flex-col border-b border-gray-100 dark:border-gray-800 pb-3"
+                  >
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                      <code
+                        class="text-purple-600 dark:text-purple-400 font-medium text-sm"
+                        >{{ method.name }}</code
+                      >
+                      <span class="text-xs text-gray-400 font-mono"
+                        >{{ method.type }}</span
+                      >
+                    </div>
+                    <p
+                      class="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed"
+                    >
+                      {{ method.desc }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                v-if="activeComponent.code"
+                class="rounded-2xl shadow-sm overflow-hidden bg-white dark:bg-[#1d1f21] border border-gray-200 dark:border-gray-700"
+              >
+                <div
+                  class="bg-gray-50 dark:bg-[#2d2d2d] px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center"
+                >
+                  <div class="flex items-center gap-3">
+                    <div class="flex gap-1.5">
+                      <div
+                        class="w-3 h-3 rounded-full bg-red-400 dark:bg-red-500"
+                      ></div>
+                      <div
+                        class="w-3 h-3 rounded-full bg-yellow-400 dark:bg-yellow-500"
+                      ></div>
+                      <div
+                        class="w-3 h-3 rounded-full bg-green-400 dark:bg-green-500"
+                      ></div>
+                    </div>
+                    <span
+                      class="text-xs font-mono text-gray-500 dark:text-gray-300"
+                      >Contoh Penggunaan Dart</span
+                    >
+                  </div>
+                  <button
+                    @click="copyCode"
+                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition text-xs flex items-center gap-1.5 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    <i
+                      :class="copied ? 'fa-solid fa-check text-green-500' : 'fa-regular fa-copy'"
+                    ></i>
+                    <span v-if="copied" class="text-green-500 font-medium"
+                      >Tersalin</span
+                    >
+                    <span v-else>Salin</span>
+                  </button>
+                </div>
+                <pre
+                  class="line-numbers m-0 border-0 language-dart"
+                ><code class="language-dart">{{ activeComponent.code }}</code></pre>
+              </div>
+            </div>
+          </transition>
+        </main>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-dart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+
+    <script>
+      // ==========================================
+      // GANTI DATA JSON ANDA DI SINI
+      // ==========================================
+      const docsData = [
+        {
+          id: "socket-connection-manager",
+          group: "Service",
+          name: "Socket Connection Manager",
+          icon: "fa-solid fa-plug",
+          description:
+            "Modul orkestrasi inti untuk menangani siklus hidup konektivitas WebSocket. Mengendalikan proses inisialisasi jaringan, delegasi status reaktif (connected, disconnected, error) ke antarmuka aplikasi, serta pembersihan memori (garbage collection) secara terpusat untuk menjaga stabilitas dan efisiensi resource sistem.",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {
+            dependencies:
+              "@angular/core, socket.io-client, rxjs (BehaviorSubject, Observable)",
+          },
+          properties: [
+            {
+              name: "CLIENT_ID",
+              type: "static string",
+              default: "",
+              desc: "Kredensial unik sesi klien yang diinjeksi oleh server saat event 'connected' divalidasi.",
+            },
+            {
+              name: "SOCKET",
+              type: "static Socket",
+              default: "",
+              desc: "Instansi raw tunggal (singleton) dari koneksi socket.io-client yang menahan jalur TCP.",
+            },
+            {
+              name: "HOST",
+              type: "static string",
+              default: "",
+              desc: "URL endpoint tujuan untuk melakukan handshaking WebSocket.",
+            },
+            {
+              name: "DATE_SERVER",
+              type: "Date",
+              default: "new Date()",
+              desc: "Objek stempel waktu instansiasi kelas untuk kebutuhan kalibrasi.",
+            },
+            {
+              name: "connectionStatus$",
+              type: "private BehaviorSubject",
+              default: "'disconnected'",
+              desc: "Subject reaktif internal yang mengunci status jaringan terakhir dan mendistribusikannya ke seluruh komponen subscriber.",
+            },
+          ],
+          methods: [
+            {
+              name: "connect",
+              type: "Observable",
+              default: "",
+              desc: "Mengaktifkan sirkuit jaringan ke server tujuan. Dikonfigurasi secara agresif dengan 5 kali percobaan ulang (reconnectionAttempts) dan batas waktu 5000ms. Menghasilkan aliran Observable yang me-return status koneksi saat ini.",
+            },
+            {
+              name: "getConnectionStatus",
+              type: "Observable",
+              default: "",
+              desc: "Mengekspos pembacaan read-only terhadap connectionStatus$ agar komponen UI dapat merespon indikator online/offline tanpa hak modifikasi state.",
+            },
+            {
+              name: "getSocket",
+              type: "Socket",
+              default: "",
+              desc: "Fungsi akses langsung untuk mengambil instansi raw Socket jika dibutuhkan injeksi library pihak ketiga.",
+            },
+            {
+              name: "disconnect",
+              type: "void",
+              default: "",
+              desc: "Memutuskan lalu lintas data dari server secara manual namun masih mengizinkan instance socket untuk melakukan reconnect di kemudian waktu.",
+            },
+            {
+              name: "close",
+              type: "void",
+              default: "",
+              desc: "Menghancurkan sirkuit koneksi secara total. Harus diiringi inisialisasi ulang jika ingin terhubung kembali.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Teardown Garbage Collection",
+              type: "Lifecycle Event",
+              default: "",
+              desc: "Fungsi connect mengikat sistem teardown RxJS. Saat semua observer mencabut langganan (unsubscribe), metode ini secara otomatis mematikan (off) seluruh listener dasar socket (connect, connected, error, disconnect) untuk menetralisir potensi memory leak.",
+            },
+            {
+              name: "State Delegation",
+              type: "Reactive Flow",
+              default: "",
+              desc: "Cegatan event bawaan dari socket.io secara langsung dialirkan ke dalam BehaviorSubject connectionStatus$, memaksa sinkronisasi satu arah (one-way data flow) menuju UI.",
+            },
+          ],
+          specialNotes: [
+            "Optimalisasi: Gunakan getConnectionStatus() di guard routing atau app.component untuk memblokir interaksi pengguna saat status 'disconnected'.",
+          ],
+          code: "this.socketService.connect('https://api.domain.com').subscribe(status => {\n  if (status === 'connected') {\n    console.log('Sirkuit jaringan stabil.');\n  }\n});",
+        },
+        {
+          id: "socket-event-bus",
+          group: "Service",
+          name: "Socket Event Bus",
+          icon: "fa-solid fa-satellite-dish",
+          description:
+            "Fasilitas infrastruktur komunikasi Pub/Sub dua arah. Memisahkan logika antara transmisi fire-and-forget, permintaan data asinkron satu kali (Promise), dan pemantauan aliran data kontinu (Observable). Menjamin isolasi respon dengan pendekatan UUID channel agar tidak terjadi kebocoran (crosstalk) antar request yang berjalan paralel.",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {
+            "Listener Alias": "type Listener = (...args: any[]) => void",
+          },
+          properties: [],
+          methods: [
+            {
+              name: "emit",
+              type: "Socket",
+              default: "",
+              desc: "Menembakkan payload data langsung ke server via TCP tanpa membuka alokasi memori untuk menunggu respon balik (Fire and Forget).",
+            },
+            {
+              name: "send",
+              type: "Promise",
+              default: "",
+              desc: "Mengirim event dan menangguhkan eksekusi asinkron menggunakan Promise hingga tepat SATU balasan diterima dari server. Otomatis menggunakan UUID isolation.",
+            },
+            {
+              name: "lifeSend",
+              type: "Observable",
+              default: "",
+              desc: "Mereset semua jalur event lama yang identik, melempar data baru, dan membuka keran Observable untuk memantau respon data berkelanjutan dari backend secara live.",
+            },
+            {
+              name: "on",
+              type: "Observable",
+              default: "",
+              desc: "Menyiapkan listener pasif yang bereaksi murni melalui Observable terhadap siaran dari server (tanpa melakukan trigger pengiriman ke server).",
+            },
+            {
+              name: "once",
+              type: "Promise",
+              default: "",
+              desc: "Membuka listener eksklusif satu kali tangkap (one-time execution) dan mematikannya otomatis setelah data diterima, menghemat beban memori listener.",
+            },
+            {
+              name: "removeListeners",
+              type: "void",
+              default: "",
+              desc: "Mencabut fungsi callback referensial spesifik agar tidak lagi mendengarkan siaran di jalur event tersebut.",
+            },
+            {
+              name: "removeAllListeners",
+              type: "void",
+              default: "",
+              desc: "Menyapu bersih seluruh fungsi callback yang terikat pada event spesifik, atau memusnahkan SELURUH callback socket jika argumen dikosongkan.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "UUID Channel Segregation",
+              type: "Network Architecture",
+              default: "",
+              desc: "Setiap panggilan send() dan lifeSend() menyuntikkan HelperService.uuid() ke string nama event. Pola ini mewajibkan server backend untuk me-return data ke channel unik tersebut, memastikan validitas sesi asinkron.",
+            },
+          ],
+          specialNotes: [
+            "Persyaratan Backend: Server Node.js/Backend wajib dirancang untuk membaca payload { event: 'stringUUID' } dan melakukan socket.emit(respons.event, data) agar Promise pada client dapat terselesaikan (resolve).",
+          ],
+          code: "try {\n  const result = await this.socketService.send('GET_USER_DATA', { id: 123 });\n  console.log('Data diterima:', result);\n} catch(err) {\n  console.error('Timeout atau gagal koneksi', err);\n}",
+        },
+        {
+          id: "socket-chunk-handler",
+          group: "Service",
+          name: "Socket Chunking Engine",
+          icon: "fa-solid fa-file-export",
+          description:
+            "Mesin canggih untuk memotong (slice) dan memanajemen unggahan payload masif (Teks JSON berlebih atau File biner). Memitigasi ancaman RAM overflow dan pemblokiran ukuran frame jaringan (Max Frame Size) WebSocket dengan teknik serialisasi rekursif tersinkronisasi.",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {
+            CHUNK_OBSERVABLE_INTERFACE:
+              "{ data: null | any, percent: number, status: 'REMAIN' | 'FINISH' }",
+            CHUNK_CONFIG_INTERFACE:
+              "{ event: string, data: any, limit?: number, next?: boolean }",
+            CHUNKFILE_CONFIG_INTERFACE:
+              "{ event: string, file: File, limit?: number, next?: boolean }",
+            CHUNKFILES_CONFIG_INTERFACE:
+              "{ event: string, files: File[], limit?: number }",
+            CHUNKFILES_OBSERVABLE_INTERFACE:
+              "{ data?: (string | null)[], percent: { current: { process: boolean, total: number }[], total: number }, status: 'REMAIN' | 'FINISH' }",
+          },
+          properties: [],
+          methods: [
+            {
+              name: "chunkData",
+              type: "Observable<CHUNK_OBSERVABLE_INTERFACE>",
+              default: "",
+              desc: "Menerima objek JSON kompleks, mengonversinya menjadi stringified base, lalu memotongnya sesuai limit karakter (default: 1000). Mengirim antrean data secara rekursif aman.",
+            },
+            {
+              name: "chunkFile",
+              type: "Observable<CHUNK_OBSERVABLE_INTERFACE>",
+              default: "",
+              desc: "Memecah Blob/File fisik menggunakan metode File.slice, membaca per blok (ArrayBuffer) dengan FileReader untuk mencegah RAM membaca file utuh di awal, lalu mengirimnya secara bertahap.",
+            },
+            {
+              name: "chunkFiles",
+              type: "Observable<CHUNKFILES_OBSERVABLE_INTERFACE>",
+              default: "",
+              desc: "Mengeksekusi unggahan sejumlah file array secara serial. Tidak menggunakan eksekusi paralel murni guna melindungi kestabilan thread JS. Melaporkan persentase spesifik tiap file dan agregasi keseluruhan.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Sequential Handshake Transmission",
+              type: "Algorithm",
+              default: "",
+              desc: "Sistem chunking menghindari membanjiri (flood) server. Setelah potongan indeks (chunkIndex) dikirim, klien mengikat event .once dengan UUID untuk menunggu validasi dari server sebelum membaca file/string potongan selanjutnya.",
+            },
+            {
+              name: "Live Iteration Indexing",
+              type: "Data Payload",
+              default: "",
+              desc: "Setiap kepingan payload selalu menyertakan metadata { data, index, total, next } untuk menjamin server backend mampu merekonstruksi file tanpa cacat offset (corrupt).",
+            },
+          ],
+          specialNotes: [
+            "Batas Ukuran: Set limit opsional pada konfigurasi menentukan rasio kecepatan upload vs keamanan timeout koneksi. Semakin tinggi limit, semakin besar RAM yang digunakan per iterasi.",
+            "Ketergantungan Eksternal: Fungsionalitas utuh membutuhkan HelperService.uuid() sebagai pembuat tanda tangan (signature) sesi agar tidak terjadi perlombaan transmisi (race condition).",
+          ],
+          code: "this.socketService.chunkFile({\n  event: 'UPLOAD_IMAGE',\n  file: myLargeImage,\n  limit: 2048 // Pemotongan per 2KB data\n}).subscribe(progress => {\n  if (progress.status === 'REMAIN') {\n    this.uploadPercent = progress.percent;\n  } else {\n    console.log('Data sukses direkonstruksi di server!', progress.data);\n  }\n});",
+        },
+      ];
+
+      new Vue({
+        el: "#app",
+        data: {
+          appInfo: {
+            title: "Widget Utilitas",
+            description:
+              "Pusat dokumentasi widget utilitas Flutter yang mencakup referensi API, parameter, konfigurasi, callback, perilaku, serta contoh implementasi untuk setiap komponen.",
+            version: "v3.0",
+          },
+          components: docsData,
+          activeComponent: docsData.length > 0 ? docsData[0] : null,
+          isDarkMode: false,
+          copied: false,
+        },
+        computed: {
+          groupedComponents() {
+            return this.components.reduce((acc, comp) => {
+              (acc[comp.group] = acc[comp.group] || []).push(comp);
+              return acc;
+            }, {});
+          },
+          compProperties() {
+            if (!this.activeComponent) return [];
+            return (
+              (this.activeComponent.additionalInfo &&
+                this.activeComponent.additionalInfo.properties) ||
+              []
+            );
+          },
+          compMethods() {
+            if (!this.activeComponent) return [];
+            return (
+              this.activeComponent.methods ||
+              (this.activeComponent.additionalInfo &&
+                this.activeComponent.additionalInfo.methods) ||
+              []
+            );
+          },
+        },
+        methods: {
+          formatInfoKey(key) {
+            return key;
+            //   .replace(/_/g, " ") // Mengganti underscore jadi spasi (grid_col -> grid col)
+            //   .replace(/([A-Z])/g, " $1") // Memberi spasi sebelum huruf kapital (camelCase)
+            //   .replace(/^./, (str) => str.toUpperCase()); // Membesarkan huruf pertama
+          },
+          copyCode() {
+            if (!this.activeComponent || !this.activeComponent.code) return;
+            const el = document.createElement("textarea");
+            el.value = this.activeComponent.code;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand("copy");
+            document.body.removeChild(el);
+
+            this.copied = true;
+            setTimeout(() => {
+              this.copied = false;
+            }, 2000);
+          },
+          updatePrismTheme() {
+            const link = document.getElementById("prism-theme-link");
+            link.href = this.isDarkMode
+              ? "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+              : "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css";
+          },
+          triggerHighlight() {
+            if (window.Prism) {
+              Prism.highlightAll();
+            }
+          },
+          selectComponent(comp) {
+            this.activeComponent = comp;
+            setTimeout(() => {
+              $("main").animate({ scrollTop: 0 }, 300);
+            }, 50);
+          },
+          toggleTheme() {
+            this.isDarkMode = !this.isDarkMode;
+            const html = document.documentElement;
+            if (this.isDarkMode) {
+              html.classList.add("dark");
+              localStorage.theme = "dark";
+            } else {
+              html.classList.remove("dark");
+              localStorage.theme = "light";
+            }
+            this.updatePrismTheme();
+          },
+        },
+        mounted() {
+          if (
+            localStorage.theme === "dark" ||
+            (!("theme" in localStorage) &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches)
+          ) {
+            this.isDarkMode = true;
+            document.documentElement.classList.add("dark");
+          } else {
+            this.isDarkMode = false;
+            document.documentElement.classList.remove("dark");
+          }
+
+          this.updatePrismTheme();
+
+          this.$nextTick(() => {
+            this.triggerHighlight();
+          });
+        },
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,2862 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FormHelperWidget - User Guide</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+      id="prism-theme-link"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+            colors: {
+              primary: "#FF5722",
+              primaryDark: "#E64A19",
+              bgLight: "#F3F4F6",
+              bgDark: "#111827",
+              cardLight: "#FFFFFF",
+              cardDark: "#1F2937",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      :root {
+        --text-main: #1f2937;
+        --text-muted: #6b7280;
+        --border-color: #e5e7eb;
+      }
+
+      html.dark {
+        --text-main: #f9fafb;
+        --text-muted: #9ca3af;
+        --border-color: #374151;
+      }
+
+      body {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 4px;
+      }
+      html.dark ::-webkit-scrollbar-thumb {
+        background: #4b5563;
+      }
+
+      .glass-header {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-color);
+      }
+      html.dark .glass-header {
+        background: rgba(31, 41, 55, 0.8);
+      }
+
+      pre[class*="language-"],
+      code[class*="language-"] {
+        background-color: transparent !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        font-family: "JetBrains Mono", monospace !important;
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+        text-shadow: none !important;
+      }
+
+      pre.line-numbers {
+        position: relative !important;
+        padding: 1.5rem !important;
+        padding-left: 3.5rem !important;
+      }
+      .line-numbers .line-numbers-rows {
+        top: 0rem !important;
+        left: -58px !important;
+        width: 3rem !important;
+        border-right: 1px solid var(--border-color) !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .line-numbers-rows > span:before {
+        color: var(--text-muted) !important;
+        padding-right: 0.8em !important;
+      }
+
+      .fade-enter-active,
+      .fade-leave-active {
+        transition: opacity 0.3s, transform 0.3s;
+      }
+      .fade-enter,
+      .fade-leave-to {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      .sidebar-link {
+        transition: all 0.2s ease;
+      }
+      .sidebar-link:hover,
+      .sidebar-link.active {
+        background-color: rgba(255, 87, 34, 0.1);
+        color: #ff5722;
+        border-right: 3px solid #ff5722;
+      }
+      html.dark .sidebar-link.active {
+        background-color: rgba(255, 87, 34, 0.2);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-bgLight dark:bg-bgDark antialiased min-h-screen overflow-hidden"
+  >
+    <div id="app" class="flex flex-col h-screen">
+      <nav
+        class="glass-header z-20 px-6 py-4 flex justify-between items-center fixed w-full top-0"
+      >
+        <div class="flex items-center gap-4">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-primary to-orange-400 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg shadow-orange-500/30"
+          >
+            F
+          </div>
+          <div>
+            <h1 class="text-xl font-bold tracking-tight">
+              {{ appInfo.title }}
+            </h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              {{ appInfo.version }}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <button
+            @click="toggleTheme"
+            class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          >
+            <i class="fa-solid fa-moon" v-if="!isDarkMode"></i>
+            <i class="fa-solid fa-sun" v-else></i>
+          </button>
+        </div>
+      </nav>
+
+      <div class="flex pt-[73px] h-full">
+        <aside
+          class="w-72 bg-white dark:bg-cardDark border-r border-gray-200 dark:border-gray-700 flex flex-col h-full z-10 overflow-y-auto pb-20 shadow-sm"
+        >
+          <div class="p-5 border-b border-gray-100 dark:border-gray-800">
+            <h2
+              class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2"
+            >
+              Pusat Bantuan
+            </h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ appInfo.description }}
+            </p>
+          </div>
+
+          <div class="p-3">
+            <div
+              v-for="(group, groupName) in groupedComponents"
+              :key="groupName"
+              class="mb-4"
+            >
+              <h3
+                class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 px-3"
+              >
+                {{ groupName }}
+              </h3>
+              <ul>
+                <li v-for="comp in group" :key="comp.id">
+                  <button
+                    @click="selectComponent(comp)"
+                    :class="['w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium sidebar-link mb-1 flex items-center gap-3', activeComponent && activeComponent.id === comp.id ? 'active' : 'text-gray-600 dark:text-gray-300']"
+                  >
+                    <i :class="comp.icon + ' w-4 text-center opacity-70'"></i>
+                    {{ comp.name }}
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto p-8 relative scroll-smooth pb-32">
+          <transition name="fade" mode="out-in" @after-enter="triggerHighlight">
+            <div
+              v-if="activeComponent"
+              :key="activeComponent.id"
+              class="max-w-5xl mx-auto"
+            >
+              <div class="mb-8">
+                <div class="flex items-center gap-3 mb-2">
+                  <span
+                    class="px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-primary font-semibold text-xs rounded-full border border-orange-200 dark:border-orange-800/50"
+                  >
+                    Widget
+                  </span>
+                  <h2
+                    class="text-3xl font-extrabold text-gray-900 dark:text-white"
+                  >
+                    {{ activeComponent.group }} {{ activeComponent.name }}
+                  </h2>
+                </div>
+                <p
+                  class="text-lg text-gray-600 dark:text-gray-300 mt-4 leading-relaxed"
+                >
+                  {{ activeComponent.description }}
+                </p>
+              </div>
+
+              <div
+                v-if="activeComponent.specialNotes && activeComponent.specialNotes.length > 0"
+                class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-2xl p-6 mb-8"
+              >
+                <h3
+                  class="text-amber-800 dark:text-amber-400 font-bold mb-3 flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-triangle-exclamation"></i> Catatan
+                  Penting
+                </h3>
+                <ul
+                  class="list-disc list-inside text-amber-700 dark:text-amber-200/80 space-y-1 ml-1 text-sm leading-relaxed"
+                >
+                  <li
+                    v-for="(note, index) in activeComponent.specialNotes"
+                    :key="index"
+                  >
+                    {{ note }}
+                  </li>
+                </ul>
+              </div>
+
+              <div
+                v-if="activeComponent.additionalInfo && Object.keys(activeComponent.additionalInfo).length > 0"
+                class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 rounded-2xl p-6 mb-8"
+              >
+                <h3
+                  class="text-indigo-800 dark:text-indigo-300 font-bold mb-4 flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-circle-info"></i>
+                  Informasi Tambahan & Metadata
+                </h3>
+
+                <div class="space-y-5">
+                  <div
+                    v-for="(value, key) in activeComponent.additionalInfo"
+                    :key="key"
+                    v-if="value !== null && value !== ''"
+                  >
+                    <h4
+                      class="font-semibold text-indigo-900 dark:text-indigo-200 mb-2 capitalize"
+                    >
+                      {{ formatInfoKey(key) }}
+                    </h4>
+
+                    <div
+                      v-if="Array.isArray(value)"
+                      class="ml-4 bg-white/60 dark:bg-black/20 rounded-xl p-4 border border-indigo-100/50 dark:border-indigo-800/30"
+                    >
+                      <ul class="space-y-4">
+                        <li
+                          v-for="(item, idx) in value"
+                          :key="idx"
+                          class="flex flex-col border-b border-indigo-100 dark:border-indigo-800/50 pb-4 last:border-0 last:pb-0"
+                        >
+                          <template
+                            v-if="typeof item === 'object' && item !== null"
+                          >
+                            <div
+                              class="flex items-baseline gap-2 flex-wrap mb-1"
+                            >
+                              <code
+                                v-if="item.name"
+                                class="text-indigo-700 dark:text-indigo-300 font-bold text-sm"
+                                >{{ item.name }}</code
+                              >
+                              <span
+                                v-if="item.type"
+                                class="text-xs text-indigo-500/80 font-mono"
+                                >{{ item.type }}</span
+                              >
+                              <span
+                                v-if="item.default && item.default !== 'null' && item.default !== ''"
+                                class="text-[10px] px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700/50"
+                              >
+                                default: {{ item.default }}
+                              </span>
+                            </div>
+                            <p
+                              v-if="item.desc"
+                              class="text-sm text-indigo-600 dark:text-indigo-200/80 mt-1 leading-relaxed"
+                            >
+                              {{ item.desc }}
+                            </p>
+                          </template>
+
+                          <template v-else>
+                            <span
+                              class="text-sm text-indigo-700 dark:text-indigo-200/80 flex items-center gap-2"
+                            >
+                              <i
+                                class="fa-solid fa-check text-indigo-400 text-xs"
+                              ></i>
+                              {{ item }}
+                            </span>
+                          </template>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div
+                      v-else-if="typeof value === 'object' && value !== null"
+                      class="ml-4 bg-white/60 dark:bg-black/20 rounded-xl p-4 border border-indigo-100/50 dark:border-indigo-800/30"
+                    >
+                      <ul class="space-y-2">
+                        <li
+                          v-for="(objValue, objKey) in value"
+                          :key="objKey"
+                          class="text-sm text-indigo-700 dark:text-indigo-200/80 flex items-start gap-2"
+                        >
+                          <i
+                            class="fa-solid fa-chevron-right text-indigo-400 text-[10px] mt-1.5"
+                          ></i>
+                          <span
+                            ><strong>{{ objKey }}:</strong> {{ objValue }}</span
+                          >
+                        </li>
+                      </ul>
+                    </div>
+
+                    <p
+                      v-else
+                      class="text-sm text-indigo-700 dark:text-indigo-200/80 leading-relaxed ml-4 border-l-2 border-indigo-300 dark:border-indigo-700 pl-3"
+                    >
+                      {{ value }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                v-if="activeComponent.install && (activeComponent.install.pubspec || activeComponent.install.androidPermission)"
+                class="mb-8"
+              >
+                <h3
+                  class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-wrench text-sm text-gray-500"></i>
+                  Instalasi & Setup
+                </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div
+                    v-if="activeComponent.install.pubspec"
+                    class="rounded-xl overflow-hidden bg-white dark:bg-[#1d1f21] border border-gray-200 dark:border-gray-700"
+                  >
+                    <div
+                      class="bg-gray-100 dark:bg-[#2d2d2d] px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-xs font-mono text-gray-600 dark:text-gray-400"
+                    >
+                      pubspec.yaml
+                    </div>
+                    <pre
+                      class="m-0 border-0 language-yaml"
+                    ><code class="language-yaml">{{ activeComponent.install.pubspec.trim() }}</code></pre>
+                  </div>
+                  <div
+                    v-if="activeComponent.install.androidPermission"
+                    class="rounded-xl overflow-hidden bg-white dark:bg-[#1d1f21] border border-gray-200 dark:border-gray-700"
+                  >
+                    <div
+                      class="bg-gray-100 dark:bg-[#2d2d2d] px-4 py-2 border-b border-gray-200 dark:border-gray-700 text-xs font-mono text-gray-600 dark:text-gray-400"
+                    >
+                      AndroidManifest.xml
+                    </div>
+                    <pre
+                      class="m-0 border-0 language-xml"
+                    ><code class="language-xml">{{ activeComponent.install.androidPermission.trim() }}</code></pre>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <div
+                  class="bg-white dark:bg-cardDark rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+                >
+                  <h3
+                    class="text-lg font-bold mb-4 flex items-center gap-2 text-red-500"
+                  >
+                    <i class="fa-solid fa-asterisk text-sm"></i> Properti Wajib
+                    (Required)
+                  </h3>
+                  <ul
+                    v-if="activeComponent.mandatoryProps && activeComponent.mandatoryProps.length > 0"
+                    class="space-y-3"
+                  >
+                    <li
+                      v-for="prop in activeComponent.mandatoryProps"
+                      :key="prop.name"
+                      class="flex flex-col border-b border-gray-100 dark:border-gray-800 pb-3 last:border-0"
+                    >
+                      <div class="flex items-baseline gap-2 flex-wrap">
+                        <code
+                          class="text-red-500 dark:text-red-400 font-bold text-sm"
+                          >{{ prop.name }}</code
+                        >
+                        <span class="text-xs text-gray-500 font-mono"
+                          >{{ prop.type }}</span
+                        >
+                        <span
+                          v-if="prop.default && prop.default !== 'null' && prop.default !== ''"
+                          class="text-[10px] px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 border border-gray-200 dark:border-gray-700"
+                        >
+                          default: {{ prop.default }}
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        {{ prop.desc }}
+                      </p>
+                    </li>
+                  </ul>
+                  <p v-else class="text-sm text-gray-500 italic">
+                    Tidak ada properti wajib. Dapat dipanggil secara langsung
+                    tanpa parameter khusus.
+                  </p>
+                </div>
+
+                <div
+                  class="bg-white dark:bg-cardDark rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700"
+                >
+                  <h3
+                    class="text-lg font-bold mb-4 flex items-center gap-2 text-blue-500"
+                  >
+                    <i class="fa-solid fa-sliders text-sm"></i> Properti
+                    Spesifik (Opsional)
+                  </h3>
+                  <ul
+                    v-if="activeComponent.optionalProps && activeComponent.optionalProps.length > 0"
+                    class="space-y-3"
+                  >
+                    <li
+                      v-for="prop in activeComponent.optionalProps"
+                      :key="prop.name"
+                      class="flex flex-col border-b border-gray-100 dark:border-gray-800 pb-3 last:border-0"
+                    >
+                      <div class="flex items-baseline gap-2 flex-wrap">
+                        <code
+                          class="text-blue-600 dark:text-blue-400 font-bold text-sm"
+                          >{{ prop.name }}</code
+                        >
+                        <span class="text-xs text-gray-500 font-mono"
+                          >{{ prop.type }}</span
+                        >
+                        <span
+                          v-if="prop.default && prop.default !== 'null' && prop.default !== ''"
+                          class="text-[10px] px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-500 border border-gray-200 dark:border-gray-700"
+                        >
+                          default: {{ prop.default }}
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        {{ prop.desc }}
+                      </p>
+                    </li>
+                  </ul>
+                  <p v-else class="text-sm text-gray-500 italic">
+                    Tidak ada properti opsional.
+                  </p>
+                </div>
+              </div>
+
+              <div
+                v-if="activeComponent.behaviors && activeComponent.behaviors.length > 0"
+                class="bg-white dark:bg-cardDark rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-8"
+              >
+                <h3
+                  class="text-lg font-bold mb-4 flex items-center gap-2 text-green-600 dark:text-green-400"
+                >
+                  <i class="fa-solid fa-bolt text-sm"></i> Behaviors & Lifecycle
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div
+                    v-for="bhv in activeComponent.behaviors"
+                    :key="bhv.name"
+                    class="flex flex-col border-b border-gray-100 dark:border-gray-800 pb-3"
+                  >
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                      <code
+                        class="text-green-600 dark:text-green-400 font-medium text-sm"
+                        >{{ bhv.name }}</code
+                      >
+                      <span class="text-xs text-gray-400 font-mono"
+                        >{{ bhv.type }}</span
+                      >
+                    </div>
+                    <p
+                      class="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed"
+                    >
+                      {{ bhv.desc }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                v-if="compMethods.length > 0"
+                class="bg-white dark:bg-cardDark rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-8"
+              >
+                <h3
+                  class="text-lg font-bold mb-4 flex items-center gap-2 text-purple-600 dark:text-purple-400"
+                >
+                  <i class="fa-solid fa-code text-sm"></i> Methods / Actions
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div
+                    v-for="method in compMethods"
+                    :key="method.name"
+                    class="flex flex-col border-b border-gray-100 dark:border-gray-800 pb-3"
+                  >
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                      <code
+                        class="text-purple-600 dark:text-purple-400 font-medium text-sm"
+                        >{{ method.name }}</code
+                      >
+                      <span class="text-xs text-gray-400 font-mono"
+                        >{{ method.type }}</span
+                      >
+                    </div>
+                    <p
+                      class="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed"
+                    >
+                      {{ method.desc }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                v-if="activeComponent.code"
+                class="rounded-2xl shadow-sm overflow-hidden bg-white dark:bg-[#1d1f21] border border-gray-200 dark:border-gray-700"
+              >
+                <div
+                  class="bg-gray-50 dark:bg-[#2d2d2d] px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center"
+                >
+                  <div class="flex items-center gap-3">
+                    <div class="flex gap-1.5">
+                      <div
+                        class="w-3 h-3 rounded-full bg-red-400 dark:bg-red-500"
+                      ></div>
+                      <div
+                        class="w-3 h-3 rounded-full bg-yellow-400 dark:bg-yellow-500"
+                      ></div>
+                      <div
+                        class="w-3 h-3 rounded-full bg-green-400 dark:bg-green-500"
+                      ></div>
+                    </div>
+                    <span
+                      class="text-xs font-mono text-gray-500 dark:text-gray-300"
+                      >Contoh Penggunaan Dart</span
+                    >
+                  </div>
+                  <button
+                    @click="copyCode"
+                    class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition text-xs flex items-center gap-1.5 px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    <i
+                      :class="copied ? 'fa-solid fa-check text-green-500' : 'fa-regular fa-copy'"
+                    ></i>
+                    <span v-if="copied" class="text-green-500 font-medium"
+                      >Tersalin</span
+                    >
+                    <span v-else>Salin</span>
+                  </button>
+                </div>
+                <pre
+                  class="line-numbers m-0 border-0 language-dart"
+                ><code class="language-dart">{{ activeComponent.code }}</code></pre>
+              </div>
+            </div>
+          </transition>
+        </main>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-dart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+
+    <script>
+      // ==========================================
+      // GANTI DATA JSON ANDA DI SINI
+      // ==========================================
+      const docsData = [
+        {
+          id: "AlertWidget",
+          group: "Alert",
+          name: "Alert",
+          icon: "fa-solid fa-circle-exclamation",
+          description:
+            "Utility class statis yang menyediakan antarmuka dialog umpan balik (feedback alert) secara instan. Menawarkan empat varian peringatan: info, success, warning, dan error dengan desain premium, ukuran responsif, serta dukungan Dark Mode otomatis.",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {},
+          methods: [
+            {
+              name: "info",
+              type: "static void",
+              default: "",
+              desc: "Menampilkan dialog informasi dengan ikon biru. Digunakan untuk pesan informatif netral. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) dengan default 'Info'.",
+            },
+            {
+              name: "success",
+              type: "static void",
+              default: "",
+              desc: "Menampilkan dialog berhasil dengan ikon hijau terang. Digunakan setelah operasi sukses seperti simpan data. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) dengan default 'Berhasil'.",
+            },
+            {
+              name: "warning",
+              type: "static void",
+              default: "",
+              desc: "Menampilkan dialog peringatan dengan ikon oranye. Digunakan untuk kondisi yang perlu diwaspadai pengguna. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) dengan default 'Peringatan'.",
+            },
+            {
+              name: "error",
+              type: "static void",
+              default: "",
+              desc: "Menampilkan dialog error dengan ikon merah. Digunakan ketika terjadi kegagalan proses atau exception. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) dengan default 'Error'.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Non-dismissible Barrier",
+              type: "Interaction",
+              default: "",
+              desc: "Dialog tidak dapat ditutup dengan mengetuk area latar belakang luar (barrierDismissible: false). Pengguna diwajibkan untuk menekan tombol 'Mengerti' agar sistem memastikan pesan telah dibaca.",
+            },
+            {
+              name: "Automatic Theme Adaptation",
+              type: "UI Render",
+              default: "",
+              desc: "Mendeteksi Brightness dari Theme.of(context) secara real-time. Jika dalam Dark Mode, latar belakang dialog berubah menjadi gelap (0xFF1E1E1E) dan warna teks menyesuaikan menjadi putih/abu-abu terang secara otomatis.",
+            },
+            {
+              name: "Responsive Constraint",
+              type: "UI Layout",
+              default: "",
+              desc: "Konten dialog dibungkus dengan ConstrainedBox dengan maxWidth 400. Ini memastikan dialog tetap rapi dan tidak terlalu melebar ketika dijalankan pada platform layar besar seperti Tablet atau Desktop.",
+            },
+          ],
+          specialNotes: [
+            "Dependency: Kelas ini memiliki ketergantungan pada package eksternal 'google_fonts' untuk merender jenis huruf Poppins.",
+            "Limitation: Tombol konfirmasi bersifat statis dengan teks 'Mengerti' dan aksi Navigator.pop(context). Tidak dapat disisipkan callback kustom untuk trigger event lain saat tombol ditekan.",
+            "Limitation: Warna tombol konfirmasi di-hardcode menggunakan Colors.deepOrange dan tidak beradaptasi dengan warna primary dari tema aplikasi.",
+            "Best Practice: Panggil AlertWidget.error() di dalam blok catch ketika menangkap Exception dari pemanggilan API untuk memberikan umpan balik langsung kepada user.",
+          ],
+          code: "try {\n  await apiService.submitData(data);\n  AlertWidget.success(\n    context, \n    'Data pengguna berhasil diperbarui dan disimpan ke dalam sistem.',\n    'Update Sukses'\n  );\n} catch (e) {\n  AlertWidget.error(\n    context, \n    'Gagal menyimpan data. Silakan periksa koneksi internet Anda.',\n  );\n}",
+        },
+        {
+          id: "ConfirmWidget",
+          group: "Alert",
+          name: "Confirm Widget",
+          icon: "fa-solid fa-circle-question",
+          description:
+            "Widget dialog utilitas yang digunakan untuk menampilkan konfirmasi kepada pengguna. Dialog ini memiliki tampilan modern dengan ikon tanda tanya melingkar di atas, judul, pesan, dan dua opsi tindakan: tombol Batal (Cancel) dan tombol OK (Confirm). Mengembalikan boolean (true/false) bergantung pada interaksi pengguna.",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {},
+          methods: [
+            {
+              name: "show",
+              type: "static Future<bool>",
+              default: "",
+              desc: "Fungsi utama untuk memunculkan dialog konfirmasi di atas layar. \n\nParameter:\n- `context` (BuildContext): Konteks Flutter yang memanggil dialog.\n- `message` (String): Pesan atau pertanyaan utama yang ingin ditampilkan di dialog.\n- `title` (String, opsional): Judul dialog. Default: 'Konfirmasi'.\n- `textCancel` (String, opsional): Label teks untuk tombol batal. Default: 'Batal'.\n- `textOk` (String, opsional): Label teks untuk tombol setuju/ok. Default: 'OK'.\n\nReturn:\nMengembalikan `Future<bool>`. Akan bernilai `true` jika pengguna menekan tombol OK, dan `false` jika pengguna menekan Batal atau dialog ditutup paksa.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Non-dismissible Barrier",
+              type: "Interaction",
+              default: "",
+              desc: "Dialog tidak dapat ditutup secara tidak sengaja dengan cara mengetuk area latar belakang di luar dialog (barrierDismissible diatur ke false). Ini memastikan pengguna membuat keputusan secara eksplisit (memilih Batal atau OK).",
+            },
+            {
+              name: "Automatic Theme Adaptation",
+              type: "UI Reactive",
+              default: "",
+              desc: "Secara otomatis menyesuaikan warna latar belakang dan teks berdasar Brightness (Tema terang/gelap) dari Theme.of(context). Pada mode gelap, dialog akan berwarna abu-abu sangat tua (0xFF1E1E1E) dengan teks putih.",
+            },
+            {
+              name: "Safe Dismissal Fallback",
+              type: "Lifecycle",
+              default: "",
+              desc: "Apabila dialog ditutup secara paksa oleh sistem atau fungsi navigasi eksternal tanpa menekan salah satu tombol, fungsi show() tetap akan menjamin untuk mengembalikan nilai `false` secara aman melalui penanganan `result ?? false`.",
+            },
+          ],
+          specialNotes: [
+            "Widget ini bergantung pada package `google_fonts` untuk menggunakan tipografi Poppins.",
+            "Warna tema untuk ikon dan tombol konfirmasi (OK) menggunakan hardcoded `Colors.orange` dan `Colors.deepOrange`. Pertimbangkan kebutuhan kustomisasi jika warna primary aplikasi Anda sangat bertentangan.",
+            "Best Practice: Gunakan await saat memanggil ConfirmWidget.show() agar dapat langsung mengambil keputusan percabangan if-else berdasarkan respons boolean pengguna.",
+          ],
+          code: "bool isConfirmed = await ConfirmWidget.show(\n  context,\n  'Apakah Anda yakin ingin menghapus data ini secara permanen?',\n  title: 'Hapus Data',\n  textOk: 'Ya, Hapus',\n  textCancel: 'Batal',\n);\n\nif (isConfirmed) {\n  // Eksekusi logika hapus data\n} else {\n  // Batalkan aksi\n}",
+        },
+        {
+          id: "ModalBottomSheetWidget",
+          group: "Alert",
+          name: "Modal Bottom Sheet",
+          icon: "fa-solid fa-window-maximize",
+          description:
+            "Widget utilitas statis untuk menampilkan bottom sheet (panel bawah) bergaya modern dengan sudut melengkung (rounded corners), indikator drag (drag handle), dan dukungan adaptasi tema otomatis (Dark/Light mode). Komponen ini juga menyediakan kontrol layout cerdas untuk menangani konten statis maupun konten yang dapat di-scroll secara independen.",
+          mandatoryProps: [
+            {
+              name: "context",
+              type: "BuildContext",
+              default: "",
+              desc: "Konteks aplikasi saat ini yang terhubung dengan Navigator untuk merender bottom sheet di atas tampilan yang sedang aktif.",
+            },
+            {
+              name: "child",
+              type: "Widget",
+              default: "",
+              desc: "Konten utama atau widget yang akan ditampilkan di dalam bottom sheet.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "isScrollControlled",
+              type: "bool",
+              default: "true",
+              desc: "Menentukan apakah bottom sheet dapat menempati ketinggian layar penuh (full screen) atau menyesuaikan dengan tinggi konten. Mengatur ke true sangat disarankan jika konten berupa form dengan input teks agar tidak tertutup keyboard.",
+            },
+            {
+              name: "isDismissible",
+              type: "bool",
+              default: "true",
+              desc: "Jika bernilai true, pengguna dapat menutup bottom sheet dengan mengetuk area kosong (barrier) di luar bottom sheet.",
+            },
+            {
+              name: "enableDrag",
+              type: "bool",
+              default: "true",
+              desc: "Mengaktifkan atau menonaktifkan kemampuan pengguna untuk menutup bottom sheet dengan gestur usap (swipe/drag) ke arah bawah.",
+            },
+            {
+              name: "useSafeArea",
+              type: "bool",
+              default: "true",
+              desc: "Menjamin agar bottom sheet tidak menabrak area sistem layar seperti notch, status bar, atau tombol navigasi OS.",
+            },
+            {
+              name: "isFlexibleContent",
+              type: "bool",
+              default: "false",
+              desc: "Parameter layout pintar. Jika diatur ke false, konten akan dibungkus SingleChildScrollView (aman untuk konten statis). Jika diatur ke true, konten dibungkus Expanded (wajib digunakan jika child memiliki ListView/GridView sendiri agar dapat di-scroll dengan benar).",
+            },
+            {
+              name: "padding",
+              type: "EdgeInsetsGeometry?",
+              default: "null",
+              desc: "Jarak bantalan (padding) yang mengelilingi widget child. Jika tidak diisi, maka tidak ada padding tambahan (EdgeInsets.zero).",
+            },
+          ],
+          additionalInfo: {
+            dependencies: "flutter/material.dart",
+          },
+          methods: [
+            {
+              name: "show",
+              type: "static Future<T?>",
+              default: "",
+              desc: "Method tunggal untuk memunculkan modal bottom sheet. Menggunakan generic type  untuk mengembalikan nilai saat bottom sheet ditutup (misalnya melalui Navigator.pop(context, data)).",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Smart Layout Switching",
+              type: "UI Render",
+              default: "",
+              desc: "Berdasarkan parameter 'isFlexibleContent', widget akan secara otomatis mengganti pembungkus (wrapper) layout. Expanded untuk konten yang mengatur scroll-nya sendiri, dan Flexible + SingleChildScrollView untuk konten statis agar secara otomatis aman dari overflow.",
+            },
+            {
+              name: "Theme Auto-Adaptation",
+              type: "UI Responsive",
+              default: "",
+              desc: "Membaca properti Brightness dari Theme.of(context). Pada mode gelap (Dark Mode), warna latar belakang secara otomatis berubah menjadi abu-abu gelap (0xFF1E1E1E), dan pada mode terang menjadi putih.",
+            },
+            {
+              name: "Automatic Drag Handle",
+              type: "Visual Cue",
+              default: "",
+              desc: "Secara otomatis menyuntikkan indikator drag (garis abu-abu horisontal dengan sudut membulat) di bagian tengah atas bottom sheet untuk memberi petunjuk visual bahwa komponen tersebut dapat ditarik ke bawah.",
+            },
+          ],
+          specialNotes: [
+            "Best Practice: Jika Anda merender ListView atau daftar pencarian tak terbatas (infinite list) di dalam parameter 'child', pastikan Anda mengeset parameter 'isFlexibleContent: true' agar tidak terjadi konflik scroll constraint.",
+            "Best Practice: Manfaatkan kembalian fungsi ini (menggunakan await) untuk menangkap data dari form atau aksi yang ada di dalam bottom sheet saat ditutup.",
+            "Limitation: Warna latar (backgroundColor) diset mentah ke Colors.transparent pada fungsi bawaan showModalBottomSheet agar dekorasi kustom melengkung (rounded corners) dari kelas ini dapat terlihat.",
+          ],
+          code: "final String? selectedOption = await ModalBottomSheetWidget.show(\n  context,\n  isFlexibleContent: true,\n  padding: const EdgeInsets.symmetric(horizontal: 16),\n  child: ListView.builder(\n    itemCount: 10,\n    itemBuilder: (context, index) {\n      return ListTile(\n        title: Text('Opsi ${index + 1}'),\n        onTap: () {\n          // Mengembalikan data dan menutup bottom sheet\n          Navigator.pop(context, 'Opsi ${index + 1}');\n        },\n      );\n    },\n  ),\n);\n\nif (selectedOption != null) {\n  print('Pengguna memilih: $selectedOption');\n}",
+        },
+        {
+          id: "ModalWidget",
+          group: "Alert",
+          name: "Modal Premium",
+          icon: "fa-solid fa-window-maximize",
+          description:
+            "Widget pengelola dialog (modal) tingkat lanjut yang menawarkan tampilan desain ala enterprise dengan efek blur (frosted glass/backdrop filter), bayangan meluas, batas melengkung, serta animasi pemunculan zoom-out yang halus. Menyediakan API level rendah untuk kustomisasi total, serta API 'modal' level tinggi (High-level API) yang telah dibungkus rapi dengan Header, Scrollable Body, Actions (tombol eksekusi async/sync), dan Loading Spinner bawaan.",
+          mandatoryProps: [
+            {
+              name: "context",
+              type: "BuildContext",
+              default: "",
+              desc: "Konteks saat ini yang terikat di dalam pohon widget (widget tree) dan memiliki akses ke instance Navigator untuk menampilkan dialog overlay.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "child",
+              type: "Widget?",
+              default: "null",
+              desc: "Konten utama yang akan dirender di bagian tengah tubuh (body) dialog. Pada API level tinggi (modal), konten ini akan dibungkus otomatis dengan padding 24.0 dan SingleChildScrollView.",
+            },
+            {
+              name: "title",
+              type: "String?",
+              default: "null",
+              desc: "[Hanya pada method .modal()] Teks yang akan ditampilkan pada sisi kiri atas Header modal dengan ketebalan teks semi-bold.",
+            },
+            {
+              name: "actions",
+              type: "List<Widget>?",
+              default: "null",
+              desc: "[Hanya pada method .modal()] Kumpulan aksi/ikon tambahan yang diletakkan pada Header, berada persis sebelum tombol Close. Sangat ideal untuk menaruh IconButton atau PopupMenuButton.",
+            },
+            {
+              name: "footerActions",
+              type: "List<Widget>?",
+              default: "null",
+              desc: "[Hanya pada method .modal()] Komponen tombol atau elemen custom yang akan merender ulang keseluruhan area Footer. Jika diisi, tombol OK dan Cancel otomatis tidak akan ditampilkan.",
+            },
+            {
+              name: "onConfirm",
+              type: "FutureOr<bool?> Function()?",
+              default: "null",
+              desc: "[Hanya pada method .modal()] Callback reaktif yang dipicu ketika tombol konfirmasi (OK) diklik. Mendukung Async/Await. Tombol dan aksi penutupan dialog akan dikunci (disabled + loading spinner) sampai promise ini mengembalikan nilai boolean. Hanya return nilai 'true' yang dapat menutup dialog; nilai 'false' atau 'null' akan membiarkan dialog tetap terbuka.",
+            },
+            {
+              name: "showCancelButton",
+              type: "bool",
+              default: "false",
+              desc: "[Hanya pada method .modal()] Menampilkan tombol sekunder dengan style outline yang digunakan untuk sekadar menutup modal tanpa aksi.",
+            },
+            {
+              name: "confirmText",
+              type: "String",
+              default: "'OK'",
+              desc: "[Hanya pada method .modal()] Mengubah teks label (caption) default untuk tombol utama aksi konfirmasi (Primary Button).",
+            },
+            {
+              name: "cancelText",
+              type: "String",
+              default: "'Cancel'",
+              desc: "[Hanya pada method .modal()] Mengubah teks label (caption) default untuk tombol sekunder atau batal.",
+            },
+            {
+              name: "afterClose",
+              type: "VoidCallback?",
+              default: "null",
+              desc: "[Hanya pada method .modal()] Callback sinkron/api-fire-and-forget yang dipicu sesaat (immediately) setelah dialog benar-benar ditutup dan hilang dari tumpukan rute.",
+            },
+            {
+              name: "width",
+              type: "double?",
+              default: "null",
+              desc: "Memaksa (force) agar modal memiliki batas minimal width yang konsisten. Berguna di layar desktop agar konten tidak collapse.",
+            },
+            {
+              name: "height",
+              type: "double?",
+              default: "null",
+              desc: "Memaksa (force) tinggi minimal dari modal.",
+            },
+            {
+              name: "modalMaxWidth",
+              type: "double",
+              default: "600",
+              desc: "Batas maksimum seberapa lebar dialog ini dapat merentang (stretch) saat diaplikasikan di peramban Web atau layar Ultra-wide. Layar di atas 600px akan menampilkan modal tepat di tengah.",
+            },
+            {
+              name: "modalMaxHeight",
+              type: "double?",
+              default: "null",
+              desc: "Batas ekstrem untuk mencegah agar modal tidak lebih tinggi dari ukuran tertentu. Jika null, batas tinggi ekstrem akan otomatis 90% dari ukuran Viewport vertikal (MediaQuery).",
+            },
+            {
+              name: "isDismissible",
+              type: "bool",
+              default: "true",
+              desc: "Jika true, pengguna diperbolehkan menekan latar transparan (barrier blur) untuk langsung membuang atau menutup dialog dari layar.",
+            },
+            {
+              name: "barrierColor",
+              type: "Color?",
+              default: "null",
+              desc: "Menimpa (override) warna latar belakang pelindung luar modal.",
+            },
+          ],
+          additionalInfo: {
+            styling:
+              "Secara umum pewarnaan elemen dialog dan batas garis (border) akan otomatis merujuk dan bereaksi (reactive) terhadap Brightness parent, memicu tema cerah dengan border abu-abu pucat atau tema gelap 0xFF1E1E1E dengan border transparan putih.",
+            animation:
+              "Transisi masuk menggunakan penggabungan (stagger) antara Tween opacity FadeTransition dengan Zoom-out ScaleTransition memakai kurva easeOutBack agar terlihat lentur seperti karet.",
+          },
+          methods: [
+            {
+              name: "show<T>",
+              type: "static Future<T?>",
+              default: "",
+              desc: "Method fondasi (Low-Level API) untuk merender modal polos langsung ke layer showGeneralDialog. Hanya berisi body box putih dengan padding dan shadow premium tanpa atribut pelengkap seperti header, divider, atau action buttons. Menerima widget custom bebas bentuk.",
+            },
+            {
+              name: "replace<T>",
+              type: "static Future<T?>",
+              default: "",
+              desc: "Pintasan (Syntactic Sugar) yang menutup dialog saat ini (via Navigator.pop) sesaat sebelum membuka dialog show() yang baru. Sangat berguna untuk flow wizard berantai (next step) agar rute modal tidak bertumpuk di memori.",
+            },
+            {
+              name: "modal<T>",
+              type: "static Future<T?>",
+              default: "",
+              desc: "Method komprehensif (High-Level API). Membangun dan mewarisi efek dari method show(), namun secara otomatis merajut tata letak internal dengan Header (Title & Close Button), Scrollable Body untuk mengamankan child dari constraint overflow, dan Footer dinamis (Auto-Loading Confirm/Cancel Action). Sangat disarankan untuk digunakan dalam eksekusi data form dan input.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Async State Blocking",
+              type: "Lifecycle & State",
+              default: "",
+              desc: "Apabila 'onConfirm' me-return promise atau delay, modal akan dibungkus oleh StatefulBuilder. Method ini otomatis merubah properti internal (isLoading = true), menonaktifkan PopScope (tombol back hardware tidak berlaku), menghitam-putihkan tombol cancel, dan merender spinner putar persis di dalam primary button. Modal aman sepenuhnya dari spam-click dan double submission.",
+            },
+            {
+              name: "Adaptive Frosted Barrier",
+              type: "UI Filter",
+              default: "",
+              desc: "Lapisan penutup belakang dialog memanfaatkan ImageFilter.blur (sigma 6.0) untuk membuyarkan elemen di layar belakangnya. Warnanya akan otomatis menyesuaikan Brightness untuk mensimulasikan kaca buram iOS-style (gelap semi transparan di light mode, atau putih transparan tipis di dark mode).",
+            },
+            {
+              name: "Safe Resolution Bound",
+              type: "Constraint",
+              default: "",
+              desc: "Ketinggian badan konten akan senantiasa menyesuaikan ukuran (minAxisSize), namun tidak akan pernah menembus batas layar akibat constraint perlindungan maxHeight 90% view port.",
+            },
+          ],
+          specialNotes: [
+            "Best Practice: Selalu jadikan method `modal<T>` sebagai pintu utama untuk dialog konfirmasi karena ia sudah menyertakan penguncian status (popscope & disable action) ketika fungsi asynchronous berjalan.",
+            "Limitation: Modifikasi warna primary-button pada konfirmasi bawaan footer diset hardcoded sebagai 'Colors.deepOrange'. Warna ini tidak akan mengikuti ColorScheme global Flutter Theme jika Anda merubah palet secara sentral.",
+          ],
+          code: "final bool? isSuccess = await ModalWidget.modal<bool>(\n  context,\n  title: 'Edit Detail Akun',\n  showCancelButton: true,\n  confirmText: 'Simpan Perubahan',\n  child: Form(\n    key: _formKey,\n    child: Column(\n      children: [\n         TextFormField(decoration: const InputDecoration(labelText: 'Nama Lengkap')),\n         TextFormField(decoration: const InputDecoration(labelText: 'Email')),\n      ],\n    ),\n  ),\n  onConfirm: () async {\n    if (!_formKey.currentState!.validate()) return false;\n    \n    // Eksekusi ini otomatis me-render loading spinner di tombol\n    final result = await apiService.updateProfile();\n    \n    if (result.isError) {\n      showToast('Gagal merubah data');\n      return false; // Membiarkan modal tetap tampil untuk direvisi ulang\n    }\n    \n    return true; // Modal ditutup, isLoading selesai, nilai True dikembalikan ke layer pemanggil.\n  },\n  afterClose: () {\n    print('Proses edit selesai & Modal tertutup');\n  }\n);\n\nif (isSuccess == true) {\n  _refreshTable();\n}",
+        },
+        {
+          id: "NoteWidget",
+          group: "Alert",
+          name: "Note Widget",
+          icon: "fa-solid fa-circle-info",
+          description:
+            "Widget banner notifikasi sebaris (inline) berdesain flat modern dengan garis aksen di sisi kiri. Dirancang untuk memberikan umpan balik kontekstual seperti informasi, peringatan, atau pesan error di antara elemen UI lainnya. Terintegrasi secara ketat dengan sistem desain FormStyle agar selaras dengan input form.",
+          mandatoryProps: [
+            {
+              name: "message",
+              type: "String",
+              default: "",
+              desc: "Teks pesan utama yang akan ditampilkan di dalam banner notifikasi. Jika teks panjang, akan otomatis turun ke baris baru (multiline).",
+            },
+            {
+              name: "color",
+              type: "Color",
+              default: "",
+              desc: "Warna dasar widget. Warna ini akan dipecah otomatis menjadi warna latar belakang (dengan opacity), warna garis batas, warna aksen vertikal kiri, dan warna ikon.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "icon",
+              type: "IconData?",
+              default: "null",
+              desc: "Ikon kustom yang dirender di sebelah kiri teks. Jika tidak diisi pada instansiasi langsung, ikon tidak akan muncul kecuali menggunakan static method helper.",
+            },
+            {
+              name: "showIcon",
+              type: "bool",
+              default: "true",
+              desc: "Menentukan apakah ikon akan ditampilkan atau disembunyikan dari layar.",
+            },
+          ],
+          additionalInfo: {
+            dependencies:
+              "google_fonts, FormStyle (dari form_helper_widget.dart)",
+          },
+          methods: [
+            {
+              name: "primary",
+              type: "static Widget",
+              default: "",
+              desc: "Method helper untuk membuat NoteWidget dengan tema warna utama (diambil dari FormStyle.primary) dan ikon default Icons.stars.",
+            },
+            {
+              name: "warning",
+              type: "static Widget",
+              default: "",
+              desc: "Method helper untuk membuat NoteWidget dengan tema peringatan (warna oranye 0xFFFF9100) dan ikon default Icons.warning_amber_rounded.",
+            },
+            {
+              name: "info",
+              type: "static Widget",
+              default: "",
+              desc: "Method helper untuk membuat NoteWidget dengan tema informasi (warna biru 0xFF00B0FF) dan ikon default Icons.info_outline.",
+            },
+            {
+              name: "danger",
+              type: "static Widget",
+              default: "",
+              desc: "Method helper untuk membuat NoteWidget dengan tema bahaya/error (diambil dari FormStyle.error) dan ikon default Icons.dangerous_outlined.",
+            },
+            {
+              name: "success",
+              type: "static Widget",
+              default: "",
+              desc: "Method helper untuk membuat NoteWidget dengan tema sukses (warna hijau 0xFF00E676) dan ikon default Icons.check_circle_outline.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Dynamic Opacity Adaptation",
+              type: "UI Render",
+              default: "",
+              desc: "Berdasarkan deteksi Brightness dari Theme perangkat, widget akan menyesuaikan rasio transparansi (opacity) untuk background dan border agar tetap kontras tanpa menyilaukan mata (12% background di Dark Mode, 8% di Light Mode).",
+            },
+            {
+              name: "Auto-stretching Accent Line",
+              type: "UI Layout",
+              default: "",
+              desc: "Memanfaatkan widget IntrinsicHeight agar kontainer garis aksen vertikal berukuran 5px di sebelah kiri merentang secara otomatis mengikuti tinggi total dari teks pesan di sebelah kanannya.",
+            },
+            {
+              name: "FormStyle Synchronization",
+              type: "Styling",
+              default: "",
+              desc: "Warna teks, ketebalan border (1.0), dan radius lengkungan (FormElementSize.md / 16.0) dipanggil langsung dari class FormStyle untuk menjaga konsistensi absolut dengan komponen form di seluruh aplikasi.",
+            },
+          ],
+          specialNotes: [
+            "Best Practice: Selalu gunakan static method helper (seperti NoteWidget.info atau NoteWidget.warning) daripada menginisialisasi NoteWidget secara manual menggunakan constructor, karena static method sudah dikalibrasi dengan ikon dan warna yang standar.",
+            "Design Note: Widget ini sengaja tidak menggunakan BoxShadow untuk mempertahankan hierarki desain flat (Flat Design) agar tidak bertabrakan dengan bayangan dari Card atau Form Input.",
+            "Limitation: Teks di dalam widget ini diatur menggunakan fontWeight w500 (Medium) agar tidak terlihat terlalu mencolok (berteriak) jika disejajarkan dengan label form input.",
+          ],
+          code: "Column(\n  children: [\n    NoteWidget.info('Silakan lengkapi data profil Anda sebelum melanjutkan.'),\n    NoteWidget.warning('Password yang Anda masukkan kurang kuat.', showIcon: true),\n    NoteWidget.danger('Gagal terhubung ke server database.'),\n    NoteWidget.success('Data berhasil disimpan secara permanen.'),\n    \n    // Penggunaan constructor manual (custom)\n    NoteWidget(\n      message: 'Pesan dengan warna custom',\n      color: Colors.purple,\n      icon: Icons.lightbulb_outline,\n    ),\n  ],\n)",
+        },
+        {
+          id: "PillWidget",
+          group: "Alert",
+          name: "Pill Badge Widget",
+          icon: "fa-solid fa-capsules",
+          description:
+            "Widget visual ringan berbentuk kapsul (pill) yang digunakan untuk menampilkan tag, lencana status (badge), atau kategori. Didesain dengan warna latar transparan tipis (12% opacity) dan border samar untuk menghasilkan tampilan modern yang tidak mendominasi hirarki visual. Menyediakan factory methods siap pakai untuk semantik warna umum (success, warning, info, dll).",
+          mandatoryProps: [
+            {
+              name: "label",
+              type: "String",
+              default: "",
+              desc: "Teks utama yang akan ditampilkan di dalam pill. Otomatis diformat dengan ukuran kecil (10px), huruf tebal, dan sedikit spasi antar huruf (letter spacing).",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "color",
+              type: "Color",
+              default: "Colors.deepOrange",
+              desc: "Warna dasar/tema dari pill. Nilai warna ini akan digunakan secara proporsional untuk mewarnai teks, latar belakang (dengan opacity 0.12), border (opacity 0.2), dan ikon.",
+            },
+            {
+              name: "icon",
+              type: "IconData?",
+              default: "null",
+              desc: "Ikon opsional yang akan ditampilkan di sebelah kiri teks label. Ukurannya dikunci kecil (12px) agar sejajar dengan tinggi font.",
+            },
+          ],
+          additionalInfo: {
+            dependencies: "google_fonts",
+          },
+          methods: [
+            {
+              name: "primary",
+              type: "static Widget",
+              default: "",
+              desc: "Helper untuk membuat PillWidget dengan warna tema utama (Colors.deepOrange). Menerima parameter string (teks) dan parameter named opsional untuk ikon.",
+            },
+            {
+              name: "success",
+              type: "static Widget",
+              default: "",
+              desc: "Helper untuk membuat PillWidget dengan semantik sukses (Colors.green).",
+            },
+            {
+              name: "info",
+              type: "static Widget",
+              default: "",
+              desc: "Helper untuk membuat PillWidget dengan semantik informasi (Colors.blue).",
+            },
+            {
+              name: "danger",
+              type: "static Widget",
+              default: "",
+              desc: "Helper untuk membuat PillWidget dengan semantik bahaya/gagal (Colors.red).",
+            },
+            {
+              name: "warning",
+              type: "static Widget",
+              default: "",
+              desc: "Helper untuk membuat PillWidget dengan semantik peringatan (Colors.amber).",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Intrinsic Shrink Wrapping",
+              type: "UI Layout",
+              default: "",
+              desc: "PillWidget menggunakan Row dengan mainAxisSize: MainAxisSize.min, yang berarti ukuran lebarnya akan secara dinamis menyusut mengikuti panjang teks label ditambah padding, mencegahnya merentang menutupi lebar layar secara penuh.",
+            },
+          ],
+          specialNotes: [
+            "Widget ini bergantung pada package `google_fonts` untuk me-render font 'Poppins'.",
+            "Komponen ini tidak memproses deteksi klik (onTap). Jika Anda memerlukan behavior chip yang dapat ditekan, Anda harus membungkus PillWidget ini secara manual dengan InkWell atau GestureDetector.",
+          ],
+          code: "Wrap(\n  spacing: 8,\n  runSpacing: 8,\n  children: [\n    PillWidget.primary('TERBARU', icon: Icons.new_releases),\n    PillWidget.success('SELESAI'),\n    PillWidget.warning('PENDING', icon: Icons.access_time),\n    PillWidget.danger('DITOLAK'),\n    PillWidget.info('DRAFT'),\n    // Constructor manual\n    PillWidget(\n      label: 'CUSTOM TAG',\n      color: Colors.purple,\n      icon: Icons.tag,\n    ),\n  ],\n)",
+        },
+        {
+          id: "PopupWidget",
+          group: "Alert",
+          name: "Popup Menu Reaktif",
+          icon: "fa-solid fa-arrow-pointer",
+          description:
+            "Widget interaktif yang berfungsi sebagai pemicu (trigger) untuk memunculkan menu pop-up secara kontekstual. Mendukung adaptasi tata letak yang cerdas di mana pop-up akan dirender sebagai dropdown melayang (floating overlay) pada area yang diklik di layar desktop, dan sebagai Bottom Sheet yang nyaman di layar mobile. Menyediakan intersepsi `beforeTap` dan kalkulasi *bounding-box* otomatis agar pop-up tidak pernah terpotong oleh ujung layar.",
+          mandatoryProps: [
+            {
+              name: "child",
+              type: "Widget",
+              default: "",
+              desc: "Elemen antarmuka (seperti ikon, tombol, atau teks) yang ketika diklik akan bertindak sebagai pemicu/trigger untuk memunculkan menu popup.",
+            },
+            {
+              name: "popupBuilder",
+              type: "WidgetBuilder",
+              default: "",
+              desc: "Fungsi callback pembangun (builder) yang akan merender konten di dalam area menu popup. Menerima konteks tersendiri (sheetContext/menuContext).",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "popupWidth",
+              type: "double",
+              default: "300",
+              desc: "Nilai pasti lebar menu popup. Properti ini utamanya hanya akan berdampak ketika menu dirender dalam mode floating desktop.",
+            },
+            {
+              name: "maxPopupHeight",
+              type: "double?",
+              default: "null",
+              desc: "Batas ketinggian maksimum kotak popup. Jika diset null, maka tinggi akan dihitung secara dinamis atau dibatasi maksimum separuh layar (50% view port).",
+            },
+            {
+              name: "triggerOnRightClick",
+              type: "bool",
+              default: "true",
+              desc: "Jika bernilai true, popup juga dapat dimunculkan melalui klik kanan (Secondary Tap) pada mouse, sangat berguna untuk implementasi menu konteks (context menu) standar di desktop/web.",
+            },
+            {
+              name: "padding",
+              type: "EdgeInsetsGeometry",
+              default: "EdgeInsets.zero",
+              desc: "Pemberian jarak spasi internal yang membungkus konten dari popupBuilder sebelum dirender di dalam kontainer.",
+            },
+            {
+              name: "dismissible",
+              type: "bool",
+              default: "true",
+              desc: "Menentukan apakah klik di area latar (barrier) atau gestur tarik (swipe-down) diizinkan untuk menutup menu popup ini.",
+            },
+            {
+              name: "beforeTap",
+              type: "void Function(void Function(bool proceed) next)?",
+              default: "null",
+              desc: "Middleware asinkron atau sinkron (hook) yang dieksekusi tepat setelah widget diklik, tapi sebelum popup benar-benar dirender. Anda wajib memanggil argumen fungsi `next(true)` di dalamnya agar popup bisa terus ditampilkan, atau `next(false)` untuk membatalkan.",
+            },
+          ],
+          additionalInfo: {
+            dependencies: "flutter/material.dart, dart:ui",
+            architecture_layer:
+              "_PopupWidget (Private class pengelola transisi navigasi dan filter blur), _DesktopMenuRoute (Custom PopupRoute), _PopupMenuLayoutDelegate (Custom SingleChildLayoutDelegate)",
+          },
+          methods: [],
+          behaviors: [
+            {
+              name: "Responsive Floating vs Anchoring",
+              type: "UI Reaction",
+              default: "",
+              desc: "Ketika layar ≥ 1024px, koordinat sentuhan absolut direkam (_tapPosition) dan diumpankan ke LayoutDelegate untuk memunculkan modal persis di sebelah mouse. Pada layar yang lebih sempit (< 1024px), koordinat sentuhan diabaikan dan popup dimunculkan dari bawah (BottomSheet).",
+            },
+            {
+              name: "Smart Edge Collision Detection",
+              type: "Layout Mathematics",
+              default: "",
+              desc: "Jika klik terjadi di dekat tepi kanan atau bawah layar (sehingga popup berpotensi tumpah/terpotong), _PopupMenuLayoutDelegate secara otomatis akan menggeser (clamp) titik X dan Y agar kotak popup tetap 100% berada dalam zona pandang.",
+            },
+            {
+              name: "Keyboard Inset Compensation",
+              type: "Viewport Awareness",
+              default: "",
+              desc: "Pada mode BottomSheet, container popup secara dinamis membaca `viewInsets.bottom` lalu menambahkannya sebagai padding bawah, untuk mencegah keyboard virtual menutupi isian input (TextField) di dalam popup.",
+            },
+            {
+              name: "Frosted Background & Elastic Animation",
+              type: "UI Filter",
+              default: "",
+              desc: "Transisi masuk menggunakan penggabungan efek Blur (backdrop filter), memudar (Fade), Skala (Scale dari 0.98), dan Geser (Slide dari Y 0.02) dengan kurva EaseOutCubic untuk nuansa yang lincah.",
+            },
+          ],
+          specialNotes: [
+            "Widget ini membaca interaksi Tap (Klik Kiri), Secondary Tap (Klik Kanan), dan Long Press (Tahan Lama). Semua gestur memicu kemunculan menu yang sama.",
+            "Bila menggunakan `beforeTap`, popup akan tertahan proses asinkronisasinya hingga developer mengeksekusi parameter `next(true)`. Pastikan Anda menangani logika (seperti API Call) secara efisien agar UI tidak terasa lag.",
+          ],
+          code: "PopupWidget(\n  popupWidth: 250,\n  triggerOnRightClick: true,\n  beforeTap: (next) async {\n    // Contoh: Validasi dulu atau ambil data sebelum render popup\n    bool allowShow = await checkPermission();\n    next(allowShow);\n  },\n  popupBuilder: (context) => Column(\n    mainAxisSize: MainAxisSize.min,\n    children: [\n      ListTile(title: Text('Edit'), leading: Icon(Icons.edit)),\n      ListTile(title: Text('Hapus'), leading: Icon(Icons.delete, color: Colors.red)),\n    ],\n  ),\n  child: IconButton(\n    icon: Icon(Icons.more_vert),\n    onPressed: null, // Fungsi dikendalikan oleh PopupWidget\n  ),\n)",
+        },
+        {
+          id: "ToastWidget",
+          group: "Alert",
+          name: "Toast / Snackbar",
+          icon: "fa-solid fa-message",
+          description:
+            "Widget utilitas statis untuk menampilkan notifikasi mengambang (snackbar/toast) di layar dengan desain modern yang dibalut bayangan halus (drop shadow). Memiliki durasi tayang otomatis selama 3 detik dan mensupport berbagai indikasi warna seperti sukses, error, atau peringatan. Menggantikan antarmuka SnackBar default material agar terlihat lebih premium.",
+          mandatoryProps: [
+            {
+              name: "context",
+              type: "BuildContext",
+              default: "",
+              desc: "Konteks aplikasi tempat notifikasi ini akan ditempelkan. Wajib memiliki hierarki induk Scaffold agar ScaffoldMessenger dapat menemukan tempat untuk merender SnackBar.",
+            },
+            {
+              name: "message",
+              type: "String",
+              default: "",
+              desc: "Teks pesan yang ingin Anda tampilkan kepada pengguna.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "isError",
+              type: "bool",
+              default: "false",
+              desc: "Jika true, warna latar belakang akan berubah menjadi merah tua dengan ikon silang (error), dirancang untuk memberikan informasi operasi yang gagal.",
+            },
+            {
+              name: "isWarning",
+              type: "bool",
+              default: "false",
+              desc: "Jika true, warna latar belakang akan berubah menjadi oranye dengan ikon peringatan, ditujukan untuk memperingatkan pengguna atas tindakan tertentu.",
+            },
+            {
+              name: "icon",
+              type: "IconData?",
+              default: "null",
+              desc: "Menimpa (override) ikon default yang ditampilkan. Jika null, sistem akan mengotomatiskan penempatan ikon berdasarkan state error/warning/success.",
+            },
+          ],
+          additionalInfo: {
+            dependencies: "google_fonts",
+          },
+          methods: [
+            {
+              name: "show",
+              type: "static void",
+              default: "",
+              desc: "Method utama untuk menampilkan toast. Berisi keseluruhan logika pemanggilan ScaffoldMessenger dan styling Container.",
+            },
+            {
+              name: "success",
+              type: "static void",
+              default: "",
+              desc: "Shortcut/Syntactic sugar untuk memanggil toast sukses dengan latar abu-abu gelap dan ikon ceklis warna oranye.",
+            },
+            {
+              name: "error",
+              type: "static void",
+              default: "",
+              desc: "Shortcut/Syntactic sugar untuk memanggil toast dengan mode isError = true secara instan.",
+            },
+            {
+              name: "warning",
+              type: "static void",
+              default: "",
+              desc: "Shortcut/Syntactic sugar untuk memanggil toast dengan mode isWarning = true secara instan.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Queue Cancellation",
+              type: "UI Lifecycle",
+              default: "",
+              desc: "Setiap kali toast dipanggil, sistem akan mengeksekusi `scaffoldMessenger.hideCurrentSnackBar()` secara otomatis. Hal ini mencegah terjadinya tumpukan antrian (queue) notifikasi yang terlalu panjang saat pengguna menekan tombol berkali-kali dengan cepat.",
+            },
+            {
+              name: "Fixed Text Color Constraint",
+              type: "Styling",
+              default: "",
+              desc: "Tanpa mempedulikan tema Brightness perangkat saat ini (Light/Dark mode), warna teks selalu diset menjadi Colors.white. Hal ini karena latar belakang bawaan toast yang dirender selalu berwarna gelap atau solid tajam (Merah/Oranye/Abu Tua).",
+            },
+          ],
+          specialNotes: [
+            "Best Practice: Manfaatkan static method `success`, `error`, dan `warning` dibandingkan memanggil `show` secara manual dengan parameter flag booleannya agar kode Anda lebih mudah dibaca (clean code).",
+            "Limitation: Modifikasi durasi tayang di-hardcode ke `Duration(seconds: 3)`. Tidak bisa diubah via parameter saat memanggil API saat ini tanpa memodifikasi class internalnya.",
+            "Peringatan: Pastikan `context` yang Anda gunakan berada di bawah `Scaffold` dalam widget tree. Context dari level paling atas (seperti sebelum MaterialApp/Scaffold) akan memicu exception dari ScaffoldMessenger.",
+          ],
+          code: "try {\n  await api.saveData();\n  ToastWidget.success(context, 'Data berhasil disimpan ke database.');\n} catch (e) {\n  ToastWidget.error(context, 'Koneksi gagal. Periksa jaringan Anda.');\n}",
+        },
+        {
+          id: "AutoRetryImageWidget",
+          group: "Tools",
+          name: "Auto Retry Image",
+          icon: "fa-solid fa-image",
+          description:
+            "Widget gambar pintar berbasis CachedNetworkImage yang memiliki mekanisme pemulihan otomatis (auto-retry). Widget ini akan secara otomatis mencoba memuat ulang gambar yang gagal diunduh berdasarkan jumlah maksimal percobaan dan jeda waktu yang telah ditentukan. Sangat berguna untuk aplikasi yang menargetkan area dengan koneksi internet tidak stabil.",
+          mandatoryProps: [
+            {
+              name: "imageUrl",
+              type: "String",
+              default: "",
+              desc: "Alamat URL gambar yang akan dimuat dan ditampilkan.",
+            },
+            {
+              name: "width",
+              type: "double",
+              default: "",
+              desc: "Lebar tetap dari widget gambar yang akan dirender.",
+            },
+            {
+              name: "height",
+              type: "double",
+              default: "",
+              desc: "Tinggi tetap dari widget gambar yang akan dirender.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "delayRetry",
+              type: "int",
+              default: "10",
+              desc: "Durasi jeda waktu dalam satuan detik sebelum widget melakukan percobaan pemuatan ulang gambar.",
+            },
+            {
+              name: "maxRetry",
+              type: "int",
+              default: "5",
+              desc: "Batas maksimum percobaan pemuatan ulang (retry) jika gambar terus gagal dimuat.",
+            },
+            {
+              name: "colorSpinner",
+              type: "Color",
+              default: "Colors.deepOrange",
+              desc: "Warna indikator pemuatan (CircularProgressIndicator) yang berputar selama gambar sedang didownload atau dalam proses percobaan ulang.",
+            },
+            {
+              name: "colorBackground",
+              type: "Color",
+              default: "Color(0xFFEEEEEE)",
+              desc: "Warna latar belakang (placeholder) yang ditampilkan saat gambar masih dalam proses pemuatan, atau saat gambar mengalami kerusakan (error).",
+            },
+            {
+              name: "debugMode",
+              type: "bool",
+              default: "false",
+              desc: "Jika bernilai true, widget akan sengaja mengganti URL dengan link yang tidak valid ('[https://no-image.com](https://no-image.com)') untuk tujuan menguji apakah mekanisme auto-retry dan fallback error berjalan dengan baik.",
+            },
+          ],
+          additionalInfo: {
+            dependencies: "cached_network_image",
+          },
+          methods: [],
+          behaviors: [
+            {
+              name: "Automatic Retry Logic",
+              type: "Lifecycle",
+              default: "",
+              desc: "Ketika terjadi kegagalan pemuatan jaringan (ditangkap oleh errorWidget), widget memicu fungsi *triggerRetry(). Fungsi ini akan menunggu selama durasi delayRetry detik, menaikkan nilai retryKey, lalu memicu setState untuk merender ulang CachedNetworkImage. Penambahan retryKey ke dalam ValueKey akan memaksa widget untuk membuang kondisi error sebelumnya dan menginisiasi request jaringan baru.",
+            },
+            {
+              name: "Adaptive Spinner Sizing",
+              type: "UI Reactive",
+              default: "",
+              desc: "Ukuran dari loading spinner akan beradaptasi secara otomatis dengan mengambil nilai terkecil antara width atau height dari widget (min(width, height)). Ukuran spinner dibatasi hingga maksimal 24 pixel agar tata letak tetap proporsional dan tidak overlap.",
+            },
+            {
+              name: "Graceful Error Fallback",
+              type: "Error Handling",
+              default: "",
+              desc: "Setelah percobaan memuat ulang gagal secara berturut-turut hingga mencapai batas maxRetry, widget akan menghentikan proses antrean coba lagi dan secara permanen menampilkan ikon 'broken_image' abu-abu di atas latar belakang warna colorBackground.",
+            },
+          ],
+          specialNotes: [
+            "Ketergantungan (Dependency): Widget ini secara langsung bergantung pada package eksternal 'cached_network_image' untuk menangani cache memori dan network request.",
+            "Performance Notes: Penggunaan nilai delayRetry yang terlalu singkat dipadukan dengan maxRetry yang tinggi berpotensi memicu request beruntun pada server gambar secara tidak efisien. Pastikan durasi delay wajar sesuai environment backend aplikasi Anda.",
+            "Integration Notes: Komponen menggunakan key: ValueKey('${widget.imageUrl}*$retryKey') pada child CachedNetworkImage sebagai trik cerdas memaksa framework Flutter mengenali perubahan state saat retrying dilakukan.",
+          ],
+          code: "AutoRetryImageWidget(\n  imageUrl: '[https://example.com/images/profile.jpg](https://www.google.com/search?q=https://example.com/images/profile.jpg)',\n  width: 120.0,\n  height: 120.0,\n  delayRetry: 5,\n  maxRetry: 3,\n  colorSpinner: Colors.blueAccent,\n  colorBackground: Colors.grey[200]!,\n  debugMode: false,\n)",
+        },
+        {
+          id: "CropWidget",
+          group: "Tools",
+          name: "Crop",
+          icon: "fa-solid fa-crop",
+          description:
+            "Widget editor crop gambar profesional dengan fitur lengkap termasuk rotasi, pembalikan (flip), penguncian rasio aspek, zoom, pan, dan UI overlay yang adaptif. Didesain untuk memberikan pengalaman editing gambar tingkat enterprise langsung di dalam aplikasi Flutter.",
+          mandatoryProps: [
+            {
+              name: "image",
+              type: "io.File",
+              default: "",
+              desc: "File gambar mentah (original) yang akan diedit atau dicrop oleh pengguna.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "aspectRatio",
+              type: "double?",
+              default: "null",
+              desc: "Rasio aspek awal untuk area crop (misal: 1.0 untuk 1:1, 16/9 untuk widescreen). Jika null, mode Free Crop akan diaktifkan.",
+            },
+            {
+              name: "lockAspectRatio",
+              type: "bool",
+              default: "false",
+              desc: "Jika diset true, pengguna tidak dapat mengubah rasio area crop dari nilai yang sedang aktif.",
+            },
+            {
+              name: "quality",
+              type: "double",
+              default: "0.95",
+              desc: "Kualitas kompresi gambar saat diekspor atau disimpan. Rentang valid adalah 0.0 (kualitas terendah) hingga 1.0 (kualitas tertinggi).",
+            },
+            {
+              name: "format",
+              type: "CropImageFormat",
+              default: "CropImageFormat.jpg",
+              desc: "Format file keluaran gambar hasil crop (contoh: jpg, png, webp).",
+            },
+            {
+              name: "circleCrop",
+              type: "bool",
+              default: "false",
+              desc: "Menentukan apakah area crop dan hasil ekspor berupa lingkaran (berguna untuk foto profil/avatar).",
+            },
+            {
+              name: "allowRotate",
+              type: "bool",
+              default: "true",
+              desc: "Menampilkan atau menyembunyikan tombol aksi untuk memutar (rotate) gambar 90 derajat.",
+            },
+            {
+              name: "allowFlip",
+              type: "bool",
+              default: "true",
+              desc: "Menampilkan atau menyembunyikan tombol aksi untuk membalik (flip) gambar secara horizontal maupun vertikal.",
+            },
+            {
+              name: "allowReset",
+              type: "bool",
+              default: "true",
+              desc: "Menampilkan atau menyembunyikan tombol reset yang akan mengembalikan transformasi gambar ke kondisi semula.",
+            },
+            {
+              name: "showGrid",
+              type: "bool",
+              default: "true",
+              desc: "Menentukan apakah grid pembantu (garis bantu 3x3) akan ditampilkan pada area crop saat pengguna melakukan interaksi drag/resize.",
+            },
+            {
+              name: "showAspectRatioPicker",
+              type: "bool",
+              default: "true",
+              desc: "Menampilkan deretan tombol rasio aspek prasetel (Free, 1:1, 16:9, dll) agar pengguna dapat memilih rasio dengan cepat.",
+            },
+            {
+              name: "showToolbar",
+              type: "bool",
+              default: "true",
+              desc: "Menampilkan panel toolbar bagian bawah yang berisi tombol putar, flip, dan reset.",
+            },
+            {
+              name: "title",
+              type: "String?",
+              default: "null",
+              desc: "Teks judul kustom yang akan ditampilkan pada AppBar. Jika tidak diisi, nilai default-nya adalah 'Crop Image'.",
+            },
+            {
+              name: "primaryColor",
+              type: "Color?",
+              default: "null",
+              desc: "Warna utama (aksen) yang akan digunakan pada border handle crop, tombol aktif, dan loading indicator. Jika null, akan mengikuti primaryColor dari Theme.",
+            },
+            {
+              name: "beforeSave",
+              type: "Future<bool> Function(io.File file)?",
+              default: "null",
+              desc: "Fungsi callback asinkron yang dieksekusi tepat sebelum file hasil crop disimpan atau dikembalikan. Kembalikan false untuk membatalkan proses penyimpanan.",
+            },
+            {
+              name: "afterSave",
+              type: "Future<bool> Function(io.File file)?",
+              default: "null",
+              desc: "Fungsi callback asinkron yang dieksekusi setelah file hasil crop sukses dibuat dan proses penyimpanan selesai.",
+            },
+            {
+              name: "onChanged",
+              type: "ValueChanged<io.File>?",
+              default: "null",
+              desc: "Fungsi callback yang dipanggil dan memberikan parameter file hasil ekspor ketika pengguna selesai menekan tombol save.",
+            },
+          ],
+          additionalInfo: {},
+          methods: [
+            {
+              name: "crop",
+              type: "static Future<io.File?>",
+              default: "",
+              desc: "Method pembantu statis (helper) tingkat tinggi untuk secara otomatis memunculkan CropWidget sebagai rute baru (MaterialPageRoute) secara full-screen dan langsung mengembalikan Future<io.File?> hasil crop.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Auto Theme Adaptation",
+              type: "UI Reactive",
+              default: "",
+              desc: "Warna antarmuka Scaffold, AppBar, Toolbar, dan ikon secara otomatis mendeteksi dan beradaptasi dengan Theme.of(context).brightness (Light/Dark Mode) agar terintegrasi sempurna dengan desain aplikasi induk.",
+            },
+            {
+              name: "Grid Fade Animation",
+              type: "Animation",
+              default: "",
+              desc: "Garis pembantu crop (grid) muncul dengan animasi fade-in ketika pengguna menyentuh/menggeser area crop, lalu menghilang secara perlahan (fade-out) ketika interaksi dilepas.",
+            },
+            {
+              name: "Free Resize Constraints",
+              type: "Gesture Limit",
+              default: "",
+              desc: "Pada mode Free Ratio, menarik titik handle tidak memengaruhi ukuran pada sumbu/bidang lawannya (titik tersebut bertindak sebagai fixed anchor absolut).",
+            },
+            {
+              name: "Minimum Size Boundary",
+              type: "Gesture Limit",
+              default: "",
+              desc: "Pengguna tidak dapat me-resize kotak crop lebih kecil dari 50x50 pixel untuk mencegah inversi ukuran atau gambar yang tidak valid.",
+            },
+            {
+              name: "Desktop Scroll Wheel Zoom",
+              type: "Interaction",
+              default: "",
+              desc: "Mendukung pembesaran (zoom) gambar secara intuitif menggunakan roda gulir mouse (PointerScrollEvent) pada perangkat desktop atau web.",
+            },
+          ],
+          specialNotes: [
+            "Widget ini menggunakan render grafis kelas rendah (dart:ui PictureRecorder) untuk melakukan cropping sesungguhnya, bukan sekadar manipulasi visual pada widget layer.",
+            "Bypass otomatis untuk resolusi: Pastikan parameter `quality` diset dengan bijak. Render canvas dart:ui akan menampung seluruh piksel gambar dalam memori selama proses konversi ke format data PNG/JPG.",
+          ],
+          code: "final io.File? croppedFile = await CropWidget.crop(\n  context,\n  image: originalFile,\n  title: 'Edit Foto Profil',\n  circleCrop: true,\n  quality: 0.85,\n  format: CropImageFormat.jpg,\n  primaryColor: Colors.blueAccent,\n  beforeSave: (file) async {\n    // Contoh: Tambahkan pengecekan ukuran maksimal atau upload\n    return true;\n  },\n);\n\nif (croppedFile != null) {\n  print('Berhasil crop: ${croppedFile.path}');\n}",
+        },
+        {
+          id: "NavigatorPageWidget",
+          group: "Tools",
+          name: "Responsive Navigator Page",
+          icon: "fa-solid fa-route",
+          description:
+            "Widget utilitas navigasi responsif yang secara cerdas merender komponen berdasarkan lebar layar (breakpoint). Pada layar desktop (lebar ≥ 1024px), konten dirender sebagai dialog/modal melayang bergaya premium dengan efek frosted glass. Sementara pada layar mobile (< 1024px), konten dirender sebagai halaman penuh (full-page) menggunakan MaterialPageRoute konvensional.",
+          mandatoryProps: [
+            {
+              name: "context",
+              type: "BuildContext",
+              default: "",
+              desc: "Konteks aplikasi saat ini yang memiliki akses ke Navigator dan MediaQuery.",
+            },
+            {
+              name: "child",
+              type: "Widget",
+              default: "",
+              desc: "Konten widget utama (misal: halaman form, detail, atau komponen utuh) yang akan dirender di dalam layar modal desktop maupun rute layar penuh mobile.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "modalMaxWidth",
+              type: "double",
+              default: "600",
+              desc: "Batasan lebar maksimum (max width) dari jendela modal ketika ditampilkan pada mode layar desktop.",
+            },
+            {
+              name: "modalMaxHeight",
+              type: "double?",
+              default: "null",
+              desc: "Batasan tinggi maksimum jendela modal pada mode desktop. Jika null, akan otomatis diatur sebesar 90% dari total tinggi layar (view port).",
+            },
+            {
+              name: "isDismissible",
+              type: "bool",
+              default: "true",
+              desc: "Jika bernilai true, khusus pada mode modal desktop, pengguna dapat mengetuk latar belakang luar (barrier) untuk menutup modal.",
+            },
+            {
+              name: "barrierColor",
+              type: "Color?",
+              default: "null",
+              desc: "Warna overlay penutup layar belakang modal pada mode desktop. Jika null, sistem akan mengotomatiskan warnanya berdasarkan tema (terang/gelap).",
+            },
+            {
+              name: "routeName",
+              type: "String?",
+              default: "null",
+              desc: "Nama identitas rute logis untuk sistem navigasi. Digunakan sebagai argumen 'name' pada class RouteSettings (berguna untuk analitik log rute).",
+            },
+            {
+              name: "wrapWithScaffoldIfRoute",
+              type: "bool",
+              default: "false",
+              desc: "Hanya berlaku pada mode mobile (navigator push). Jika true, secara otomatis membungkus konten widget child ke dalam Scaffold agar memiliki layout latar dan app bar dasar yang valid secara material.",
+            },
+            {
+              name: "backgroundColor",
+              type: "Color?",
+              default: "null",
+              desc: "Warna latar belakang untuk Scaffold pada mode mobile. Jika null, akan menyesuaikan berdasarkan tema bawaan.",
+            },
+          ],
+          additionalInfo: {
+            dependencies: "flutter/material.dart, dart:ui",
+            enums: "PopupMode (modal, navigator, inline)",
+          },
+          methods: [
+            {
+              name: "push<T>",
+              type: "static Future<T?>",
+              default: "",
+              desc: "Metode utama untuk berpindah antarmuka yang akan memutuskan secara kondisional apakah me-render tampilan sebagai GeneralDialog (Desktop) atau MaterialPageRoute (Mobile).",
+            },
+            {
+              name: "pushReplacementx<T, TO>",
+              type: "static Future<T?>",
+              default: "",
+              desc: "Pintasan (Syntactic Sugar) yang akan menutup (pop) entri navigasi saat ini kemudian menimpa (replace) dengan NavigatorPageWidget.push yang baru. Berguna untuk perpindahan halaman linier seperti Next Step Wizard tanpa menumpuk riwayat stack layer rute.",
+            },
+            {
+              name: "pushReturnMode",
+              type: "static void",
+              default: "",
+              desc: "Varian push lanjutan untuk kasus khusus di mana widget di dalam child sangat membutuhkan konteks terkait 'di mode apa' widget tersebut sedang berada, yang akan dilempar melalui Builder Callback yang me-return enum PopupMode (modal atau navigator).",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Responsive Split Routing",
+              type: "Architecture",
+              default: "",
+              desc: "Ketika lebar view port layar mencapai lebih dari sama dengan (>=) 1024px, maka aliran kode (flow code) otomatis di-bypass (dialihkan) untuk mengeksekusi showGeneralDialog. Jika lebih rendah, sistem akan membangun MaterialPageRoute.",
+            },
+            {
+              name: "Dark Mode Barrier Frosting",
+              type: "UI Reaction",
+              default: "",
+              desc: "Apabila di mode terang, overlay barrier modal berwarna hitam transparan (0.4 opacity). Apabila di mode gelap, efeknya ditransformasi menjadi pelindung putih tipis dengan transparansi 0.04 yang bersinergi dengan filter pemburaman layar (frosted blur).",
+            },
+            {
+              name: "Intrinsic Constraint Adaptation",
+              type: "UI Reaction",
+              default: "",
+              desc: "Ukuran box container modal di-skalakan secara statis sehingga apabila konten (child) lebih pendek, modal akan mengikuti tinggi minimum dengan aman. Tinggi batas maksimal dilimit oleh perhitungan MediaQuery 90% secara proporsional.",
+            },
+          ],
+          specialNotes: [
+            "Peringatan Trik UI Desktop: Karena layer Modal Desktop dibungkus Material() dengan clipBehavior 'Clip.antiAlias' untuk melengkungkan sudut, menyisipkan widget turunan (child) berupa Scaffold secara utuh *di dalam* modal desktop bisa menyebabkan double backgroundColor (putih di atas putih) atau overflow margin (Scaffold mencoba memakan layar utuh). Sebaiknya rancang form/child secara fleksibel (tidak terikat Scaffold secara instan).",
+            "Warning: pushReturnMode hanya me-return void (fire and forget), sehingga ia tidak ditujukan jika Anda mengharapkan respons await result layaknya navigator.",
+          ],
+          code: "final resultData = await NavigatorPageWidget.push<String>(\n  context,\n  modalMaxWidth: 700,\n  wrapWithScaffoldIfRoute: true,\n  routeName: '/user/detail',\n  child: FormDetailPengguna(),\n);\n\nif (resultData != null) {\n  print('Kembali dengan data: $resultData');\n}",
+        },
+        {
+          id: "DriftListView",
+          group: "Widget",
+          name: "Drift List View",
+          icon: "fa-solid fa-list",
+          description:
+            "Widget pembungkus (wrapper) untuk menampilkan daftar data reaktif berbasis Stream dengan fitur infinite scrolling otomatis. Widget ini secara khusus dirancang untuk bekerja secara harmonis dengan database reaktif (seperti Drift) dengan memuat data tambahan (pagination) secara dinamis berdasarkan parameter limit saat pengguna melakukan scroll ke bagian bawah layar. Mendukung tampilan List standar dan Grid responsif.",
+          mandatoryProps: [
+            {
+              name: "streamFactory",
+              type: "Stream<List> Function(int limit)",
+              default: "",
+              desc: "Fungsi utama yang dipanggil oleh widget untuk mendapatkan aliran data (Stream). Fungsi ini wajib menerima parameter 'limit' yang akan diperbarui secara otomatis oleh widget saat terjadi infinite scroll.",
+            },
+            {
+              name: "itemBuilder",
+              type: "Widget Function(BuildContext context, T item)",
+              default: "",
+              desc: "Fungsi callback untuk membangun UI (Widget) pada setiap item di dalam list/grid. Menerima context dan satu instance objek data bertipe generic .",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "emptyWidget",
+              type: "Widget?",
+              default: "null",
+              desc: "Tampilan khusus yang akan dirender jika stream tidak menghasilkan data atau array kosong. Jika tidak diisi, akan menampilkan teks 'Data tidak ditemukan' di tengah layar.",
+            },
+            {
+              name: "padding",
+              type: "EdgeInsetsGeometry?",
+              default: "EdgeInsets.fromLTRB(12, 18, 12, 120)",
+              desc: "Jarak bantalan di sekeliling daftar/grid. Jika isResponsive false, defaultnya menjadi EdgeInsets.fromLTRB(0, 18, 0, 120).",
+            },
+            {
+              name: "loading",
+              type: "Widget",
+              default: "Center(child: CircularProgressIndicator())",
+              desc: "Tampilan indikator pemuatan yang dirender pada saat stream berada pada status 'waiting' dan belum memiliki data awal.",
+            },
+            {
+              name: "initialLimit",
+              type: "int",
+              default: "20",
+              desc: "Jumlah batas data (limit) pertama yang akan diminta kepada streamFactory saat widget diinisialisasi.",
+            },
+            {
+              name: "isResponsive",
+              type: "bool",
+              default: "true",
+              desc: "Menentukan struktur tata letak. Jika true, merender data sebagai Grid menggunakan ResponsiveGridRow. Jika false, menggunakan ListView.builder vertikal standar.",
+            },
+            {
+              name: "increment",
+              type: "int",
+              default: "20",
+              desc: "Jumlah penambahan limit data setiap kali pengguna mencapai bagian akhir scroll.",
+            },
+          ],
+          additionalInfo: {
+            dependencies: "responsive_grid",
+            use_case:
+              "Menampilkan daftar item dari database lokal (Drift/SQLite) yang berjumlah ribuan tanpa menyebabkan lag, dengan mengambil sekian item di awal dan menambahkannya ketika discroll.",
+          },
+          methods: [],
+          behaviors: [
+            {
+              name: "Infinite Scrolling Trigger",
+              type: "Scroll Detection",
+              default: "",
+              desc: "ScrollController mendengarkan posisi scroll. Ketika posisi piksel mencapai 200 poin dari batas maksimal bawah (_scrollController.position.maxScrollExtent - 200), widget akan menambahkan nilai _currentLimit sebesar nilai increment dan memicu setState untuk mengambil stream baru.",
+            },
+            {
+              name: "Memory Management",
+              type: "Lifecycle Lifecycle",
+              default: "",
+              desc: "ScrollController didaftarkan pada initState dan dilepas (dispose) secara aman di method dispose() agar tidak meninggalkan event listener menggantung yang memicu memory leak.",
+            },
+            {
+              name: "Responsive Grid Layout",
+              type: "UI Render",
+              default: "",
+              desc: "Bila isResponsive bernilai true, setiap item secara otomatis dikemas menggunakan ResponsiveGridCol dengan komposisi: xs: 12 (layar kecil 1 kolom), md: 6 (layar sedang 2 kolom), lg: 4 (layar besar 3 kolom).",
+            },
+          ],
+          specialNotes: [
+            "Widget ini bergantung pada package pihak ketiga 'responsive_grid' untuk menyusun struktur kotak responsif.",
+            "Best Practice: Selalu definisikan generic type `<T>` saat memanggil widget ini, misalnya `DriftListView<UserModel>(...)` agar parameter `item` dalam `itemBuilder` dikenali dengan tipe yang tepat.",
+            "Integration Notes: Karena `streamFactory` dipanggil ulang dan mereturn Stream baru setiap kali batas (limit) tercapai, pastikan data source backend/database Anda benar-benar mengimplementasikan query berbasis LIMIT secara ringan.",
+          ],
+          code: "DriftListView(\n  initialLimit: 15,\n  increment: 10,\n  isResponsive: true,\n  streamFactory: (limit) {\n    // Mengambil stream data dari Drift database\n    return database.userDao.watchAllUsersWithLimit(limit);\n  },\n  itemBuilder: (context, user) {\n    return Card(\n      child: ListTile(\n        title: Text(user.name),\n        subtitle: Text(user.email),\n      ),\n    );\n  },\n  emptyWidget: const Center(\n    child: Text('Belum ada pengguna terdaftar.'),\n  ),\n)",
+        },
+        {
+          id: "buildEmptyWidget",
+          group: "Helper",
+          name: "buildEmptyWidget",
+          icon: "fa-solid fa-folder-open",
+          description:
+            "Fungsi helper global untuk membangun tampilan status kosong (empty state) yang konsisten dan elegan di seluruh modul aplikasi. Menampilkan tata letak terpusat yang terdiri dari ikon melingkar semi-transparan dan pesan deskriptif teks yang dapat disesuaikan.",
+          mandatoryProps: [],
+          optionalProps: [
+            {
+              name: "message",
+              type: "String",
+              default: "'Data tidak tersedia'",
+              desc: "Pesan teks informasi yang akan ditampilkan di bawah komponen ikon untuk memberi tahu pengguna mengenai status kekosongan data saat ini.",
+            },
+            {
+              name: "icon",
+              type: "IconData",
+              default: "Icons.storage_rounded",
+              desc: "Ikon visual utama yang akan dirender di dalam bingkai lingkaran dekoratif di bagian tengah atas widget.",
+            },
+          ],
+          additionalInfo: {
+            dependencies: "google_fonts, flutter/material.dart",
+            methods: [],
+            behaviors: [
+              {
+                name: "Centering Alignment",
+                type: "UI Layout",
+                default: "",
+                desc: "Seluruh komponen secara otomatis diposisikan tepat di tengah-tengah kontainer induknya menggunakan widget Center dan Column dengan MainAxisAlignment.center.",
+              },
+              {
+                name: "Font Branding Integration",
+                type: "Typography",
+                default: "",
+                desc: "Teks pesan secara otomatis menggunakan kustomisasi dari GoogleFonts.poppins dengan spesifikasi font size 14, warna abu-abu, dan font weight w500.",
+              },
+            ],
+          },
+          methods: [],
+          behaviors: [],
+          specialNotes: [
+            "Fungsi ini mengembalikan komponen Widget murni sehingga sangat fleksibel untuk disisipkan langsung sebagai parameter nilai emptyState/emptyWidget pada komponen list view atau kontainer kustom lainnya.",
+            "Memiliki ketergantungan wajib pada package 'google_fonts'. Pastikan package tersebut sudah terdaftar di pubspec.yaml proyek Anda.",
+            "Desain latar belakang lingkaran ikon menggunakan warna dasar abu-abu dengan opacity rendah (0.05) untuk memberikan kesan UI modern yang minimalis.",
+          ],
+          code: "buildEmptyWidget(\n  message: 'Belum ada pemberitahuan baru untuk Anda.',\n  icon: Icons.notifications_none_rounded,\n)",
+        },
+        {
+          id: "LoadingWidget",
+          group: "Helper",
+          name: "Loading Widget",
+          icon: "fa-solid fa-spinner",
+          description:
+            "Helper class utilitas untuk menampilkan indikator pemuatan (loading overlay) layar penuh secara programmatic. Komponen ini dirender menggunakan OverlayEntry, sehingga tidak mengganggu hierarki antarmuka utama. Mendukung pembaruan pesan secara real-time menggunakan method chaining tanpa memicu setState di layar pemanggil, serta otomatis beradaptasi dengan mode gelap (Dark Mode).",
+          mandatoryProps: [
+            {
+              name: "context",
+              type: "BuildContext",
+              default: "",
+              desc: "Konteks aplikasi saat ini yang memiliki akses ke struktur Navigator dan Overlay. Dibutuhkan untuk menginisialisasi dan menyuntikkan OverlayEntry ke dalam layar.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "message",
+              type: "String",
+              default: "'Loading...'",
+              desc: "Teks pesan awal yang ditampilkan di bawah indikator putar (spinner) saat overlay pertama kali dimunculkan.",
+            },
+          ],
+          additionalInfo: {
+            dependencies: "google_fonts",
+            architecture:
+              "Overlay Injection berbasis Singleton-like instance (dengan method chaining)",
+          },
+          methods: [
+            {
+              name: "init",
+              type: "static LoadingWidget",
+              default: "",
+              desc: "Fungsi statis (factory) utama untuk membuat instance LoadingWidget baru. Menerima parameter wajib berupa context dan parameter opsional berupa pesan awal.",
+            },
+            {
+              name: "show",
+              type: "LoadingWidget",
+              default: "",
+              desc: "Mengeksekusi penyisipan (insert) OverlayEntry ke layar, sehingga memblokir interaksi pengguna dan menampilkan indikator loading. Mengembalikan instance dirinya sendiri.",
+            },
+            {
+              name: "hide",
+              type: "LoadingWidget",
+              default: "",
+              desc: "Mencabut (remove) OverlayEntry dari layar sementara waktu tanpa menghancurkan instance secara total. Dapat dimunculkan kembali dengan memanggil show().",
+            },
+            {
+              name: "message",
+              type: "LoadingWidget",
+              default: "",
+              desc: "Memperbarui teks informasi loading di layar secara instan (real-time). Menerima string baru dan hanya me-rebuild konteks OverlayEntry tanpa menyentuh widget tree induk.",
+            },
+            {
+              name: "close",
+              type: "void",
+              default: "",
+              desc: "Menyembunyikan overlay dan menandai (flag) instance tersebut sebagai disposed. Instance yang sudah di-close tidak akan bisa digunakan untuk memanggil show() lagi demi mencegah memory leak.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Fluent Interface (Method Chaining)",
+              type: "Architecture",
+              default: "",
+              desc: "Semua metode manipulasi status seperti show(), hide(), dan message() mengembalikan objek yang sama (this), memungkinkan eksekusi kode berantai yang ringkas seperti LoadingWidget.init(context).show().message('Tunggu...').",
+            },
+            {
+              name: "Isolated Repaint",
+              type: "State Management",
+              default: "",
+              desc: "Metode message() memicu _overlayEntry?.markNeedsBuild(). Teknik ini sangat efisien karena hanya me-rebuild komponen overlay itu sendiri tanpa harus menjalankan ulang fungsi build() pada halaman tempat fungsi ini dipanggil.",
+            },
+            {
+              name: "Interactive Barrier",
+              type: "UI Flow",
+              default: "",
+              desc: "Menambahkan lapisan modal dengan latar belakang Colors.black45 yang secara otomatis mencegat (intercept) seluruh interaksi sentuh (touch events) pengguna terhadap tombol atau form di belakangnya.",
+            },
+            {
+              name: "Theme Auto-Adaptation",
+              type: "UI Responsive",
+              default: "",
+              desc: "Membaca Brightness dari Theme perangkat. Pada Dark Mode, kotak loading dirender dengan warna 0xFF1E1E1E dan teks putih, sementara pada Light Mode menggunakan warna putih dan teks hitam.",
+            },
+          ],
+          specialNotes: [
+            "Best Practice: Selalu simpan instansiasi LoadingWidget.init() ke dalam sebuah variabel, lalu wajib memanggil metode .close() di dalam blok try-finally pada operasi asynchronous untuk menjamin loading hilang meskipun terjadi error/exception.",
+            "Limitation: Jangan memanggil metode .show() kembali pada instance yang metode .close()-nya telah dipanggil, karena aksi tersebut akan diblokir oleh flag _isDisposed.",
+            "Integration Notes: Warna spinner (CircularProgressIndicator) di-hardcode menggunakan Colors.deepOrange. Apabila Anda membutuhkan penyesuaian tema warna, warna ini harus diubah secara manual di dalam kode sumber.",
+            "Warning: Pastikan BuildContext yang dilempar valid dan terhubung dengan pohon Navigator yang memiliki akses ke state Overlay (bukan context yang berada di luar hierarki Material/WidgetsApp).",
+          ],
+          code: "Future prosesData(BuildContext context) async {\n  // 1. Inisialisasi dan tampilkan loading screen\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    \n    // 2. Ubah pesan loading di tengah proses tanpa memblokir UI\n    loader.message('Mengunduh aset dari server...');\n    await Future.delayed(const Duration(seconds: 2));\n    \n    loader.message('Menyimpan ke memori lokal...');\n    await Future.delayed(const Duration(seconds: 1));\n\n  } catch (e) {\n    print('Terjadi kesalahan: $e');\n  } finally {\n    // 3. Wajib panggil close() di finally agar layar tidak hang\n    loader.close();\n  }\n}",
+        },
+        {
+          id: "datetime-formatting",
+          group: "Helper",
+          name: "Date & Time Formatting",
+          icon: "fa-solid fa-calendar-days",
+          description:
+            "Kumpulan fungsi utilitas untuk memformat objek DateTime dan Timestamp Firestore menjadi string tanggal yang ramah pengguna dengan pelokalan Indonesia (id_ID), serta konversi bolak-balik dari format angka absolut.",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {
+            dependencies: "intl, cloud_firestore",
+          },
+          methods: [
+            {
+              name: "formatTanggalV1",
+              type: "String Function",
+              default: "",
+              desc: "Menerjemahkan Timestamp menjadi format relatif pintar. Menampilkan 'HH:mm' untuk hari ini, 'Kemarin, HH:mm' untuk H-1, nama hari untuk dalam seminggu, dan tanggal penuh untuk tahun lampau.",
+            },
+            {
+              name: "formatTanggalV2",
+              type: "String Function",
+              default: "",
+              desc: "Mengonversi Timestamp ke format panjang (contoh: 12 Januari 2024, 15:30).",
+            },
+            {
+              name: "formatTanggalV3",
+              type: "String Function",
+              default: "",
+              desc: "Mengonversi Timestamp ke format pendek tanpa jam (contoh: 12 Jan 2024).",
+            },
+            {
+              name: "formatDataTime",
+              type: "String Function",
+              default: "",
+              desc: "Memformat objek DateTime bawaan Dart menggunakan custom format string. Default format adalah 'yyyy-MM-dd HH:mm:ss'.",
+            },
+            {
+              name: "intToDate",
+              type: "DateTime Function",
+              default: "",
+              desc: "Mengonversi angka berformat YYYYMMDD menjadi objek DateTime.",
+            },
+            {
+              name: "intToDay",
+              type: "String Function",
+              default: "",
+              desc: "Menerjemahkan integer (1-7) menjadi nama hari dalam bahasa Indonesia (Senin-Minggu).",
+            },
+            {
+              name: "intToMonth",
+              type: "String Function",
+              default: "",
+              desc: "Menerjemahkan integer (1-12) menjadi nama bulan dalam bahasa Indonesia.",
+            },
+            {
+              name: "intToTime",
+              type: "TimeOfDay Function",
+              default: "",
+              desc: "Mengonversi angka berformat HHMM menjadi objek TimeOfDay.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Null Fallback",
+              type: "Safety Handling",
+              default: "",
+              desc: "Fungsi pemformatan tanggal akan mengembalikan string '-' secara aman jika parameter Timestamp bernilai null.",
+            },
+          ],
+          specialNotes: [
+            "Pastikan initializeDateFormatting('id_ID', null) sudah dipanggil di level main aplikasi Anda agar DateFormat dapat memproses pelokalan Indonesia tanpa error.",
+          ],
+          code: "String displayDate = formatTanggalV1(firestoreDoc['createdAt']); // Contoh output: 'Hari ini, 14:00'",
+        },
+        {
+          id: "text-transformation",
+          group: "Helper",
+          name: "Text Transformation",
+          icon: "fa-solid fa-font",
+          description:
+            "Modul utilitas untuk mengubah manipulasi ukuran huruf (case transformation) pada teks dan memetakan kunci sistem menjadi label yang lazim dibaca (human-readable).",
+          mandatoryProps: [],
+          additionalInfo: {},
+          optionalProps: [
+            {
+              name: "TransformTextType",
+              type: "enum",
+              default: "uppercase",
+              desc: "Kumpulan opsi transformasi teks: sentence, lowercase, uppercase, capitalizeEachWord, dan toggleCase.",
+            },
+          ],
+          methods: [
+            {
+              name: "transformText",
+              type: "String Function",
+              default: "",
+              desc: "Mengubah struktur kapitalisasi string berdasarkan tipe yang di-assign melalui TransformTextType.",
+            },
+            {
+              name: "staffFormalLabel",
+              type: "String Function",
+              default: "",
+              desc: "Mengonversi alias peran sistem bahasa Inggris ('waiter', 'kitchen', 'cashier') menjadi sebutan formal Indonesia ('Pelayan', 'Dapur', 'Kasir').",
+            },
+          ],
+          behaviors: [],
+          specialNotes: [],
+          code: "String title = transformText('selamat datang di sistem', type: TransformTextType.capitalizeEachWord);\n// Output: 'Selamat Datang Di Sistem'",
+        },
+        {
+          id: "number-utilities",
+          group: "Helper",
+          name: "Number Utilities",
+          icon: "fa-solid fa-calculator",
+          description:
+            "Kumpulan fungsi untuk melakukan parsing tipe data angka dengan mekanisme perlindungan (safe parsing) untuk mencegah null-pointer atau format exception, serta kemampuan membersihkan teks angka kotor menjadi format valid.",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {},
+          methods: [
+            {
+              name: "toIntSafe",
+              type: "int Function",
+              default: "",
+              desc: "Mengeksekusi konversi ke integer dari tipe dinamis. Mengembalikan 0 jika gagal diparse atau bernilai null.",
+            },
+            {
+              name: "toDoubleSafe",
+              type: "double Function",
+              default: "",
+              desc: "Mengeksekusi konversi ke double dari tipe dinamis secara aman. Mengonversi separator desimal ',' menjadi '.' secara otomatis.",
+            },
+            {
+              name: "normalizeNumber",
+              type: "num Function",
+              default: "",
+              desc: "Mengubah value dinamis menjadi int jika nilai desimalnya murni bulat (.0), atau membiarkannya sebagai double.",
+            },
+            {
+              name: "extractNumber",
+              type: "num Function",
+              default: "",
+              desc: "Mengekstrak angka mentah dari teks kotor (yang bercampur karakter atau mata uang), mengenali pola koma dan titik berdasarkan logika penulisan angka Indonesia atau US.",
+            },
+            {
+              name: "formatNumberClean",
+              type: "String Function",
+              default: "",
+              desc: "Mencetak angka num menjadi String hingga 4 desimal dengan membuang angka nol trailing (0 berlebih di belakang) dan titik tak berguna.",
+            },
+            {
+              name: "doubleClean",
+              type: "String Function",
+              default: "",
+              desc: "Format angka desimal 2 digit dengan menghapus tailing zero, menghasilkan string rapi (misal: 12.50 menjadi 12.5).",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Crash-Free Extraction",
+              type: "Data Manipulation",
+              default: "",
+              desc: "Semua metode didesain dengan nilai fallback sehingga sistem tidak akan crash jika disuplai dengan format null, string teks huruf murni, atau tipe lain.",
+            },
+          ],
+          specialNotes: [
+            "Fungsi extractNumber menggunakan pola Regex dan perbandingan indexOf untuk menebak secara logis mana pemisah ribuan dan mana pemisah desimal dari format teks yang ambigu.",
+          ],
+          code: "int stok = toIntSafe(json['stock']); // Jika null, menjadi 0\nnum harga = extractNumber('Rp 1.500.000,50'); // Output: 1500000.5",
+        },
+        {
+          id: "currency-formatting",
+          group: "Helper",
+          name: "Currency Formatting",
+          icon: "fa-solid fa-money-bill-wave",
+          description:
+            "Utilitas formatting angka menjadi standar format mata uang dan penyediaan input formatter global untuk penggunaan langsung di TextFormField.",
+          mandatoryProps: [],
+          additionalInfo: {
+            dependencies: "flutter_multi_formatter, intl",
+          },
+          optionalProps: [
+            {
+              name: "currencyInputFormatter",
+              type: "CurrencyInputFormatter",
+              default: "Leading 'Rp ', separator titik",
+              desc: "Objek input formatter untuk TextFormField yang menyisipkan prefix 'Rp ' otomatis beserta titik pemisah ribuan saat pengguna mengetik.",
+            },
+            {
+              name: "currencyInputFormatterSimple",
+              type: "CurrencyInputFormatter",
+              default: "Separator titik tanpa prefix",
+              desc: "Objek input formatter yang sama dengan di atas, namun murni hanya memformat ribuan tanpa teks awalan mata uang.",
+            },
+          ],
+          methods: [
+            {
+              name: "formatRupiah",
+              type: "String Function",
+              default: "",
+              desc: "Memformat nilai nominal num menjadi format mata uang Indonesia. Mendukung penonaktifan imbuhan 'Rp' lewat flag opsional leading dan kustomisasi prefix.",
+            },
+          ],
+          behaviors: [],
+          specialNotes: [],
+          code: "String textHarga = formatRupiah(250000); // Output: 'Rp 250.000'\n// Penggunaan TextField:\nTextField(inputFormatters: [currencyInputFormatter]);",
+        },
+        {
+          id: "timezone-synchronizer",
+          group: "Helper",
+          name: "Timezone & NTP Synchronizer",
+          icon: "fa-solid fa-clock",
+          description:
+            "Sistem pencegah manipulasi waktu lokal. Mengkompensasi selisih antara waktu perangkat (lokal) dengan server NTP cloud untuk menghasilkan waktu mutlak yang valid, sangat krusial bagi sistem absensi atau transaksi e-commerce.",
+          mandatoryProps: [],
+          additionalInfo: {
+            dependencies: "ntp, timezone",
+            serverNTP: "time.google.com",
+          },
+          optionalProps: [
+            {
+              name: "_offset",
+              type: "int",
+              default: "0",
+              desc: "Nilai jeda/selisih waktu dalam satuan milidetik antara perangkat dengan server (static variable).",
+            },
+            {
+              name: "_hasSynced",
+              type: "bool",
+              default: "false",
+              desc: "Flag boolean statis yang menandakan apakah sinkronisasi telah sukses dilakukan.",
+            },
+          ],
+          methods: [
+            {
+              name: "init",
+              type: "static void",
+              default: "",
+              desc: "Mengeksekusi inisialisasi basis data library timezone (tz_data).",
+            },
+            {
+              name: "syncTime",
+              type: "static Future",
+              default: "",
+              desc: "Melakukan handshake jaringan asinkron dengan time.google.com untuk mengambil NTP offset. Memiliki auto-catch error menjadi offset 0 jika jaringan offline.",
+            },
+            {
+              name: "now",
+              type: "static Future",
+              default: "",
+              desc: "Mendapatkan model TimeZoneData komprehensif berdasarkan offset sinkronisasi dan kode zona waktu tz (default Asia/Jakarta).",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Lazy Synchronization",
+              type: "Lifecycle",
+              default: "",
+              desc: "Metode now() akan memeriksa _hasSynced. Jika belum pernah tersinkron, ia akan otomatis me-trigger syncTime() tanpa intervensi manual dari sisi developer.",
+            },
+          ],
+          specialNotes: [
+            "Wajib jalankan TimezoneHelper.init() di void main() sebelum aplikasi di-build untuk mengaktifkan dictionary zona waktu lokal dart.",
+          ],
+          code: "await TimezoneHelper.init();\nTimeZoneData accurateTime = await TimezoneHelper.now('Asia/Jakarta');\nprint(accurateTime.now);",
+        },
+        {
+          id: "security-hash",
+          group: "Helper",
+          name: "Security & Hash",
+          icon: "fa-solid fa-shield-halved",
+          description:
+            "Fungsi kriptografi minor untuk proses hashing dasar pada aplikasi.",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {
+            dependencies: "crypto",
+          },
+          methods: [
+            {
+              name: "toMd5",
+              type: "String Function",
+              default: "",
+              desc: "Menerima String mentah, mengubahnya ke UTF-8, dan memprosesnya dengan konverter md5 untuk mengembalikan hash hexadeciminal. Lazim untuk checksum lokal atau avatar gravatar.",
+            },
+          ],
+          behaviors: [],
+          specialNotes: [
+            "Perhatian: Jangan pernah menggunakan MD5 untuk menyimpan kata sandi (passwords) tingkat tinggi karena sangat rentan terhadap serangan collision dan rainbow table. Gunakan bcrypt, scrypt, atau argon2 untuk keamanan auth.",
+          ],
+          code: "String hashed = toMd5('password123');",
+        },
+        {
+          id: "privacy-masking",
+          group: "Helper",
+          name: "Privacy Masking",
+          icon: "fa-solid fa-user-secret",
+          description:
+            "Utilitas pemformatan UI untuk menyensor atau menutupi karakter sebagian dari informasi sensitif milik pengguna seperti nomor ponsel atau alamat jalan.",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {},
+          methods: [
+            {
+              name: "maskPhoneNumber",
+              type: "String Function",
+              default: "",
+              desc: "Menyensor nomor telepon di area tengah. Misalnya 081234567890 menjadi 081******890 (menjaga 3 angka awal dan 3 angka akhir).",
+            },
+            {
+              name: "maskAddress",
+              type: "String Function",
+              default: "",
+              desc: "Mengekspos 8 karakter pertama dari alamat string, lalu menimpa sisanya dengan bintang.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Length Guard",
+              type: "Safety Mechanism",
+              default: "",
+              desc: "Apabila panjang parameter kurang dari threshold (misal nomor telepon < 8 karakter, alamat < 10 karakter), fungsi akan mengembalikan parameter tersebut dalam keadaan utuh untuk menghindari String Index Out Of Bound error.",
+            },
+          ],
+          specialNotes: [],
+          code: "String securePhone = maskPhoneNumber('+6281987654321');",
+        },
+        {
+          id: "image-compression",
+          group: "Helper",
+          name: "Image Compression",
+          icon: "fa-solid fa-file-image",
+          description:
+            "Modul manipulasi file fisik (I/O) untuk mengompresi gambar dan merubah ekstensinya secara otomatis demi penghematan kuota penyimpanan cloud.",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {
+            dependencies:
+              "flutter_image_compress, path_provider, path, dart:io",
+          },
+          methods: [
+            {
+              name: "compressImageToWebP",
+              type: "Future<File?>",
+              default: "",
+              desc: "Menerima objek java.io.File, mengeksekusi kompresi dengan quality 30 dan resolusi minimum 500x500px, serta mengubah paksa strukturnya menjadi format WebP ultra ringan. Menyimpan hasil kompresi di Temporary Directory OS.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Timestamp Renaming",
+              type: "File System",
+              default: "",
+              desc: "File yang dihasilkan dari proses kompresi akan secara acak dinamakan menggunakan DateTime.now().millisecondsSinceEpoch untuk menjamin keunikan mutlak di direktori sementara.",
+            },
+          ],
+          specialNotes: [
+            "Implementasi target spesifik ini mendesain kualitas di 30% dan ukuran 500x500. Sangat agresif. Jika gambar dipakai untuk keperluan detail cetak atau zoomable image, nilai ini perlu diekstrak ke parameter agar bisa disesuaikan.",
+          ],
+          code: "File original = File(pathImage);\nFile? compressed = await compressImageToWebP(original);",
+        },
+        {
+          id: "search-keyword-generator",
+          group: "Helper",
+          name: "Search Keyword Generator",
+          icon: "fa-solid fa-magnifying-glass",
+          description:
+            "Fungsi krusial untuk membuat matriks tokenizer pencarian (n-grams/prefixes). Mengakali batasan Firestore NoSQL yang tidak mendukung kueri pencarian teks parsial (seperti 'LIKE' di SQL).",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {},
+          methods: [
+            {
+              name: "createKeywords",
+              type: "List Function",
+              default: "",
+              desc: "Mengiris-iris setiap kata yang didapat dari Map data berdasarkan targetKeys. Menghasilkan prefix string bertahap (mulai dari panjang 'minPrefix' hingga 'maxPrefix'). Mengembalikan daftar unik kata kunci (list) yang maksimal ditahan oleh 'maxKeyword'.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Deduplication Set",
+              type: "Algorithm",
+              default: "",
+              desc: "Secara internal menggunakan tipe koleksi Set<String> ketika merajut irisan kata agar nilai penggalan tidak pernah ada yang duplikat, dan mengonversinya kembali menjadi list toList() di pengembalian.",
+            },
+          ],
+          specialNotes: [
+            "Penggunaan fungsi ini cukup berat karena adanya loop bersarang dalam jumlah yang dinamis. Pastikan untuk hanya memanggilnya pada saat memproses layer repository/data persisten (contoh: sebelum mengirim payload Firestore), dan hindari pemanggilan pada reaktif build Widget.",
+          ],
+          code: "final docData = {'nama_produk': 'Kopi Gula Aren'};\nfinal generatedKeywords = createKeywords(data: docData, targetKeys: ['nama_produk']);\ndocData['keywords'] = generatedKeywords;\nawait firestore.collection('products').add(docData);",
+        },
+        {
+          id: "ui-helper-general",
+          group: "Helper",
+          name: "UI Helper & Components",
+          icon: "fa-solid fa-layer-group",
+          description:
+            "Bantuan render antarmuka grafis (GUI) mini yang mengekstrak komponen layout berulang agar UI code tetap bersih dan rapi.",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {},
+          methods: [
+            {
+              name: "widgetInfoRow",
+              type: "Container Function",
+              default: "",
+              desc: "Me-return widget Container siap pakai yang menyusun key (label atas) dan value (nilai bawah). Mendukung pengaturan latar belakang dan warna teks yang responsif terhadap variabel darkMode.",
+            },
+          ],
+          behaviors: [],
+          specialNotes: [],
+          code: "widgetInfoRow(Theme.of(context).brightness == Brightness.dark, 'Nama Staf', 'Budi Santoso');",
+        },
+        {
+          id: "GridRowWidget",
+          group: "Widget",
+          name: "Grid System",
+          icon: "fa-solid fa-table-columns",
+          description:
+            "Sistem layout grid responsif berbasis 12-kolom yang terinspirasi dari Bootstrap. Komponen ini terdiri dari GridRowWidget sebagai kontainer utama dan GridColWidget sebagai penentu lebar kolom pada berbagai titik henti (breakpoint). Memungkinkan pembuatan desain antarmuka yang fleksibel dan dapat beradaptasi secara otomatis dari layar mobile kecil hingga layar desktop super lebar.",
+          mandatoryProps: [
+            {
+              name: "children",
+              type: "List<GridColWidget>",
+              default: "",
+              desc: "Daftar kolom yang akan dirender di dalam baris grid. Hanya menerima turunan bertipe GridColWidget.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "justify",
+              type: "GridJustify",
+              default: "GridJustify.start",
+              desc: "Menentukan bagaimana ruang kosong horizontal di dalam baris didistribusikan antar kolom. Mendukung start, center, end, spaceBetween, spaceAround, dan spaceEvenly.",
+            },
+            {
+              name: "alignItems",
+              type: "GridAlign",
+              default: "GridAlign.start",
+              desc: "Menentukan perataan vertikal seluruh kolom di dalam baris tersebut. Mendukung start, center, end, dan stretch.",
+            },
+            {
+              name: "columnGap",
+              type: "double",
+              default: "12.0",
+              desc: "Jarak renggang (spacing) horizontal antar kolom dalam satuan piksel.",
+            },
+            {
+              name: "rowGap",
+              type: "double",
+              default: "12.0",
+              desc: "Jarak renggang (spacing) vertikal antar baris apabila kolom mengalami pembungkusan (wrapping) ke bawah.",
+            },
+          ],
+          additionalInfo: {
+            grid_col_mandatory_props: [
+              {
+                name: "child",
+                type: "Widget",
+                default: "",
+                desc: "Konten widget yang akan dirender di dalam kolom.",
+              },
+            ],
+            grid_col_optional_props: [
+              {
+                name: "xs",
+                type: "int",
+                default: "12",
+                desc: "Lebar kolom (1-12) pada layar ekstra kecil (< 576px). Nilai 0 akan menyembunyikan kolom (display: none).",
+              },
+              {
+                name: "sm",
+                type: "int?",
+                default: "null",
+                desc: "Lebar kolom (1-12) pada layar kecil (≥ 576px).",
+              },
+              {
+                name: "md",
+                type: "int?",
+                default: "null",
+                desc: "Lebar kolom (1-12) pada layar menengah (≥ 768px).",
+              },
+              {
+                name: "lg",
+                type: "int?",
+                default: "null",
+                desc: "Lebar kolom (1-12) pada layar besar (≥ 992px).",
+              },
+              {
+                name: "xl",
+                type: "int?",
+                default: "null",
+                desc: "Lebar kolom (1-12) pada layar ekstra besar (≥ 1200px).",
+              },
+              {
+                name: "xxl",
+                type: "int?",
+                default: "null",
+                desc: "Lebar kolom (1-12) pada layar 2X besar (≥ 1400px).",
+              },
+              {
+                name: "xxxl",
+                type: "int?",
+                default: "null",
+                desc: "Lebar kolom (1-12) pada layar 3X besar (≥ 1600px).",
+              },
+            ],
+          },
+          methods: [
+            {
+              name: "breakpoint",
+              type: "Breakpoint",
+              default: "",
+              desc: "Fungsi helper independen untuk mendeteksi breakpoint aktif saat ini berdasarkan lebar layar (width). Menerima parameter opsional context atau width secara langsung.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Responsive Cascading",
+              type: "UI Layout",
+              default: "",
+              desc: "Sistem GridColWidget mewarisi (cascade) nilai breakpoint dari yang terkecil hingga terbesar. Jika Anda hanya mengatur nilai xs=12 dan md=6, maka pada layar lg, xl, xxl sistem akan menggunakan nilai md=6 secara otomatis karena nilai yang lebih besar akan mengambil fallback (nilai acuan) dari breakpoint valid tepat di bawahnya.",
+            },
+            {
+              name: "Zero Width Omission",
+              type: "Performance",
+              default: "",
+              desc: "Jika sebuah GridColWidget menghasilkan porsi rentang kolom (colSpan) sebesar 0 pada suatu breakpoint, widget akan otomatis dirender sebagai SizedBox.shrink(). Ini akan membuang elemen tersebut dari layout dan menghemat memori rendering (mirip dengan d-none di CSS).",
+            },
+            {
+              name: "Clamp Overflow Protection",
+              type: "UI Layout",
+              default: "",
+              desc: "Perhitungan lebar absolut per kolom dibungkus menggunakan .clamp(0.0, maxWidth). Hal ini menetralkan risiko cacat desimal floating-point saat layar digeser (resize) yang umumnya menyebabkan komponen terlempar ke baris berikutnya tanpa alasan yang jelas.",
+            },
+          ],
+          specialNotes: [
+            "GridRowWidget secara internal menggunakan LayoutBuilder. Hal ini membuat grid dapat bereaksi terhadap lebar parent terdekatnya, bukan hanya mendeteksi resolusi absolut dari MediaQuery. Sangat berguna untuk nested-grid.",
+            "Fitur GridAlign.stretch hanya akan berfungsi sempurna jika constraint vertikal pembungkus parent tidak diatur ke infinite (harus memiliki batasan tinggi yang jelas).",
+          ],
+          code: "GridRowWidget(\n  justify: GridJustify.spaceBetween,\n  rowGap: 16.0,\n  columnGap: 16.0,\n  children: [\n    GridColWidget(\n      xs: 12,   // Penuh di Mobile\n      md: 6,    // 50% di Tablet\n      lg: 4,    // 33.3% di Desktop\n      child: Container(color: Colors.red, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      lg: 4,\n      child: Container(color: Colors.green, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 12,   // Penuh di Tablet (baris ke-2)\n      lg: 4,    // Sejajar dengan yang lain di Desktop\n      child: Container(color: Colors.blue, height: 100),\n    ),\n  ],\n)",
+        },
+        {
+          id: "FirestoreService",
+          group: "Service",
+          name: "Firestore Service",
+          icon: "fa-solid fa-cloud",
+          description:
+            "Layanan kelas statis yang memfasilitasi integrasi dan operasi backend dengan Firebase Cloud Firestore dan Firebase Storage. Menyediakan antarmuka (wrapper) terpusat untuk operasi CRUD, sistem listener realtime (Stream), query bersyarat dinamis (melalui helper WhereClause), serta manipulasi file (upload, replace, remove) dengan injeksi meta-data ID dan Referensi secara otomatis.",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {
+            dependencies: "cloud_firestore, firebase_storage",
+            "WhereClause Helper":
+              "Kelas utilitas untuk mem-parsing filter query Firestore. Memiliki parameter wajib 'field' dan 'value', serta 'operator' opsional dengan nilai bawaan WhereClause.equal ('=='). Operator yang didukung: equal, notEqual, lessThan, lessThanOrEqual, greaterThan, greaterThanOrEqual, arrayContains, arrayContainsAny, whereIn, whereNotIn.",
+          },
+          methods: [
+            {
+              name: "getCollect",
+              type: "static Stream<QuerySnapshot<Object?>>",
+              default: "",
+              desc: "Membuka aliran data (stream) secara realtime dari suatu koleksi. Menerima parameter opsional: where (List), orderBy, descending (default: false), dan limit.",
+            },
+            {
+              name: "getCollectOnce",
+              type: "static Future<QuerySnapshot<Object?>>",
+              default: "",
+              desc: "Mengambil data (fetch) dari koleksi sebanyak satu kali. Mendukung filter yang sama persis dengan getCollect.",
+            },
+            {
+              name: "insert",
+              type: "static Future",
+              default: "",
+              desc: "Menyisipkan data baru (Map<String, dynamic>) ke dalam koleksi. Jika parameter 'id' diberikan, akan membuat dokumen dengan ID spesifik; jika null, Firestore akan melakukan auto-generate ID.",
+            },
+            {
+              name: "updateAndInsert",
+              type: "static Future",
+              default: "",
+              desc: "Melakukan operasi Upsert (Update or Insert). Mencari data berdasarkan idPrimary atau kueri (where). Jika ditemukan, dokumen di-update (merge: true); jika tidak, dokumen baru disisipkan (insert).",
+            },
+            {
+              name: "update",
+              type: "static Future",
+              default: "",
+              desc: "Memperbarui dokumen yang sudah ada secara parsial berdasarkan idPrimary atau hasil kueri limit(1) dari WhereClause.",
+            },
+            {
+              name: "delete",
+              type: "static Future",
+              default: "",
+              desc: "Menghapus suatu dokumen dari koleksi. Membutuhkan parameter idPrimary atau kondisi spesifik via klausa where.",
+            },
+            {
+              name: "streamFirst",
+              type: "static Stream<Map<String, dynamic>?>",
+              default: "",
+              desc: "Mengembalikan stream realtime yang memonitor satu dokumen secara spesifik (via idPrimary) atau dokumen pertama yang cocok dengan filter kueri (limit 1).",
+            },
+            {
+              name: "getFirst",
+              type: "static StreamSubscription?",
+              default: "",
+              desc: "Mendaftarkan listener realtime pada dokumen spesifik dan menembakkan data terbaru melalui callback function onData(Map<String, dynamic>? data). Digunakan untuk kendali lifecycle subscription manual.",
+            },
+            {
+              name: "getFirstOnce",
+              type: "static Future<Map<String, dynamic>?>",
+              default: "",
+              desc: "Mengambil satu dokumen spesifik berdasarkan idPrimary atau query filter, lalu mengekstrak datanya menjadi Map tunggal. Mengembalikan null jika dokumen tidak ditemukan.",
+            },
+            {
+              name: "getReference",
+              type: "static Future<DocumentReference?>",
+              default: "",
+              desc: "Mengembalikan instance DocumentReference untuk suatu dokumen tanpa mengekstrak data di dalamnya, berguna untuk operasi referensi relasional antar koleksi.",
+            },
+            {
+              name: "uploadFile",
+              type: "static Future<String?>",
+              default: "",
+              desc: "Mengunggah data file dalam bentuk Uint8List ke Firebase Storage. Mengembalikan URL unduhan (download URL) publik jika sukses, atau null jika gagal. Folder default adalah 'uploads'.",
+            },
+            {
+              name: "replaceFile",
+              type: "static Future<String?>",
+              default: "",
+              desc: "Menghapus file lama yang berada pada path yang sama lalu mengunggah file baru. Mengembalikan download URL dari file yang baru diunggah.",
+            },
+            {
+              name: "removeFile",
+              type: "static Future",
+              default: "",
+              desc: "Menghapus file secara permanen dari Firebase Storage berdasarkan fileName dan folder.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Meta-Data Injection",
+              type: "Data Manipulation",
+              default: "",
+              desc: "Pada setiap metode yang mengekstrak dan me-return Map tunggal (seperti getFirstOnce atau streamFirst), service ini secara otomatis menyisipkan key tambahan berupa 'id' (berisi document ID) dan 'ref' (berisi DocumentReference) ke dalam payload hasil untuk mempermudah akses pada operasi selanjutnya.",
+            },
+            {
+              name: "SetOptions Merge Strategy",
+              type: "Database Operation",
+              default: "",
+              desc: "Metode pembaruan terintegrasi (seperti updateAndInsert) menggunakan atribut SetOptions(merge: true). Hal ini menjamin bahwa hanya kolom data (fields) spesifik yang tertimpa tanpa merusak keseluruhan data di dalam dokumen tersebut.",
+            },
+            {
+              name: "Query Operator Exception Guard",
+              type: "Error Handling",
+              default: "",
+              desc: "Jika sebuah klausa menggunakan string operator yang tidak dikenali/ilegal di dalam loop _queryHenadler, sistem akan melempar Exception secara sinkron untuk memblokir eksekusi query yang cacat (corrupt) ke server Firebase.",
+            },
+          ],
+          specialNotes: [
+            "Best Practice: Selalu gunakan static class helper 'WhereClause' yang telah disediakan ketika mem-parsing parameter filter pada method seperti getCollect untuk menghindari kesalahan pengetikan string operator query.",
+            "Limitation: Fitur File Storage dari kelas ini difokuskan pada tipe data raw bytes (Uint8List) dari file, sehingga jika Anda menggunakan path file lokal atau XFile (seperti pada image_picker mobile), Anda harus mengkonversinya terlebih dahulu menjadi format readAsBytes().",
+            "Performance Notes: Pada pemanggilan getCollectOnce, tidak ada kendali caching di dalam kode, permintaan selalu dieksekusi secara remote/network first melalui SDK Firestore default.",
+          ],
+          code: "final List filters = [\n  WhereClause(field: 'status', operator: WhereClause.equal, value: 'active'),\n  WhereClause(field: 'age', operator: WhereClause.greaterThanOrEqual, value: 18)\n];\n\n// Mengambil data secara realtime dengan filter\nfinal userStream = FirestoreService.getCollect('users', where: filters, limit: 10);\n\n// Menyisipkan data baru tanpa ID (auto ID)\nfinal docRef = await FirestoreService.insert('users', {\n  'name': 'John Doe',\n  'status': 'active',\n  'age': 25,\n  'createdAt': FieldValue.serverTimestamp(),\n});\n\n// Memperbarui data pengguna\nawait FirestoreService.update('users', {\n  'age': 26\n}, idPrimary: docRef.id);",
+        },
+        {
+          id: "GitService",
+          group: "Service",
+          name: "GitHub API Service",
+          icon: "fa-brands fa-github",
+          description:
+            "Layanan utilitas untuk mengelola sinkronisasi file (upload dan delete) secara langsung ke repository GitHub menggunakan GitHub REST API. Layanan ini mendukung eksekusi tunggal (single) maupun massal (batch) via Git Tree API, serta memancarkan progres secara real-time menggunakan arsitektur Stream.",
+          mandatoryProps: [],
+          additionalInfo: {
+            dependencies: "http, path",
+            helper_GitUploadProgress:
+              "Model class yang dipancarkan oleh Stream berisi `progress` (double 0.0 - 1.0) dan `message` (String) untuk keperluan render UI pemuatan (loading).",
+            helper_GitFomatFileUpload:
+              "Model class untuk membungkus file fisik lokal (`File`) beserta `filename` opsional untuk kustomisasi nama atau ekstensi akhir saat diunggah.",
+            helper_GitFormatContentUpload:
+              "Model class untuk membungkus data teks mentah atau base64 (`content`) beserta jalur tujuan di repository (`path`).",
+          },
+          optionalProps: [
+            {
+              name: "token",
+              type: "String",
+              default: "github_pat_...",
+              desc: "Personal Access Token (PAT) GitHub untuk otentikasi. Wajib memiliki scope 'repo'.",
+            },
+            {
+              name: "owner",
+              type: "String",
+              default: "tminspiratif",
+              desc: "Nama pemilik akun atau organisasi (organization) repository GitHub.",
+            },
+            {
+              name: "repo",
+              type: "String",
+              default: "respo",
+              desc: "Nama repository target tempat file akan diunggah atau dihapus.",
+            },
+            {
+              name: "branch",
+              type: "String",
+              default: "main",
+              desc: "Nama branch (cabang) target tempat commit akan diterapkan.",
+            },
+            {
+              name: "url",
+              type: "static const String",
+              default:
+                "'[https://tminspiratif.github.io/respo/](https://tminspiratif.github.io/respo/)'",
+              desc: "URL dasar (base URL) publik untuk mengakses repository (biasanya URL GitHub Pages).",
+            },
+          ],
+          methods: [
+            {
+              name: "uploadSingle",
+              type: "Stream",
+              default: "",
+              desc: "Mengunggah satu buah konten (teks/base64) secara langsung. Parameter wajib: `content` (GitFormatContentUpload) dan `commit` (pesan commit). Secara otomatis mengambil SHA dari file yang sudah ada jika melakukan replace/update.",
+            },
+            {
+              name: "uploadBatch",
+              type: "Stream",
+              default: "",
+              desc: "Mengunggah kumpulan konten secara bersamaan. Mengeksekusi pembuatan Git Tree secara dinamis agar seluruh perubahan digabung ke dalam satu kali commit, mempercepat proses jaringan.",
+            },
+            {
+              name: "deleteSingle",
+              type: "Stream",
+              default: "",
+              desc: "Menghapus satu file dari repository. Parameter wajib: `path` (lokasi file) dan `commit` (pesan). Akan memverifikasi keberadaan SHA file sebelum melancarkan aksi penghapusan.",
+            },
+            {
+              name: "deleteBatch",
+              type: "Stream",
+              default: "",
+              desc: "Menghapus sekumpulan file secara massal. Membuat Git Tree baru di mana entri SHA file yang dihapus diatur menjadi `null`.",
+            },
+            {
+              name: "uploadFileSingle",
+              type: "Stream",
+              default: "",
+              desc: "Mengonversi satu file fisik (dart:io File) menjadi format Base64 dan mengunggahnya. Mendukung `folderTarget` untuk menetapkan sub-direktori penyimpanan, serta resolusi ekstensi otomatis.",
+            },
+            {
+              name: "uploadFileBatch",
+              type: "Stream",
+              default: "",
+              desc: "Mengunggah sekumpulan file fisik. Memecah setiap file menjadi blob terpisah terlebih dahulu menggunakan Git Blobs API, kemudian mengikat seluruh blob tersebut ke dalam satu Tree dan melakukan satu kali commit. Sangat efisien untuk upload bulk gambar/dokumen.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Stream Emitting",
+              type: "Reactive Flow",
+              default: "",
+              desc: "Setiap metode mengembalikan data melalui `yield` secara bertahap, memberikan rasio persentase dan teks status (seperti 'Checking storage...', 'Preparing assets...', 'Synchronizing cloud...') kepada pihak pemanggil. Hal ini memungkinkan antarmuka pengguna memperbarui Progress Bar secara presisi.",
+            },
+            {
+              name: "Auto SHA Resolution",
+              type: "Git Flow",
+              default: "",
+              desc: "Saat memodifikasi atau menghapus file, API GitHub mewajibkan lampiran token SHA asli (sebagai tanda tangan versi). Service ini secara otomatis memanggil HTTP GET terlebih dahulu untuk menarik SHA tersebut sehingga developer tidak perlu mengelola versioning secara manual.",
+            },
+            {
+              name: "Tree Injection Mode",
+              type: "Data Manipulation",
+              default: "",
+              desc: "Pada operasi batch (massal), metode ini menghindari teknik spamming upload 1-per-1. Sebagai gantinya, file-file diinjeksi ke dalam Git Tree berbasis parent commit terakhir (`base_tree`), sehingga API rate-limit GitHub tetap aman dan riwayat commit tidak kotor.",
+            },
+          ],
+          specialNotes: [
+            "Warning: Meng-hardcode Personal Access Token (PAT) langsung di dalam source code seperti ini menimbulkan risiko keamanan yang tinggi pada aplikasi produksi (production). Sebaiknya token disuntikkan lewat .env atau diolah dari backend server perantara.",
+            "Limitation: GitHub REST API memiliki batas ukuran upload melalui JSON payload sebesar 100MB per file. Untuk file lebih besar, gunakan skema raw blob atau Large File Storage (Git LFS).",
+            "Best Practice: Selalu dengarkan (listen) Stream dari metode-metode ini menggunakan `await for` atau `StreamBuilder` di antarmuka UI untuk menjaga transparansi proses pengunggahan kepada pengguna.",
+          ],
+          code: "final service = GitService();\nfinal myFile = GitFomatFileUpload(file: File('/path/to/image.jpg'), filename: 'avatar.jpg');\n\ntry {\n  await for (final progress in service.uploadFileSingle(\n    file: myFile,\n    commit: 'Update avatar profile',\n    folderTarget: 'assets/images',\n  )) {\n    print('Progress: ${progress.progress * 100}% - ${progress.message}');\n    // Tautkan ini ke UI CircularProgressIndicator\n  }\n  print('Upload berhasil!');\n} catch (e) {\n  print('Terjadi kesalahan saat upload: $e');\n}",
+        },
+      ];
+
+      new Vue({
+        el: "#app",
+        data: {
+          appInfo: {
+            title: "Widget Utilitas",
+            description:
+              "Pusat dokumentasi widget utilitas Flutter yang mencakup referensi API, parameter, konfigurasi, callback, perilaku, serta contoh implementasi untuk setiap komponen.",
+            version: "v3.0",
+          },
+          components: docsData,
+          activeComponent: docsData.length > 0 ? docsData[0] : null,
+          isDarkMode: false,
+          copied: false,
+        },
+        computed: {
+          groupedComponents() {
+            return this.components.reduce((acc, comp) => {
+              (acc[comp.group] = acc[comp.group] || []).push(comp);
+              return acc;
+            }, {});
+          },
+          compProperties() {
+            if (!this.activeComponent) return [];
+            return (
+              (this.activeComponent.additionalInfo &&
+                this.activeComponent.additionalInfo.properties) ||
+              []
+            );
+          },
+          compMethods() {
+            if (!this.activeComponent) return [];
+            return (
+              this.activeComponent.methods ||
+              (this.activeComponent.additionalInfo &&
+                this.activeComponent.additionalInfo.methods) ||
+              []
+            );
+          },
+        },
+        methods: {
+          formatInfoKey(key) {
+            return key;
+            // .replace(/_/g, " ") // Mengganti underscore jadi spasi (grid_col -> grid col)
+            // .replace(/([A-Z])/g, " $1") // Memberi spasi sebelum huruf kapital (camelCase)
+            // .replace(/^./, (str) => str.toUpperCase()); // Membesarkan huruf pertama
+          },
+          copyCode() {
+            if (!this.activeComponent || !this.activeComponent.code) return;
+            const el = document.createElement("textarea");
+            el.value = this.activeComponent.code;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand("copy");
+            document.body.removeChild(el);
+
+            this.copied = true;
+            setTimeout(() => {
+              this.copied = false;
+            }, 2000);
+          },
+          updatePrismTheme() {
+            const link = document.getElementById("prism-theme-link");
+            link.href = this.isDarkMode
+              ? "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+              : "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css";
+          },
+          triggerHighlight() {
+            if (window.Prism) {
+              Prism.highlightAll();
+            }
+          },
+          selectComponent(comp) {
+            this.activeComponent = comp;
+            setTimeout(() => {
+              $("main").animate({ scrollTop: 0 }, 300);
+            }, 50);
+          },
+          toggleTheme() {
+            this.isDarkMode = !this.isDarkMode;
+            const html = document.documentElement;
+            if (this.isDarkMode) {
+              html.classList.add("dark");
+              localStorage.theme = "dark";
+            } else {
+              html.classList.remove("dark");
+              localStorage.theme = "light";
+            }
+            this.updatePrismTheme();
+          },
+        },
+        mounted() {
+          if (
+            localStorage.theme === "dark" ||
+            (!("theme" in localStorage) &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches)
+          ) {
+            this.isDarkMode = true;
+            document.documentElement.classList.add("dark");
+          } else {
+            this.isDarkMode = false;
+            document.documentElement.classList.remove("dark");
+          }
+
+          this.updatePrismTheme();
+
+          this.$nextTick(() => {
+            this.triggerHighlight();
+          });
+        },
+      });
+    </script>
+  </body>
+</html>

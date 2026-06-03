@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistem Pusat Navigasi</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+            },
+            colors: {
+              primary: "#FF5722",
+              primaryDark: "#E64A19",
+              bgLight: "#F3F4F6",
+              bgDark: "#111827",
+              cardLight: "#FFFFFF",
+              cardDark: "#1F2937",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      :root {
+        --text-main: #1f2937;
+        --text-muted: #6b7280;
+        --border-color: #e5e7eb;
+      }
+
+      html.dark {
+        --text-main: #f9fafb;
+        --text-muted: #9ca3af;
+        --border-color: #374151;
+      }
+
+      body {
+        background-color: var(--bgLight);
+        color: var(--text-main);
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      html.dark body {
+        background-color: var(--bgDark);
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 4px;
+      }
+      html.dark ::-webkit-scrollbar-thumb {
+        background: #4b5563;
+      }
+
+      .glass-header {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-color);
+      }
+      html.dark .glass-header {
+        background: rgba(31, 41, 55, 0.8);
+      }
+
+      .sidebar-link {
+        transition: all 0.2s ease;
+      }
+      .sidebar-link:hover,
+      .sidebar-link.active {
+        background-color: rgba(255, 87, 34, 0.1);
+        color: #ff5722;
+        border-right: 3px solid #ff5722;
+      }
+      html.dark .sidebar-link.active,
+      html.dark .sidebar-link:hover {
+        background-color: rgba(255, 87, 34, 0.2);
+      }
+
+      html.dark main {
+        background-color: #1a1a1a;
+      }
+      .smooth-fade {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body class="antialiased min-h-screen overflow-hidden">
+    <div id="app" class="flex flex-col h-screen">
+      <nav
+        class="glass-header z-20 px-6 py-4 flex justify-between items-center fixed w-full top-0"
+      >
+        <div class="flex items-center gap-4">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-primary to-orange-400 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg shadow-orange-500/30"
+          >
+            {{ appInfo.logoText }}
+          </div>
+          <div>
+            <h1
+              class="text-xl font-bold tracking-tight text-gray-900 dark:text-white"
+            >
+              {{ appInfo.title }}
+            </h1>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              {{ appInfo.version }}
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <button
+            @click="toggleTheme"
+            class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          >
+            <i class="fa-solid fa-moon" v-if="!isDarkMode"></i>
+            <i class="fa-solid fa-sun" v-else></i>
+          </button>
+        </div>
+      </nav>
+
+      <div class="flex pt-[73px] h-full">
+        <aside
+          class="hidden md:flex w-72 bg-cardLight dark:bg-cardDark border-r border-gray-200 dark:border-gray-700 flex-col h-full z-10 overflow-y-auto pb-20 shadow-sm"
+        >
+          <div class="p-5 border-b border-gray-100 dark:border-gray-800">
+            <h2
+              class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2"
+            >
+              Menu Utama
+            </h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ appInfo.description }}
+            </p>
+          </div>
+
+          <div class="p-3">
+            <div
+              v-for="(group, gIdx) in sidebarGroups"
+              :key="gIdx"
+              class="mb-4"
+            >
+              <h3
+                class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 px-3"
+              >
+                {{ group.title }}
+              </h3>
+              <ul>
+                <li v-for="(item, iIdx) in group.items" :key="iIdx">
+                  <a
+                    :href="item.href"
+                    :target="item.target"
+                    :class="['w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium sidebar-link mb-1 flex items-center gap-3', item.isActive ? 'active' : 'text-gray-600 dark:text-gray-300']"
+                  >
+                    <i
+                      :class="item.icon"
+                      class="w-4 text-center opacity-70"
+                    ></i>
+                    {{ item.name }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+
+        <main
+          class="flex-1 overflow-y-auto p-6 md:p-10 relative scroll-smooth pb-32"
+        >
+          <div class="max-w-6xl mx-auto smooth-fade">
+            <div class="mb-12">
+              <div
+                class="inline-flex items-center gap-2 px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-primary font-semibold text-xs rounded-full border border-orange-200 dark:border-orange-800/50 mb-4"
+              >
+                <span class="relative flex h-2 w-2">
+                  <span
+                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"
+                  ></span>
+                  <span
+                    class="relative inline-flex rounded-full h-2 w-2 bg-primary"
+                  ></span>
+                </span>
+                {{ welcomeData.tag }}
+              </div>
+              <h2
+                class="text-4xl font-extrabold text-gray-900 dark:text-white mb-4 tracking-tight"
+              >
+                {{ welcomeData.title }}
+                <span class="text-primary"
+                  >{{ welcomeData.titleHighlight }}</span
+                >
+              </h2>
+              <p
+                class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl"
+              >
+                {{ welcomeData.description }}
+              </p>
+            </div>
+
+            <div
+              v-for="(category, cIdx) in moduleCategories"
+              :key="'cat-' + cIdx"
+              class="mb-12"
+            >
+              <h3
+                class="text-lg font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center gap-2"
+              >
+                <i :class="category.icon" class="text-gray-400"></i> {{
+                category.title }}
+              </h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a
+                  v-for="(mod, mIdx) in category.modules"
+                  :key="'mod-' + mIdx"
+                  :href="mod.href"
+                  :target="mod.target"
+                  :class="['group block bg-cardLight dark:bg-cardDark p-6 rounded-2xl border border-gray-200 dark:border-gray-700 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 relative overflow-hidden', mod.borderClass]"
+                >
+                  <div
+                    :class="['w-12 h-12 rounded-xl flex items-center justify-center text-xl mb-5 group-hover:scale-110 transition-transform duration-300', mod.bgLight, mod.bgDark, mod.textClass]"
+                  >
+                    <i :class="mod.icon"></i>
+                  </div>
+                  <h4
+                    :class="['text-xl font-bold text-gray-900 dark:text-white mb-2 transition-colors', mod.hoverTextClass]"
+                  >
+                    {{ mod.title }}
+                  </h4>
+                  <p
+                    class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 leading-relaxed"
+                  >
+                    {{ mod.desc }}
+                  </p>
+                  <div
+                    :class="['mt-6 flex items-center text-sm font-medium', mod.textClass]"
+                  >
+                    Buka Modul
+                    <i
+                      class="fa-solid fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"
+                    ></i>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      new Vue({
+        el: "#app",
+        data() {
+          return {
+            isDarkMode: false,
+
+            // Konfigurasi Header & Info General
+            appInfo: {
+              logoText: "D",
+              title: "Sistem Terpadu",
+              version: "Navigation Hub v2.0",
+              description:
+                "Pusat navigasi untuk seluruh modul sistem dan panduan developer.",
+            },
+
+            // Konfigurasi Welcome Section
+            welcomeData: {
+              tag: "Sistem Pusat Navigasi Aktif",
+              title: "Selamat Datang di",
+              titleHighlight: "Ekosistem.",
+              description:
+                "Akses cepat ke seluruh arsitektur panduan pengguna, dokumentasi frontend, dan referensi sistem inti. Silakan pilih kategori modul di bawah untuk memulai.",
+            },
+
+            // Konfigurasi Data Sidebar Menu
+            sidebarGroups: [
+              //   {
+              //     title: "General",
+              //     items: [
+              //       {
+              //         name: "Beranda (Hub)",
+              //         icon: "fa-solid fa-house",
+              //         href: "#",
+              //         target: "_self",
+              //         isActive: true,
+              //       },
+              //       {
+              //         name: "Getting Started",
+              //         icon: "fa-solid fa-compass",
+              //         href: "#",
+              //         target: "_self",
+              //         isActive: false,
+              //       },
+              //     ],
+              //   },
+              {
+                title: "Developer Docs",
+                items: [
+                  {
+                    name: "Form Flutter",
+                    icon: "fa-solid fa-layer-group",
+                    href: "ft_form.html",
+                    target: "_blank",
+                    isActive: false,
+                  },
+                  {
+                    name: "Helper Flutter",
+                    icon: "fa-solid fa-toolbox",
+                    href: "ft_helper.html",
+                    target: "_blank",
+                    isActive: false,
+                  },
+                  {
+                    name: "Socket Angular",
+                    icon: "fa-solid fa-server",
+                    href: "ag_socket.html",
+                    target: "_blank",
+                    isActive: false,
+                  },
+                ],
+              },
+              //   {
+              //     title: "Core Systems",
+              //     items: [
+              //       {
+              //         name: "Database Service",
+              //         icon: "fa-solid fa-database",
+              //         href: "ft_database.html",
+              //         target: "_blank",
+              //         isActive: false,
+              //       },
+              //       {
+              //         name: "Authentication",
+              //         icon: "fa-solid fa-shield-halved",
+              //         href: "ft_auth.html",
+              //         target: "_blank",
+              //         isActive: false,
+              //       },
+              //     ],
+              //   },
+            ],
+
+            // Konfigurasi Data Card Modules Main Content
+            moduleCategories: [
+              {
+                title: "Modul Dokumentasi Frontend",
+                icon: "fa-solid fa-book-open",
+                modules: [
+                  {
+                    title: "Form Flutter",
+                    desc: "Panduan komponen UI, input, validasi, dan widget standar untuk formulir.",
+                    icon: "fa-solid fa-layer-group",
+                    href: "ft_form.html",
+                    target: "_blank",
+                    borderClass:
+                      "hover:border-primary dark:hover:border-primary",
+                    bgLight: "bg-orange-50",
+                    bgDark: "dark:bg-orange-900/20",
+                    textClass: "text-primary",
+                    hoverTextClass: "group-hover:text-primary",
+                  },
+                  {
+                    title: "Helper Flutter",
+                    desc: "Kumpulan utilitas global, formater teks, manipulasi tanggal, dan operasi angka.",
+                    icon: "fa-solid fa-toolbox",
+                    href: "ft_helper.html",
+                    target: "_blank",
+                    borderClass:
+                      "hover:border-indigo-500 dark:hover:border-indigo-500",
+                    bgLight: "bg-indigo-50",
+                    bgDark: "dark:bg-indigo-900/20",
+                    textClass: "text-indigo-500",
+                    hoverTextClass: "group-hover:text-indigo-500",
+                  },
+                ],
+              },
+              //   {
+              //     title: "Backend & Core Services",
+              //     icon: "fa-solid fa-server",
+              //     modules: [
+              //       {
+              //         title: "Database Config",
+              //         desc: "Dokumentasi skema database, aturan rule NoSQL, dan utilitas query data.",
+              //         icon: "fa-solid fa-database",
+              //         href: "ft_database.html",
+              //         target: "_blank",
+              //         borderClass:
+              //           "hover:border-emerald-500 dark:hover:border-emerald-500",
+              //         bgLight: "bg-emerald-50",
+              //         bgDark: "dark:bg-emerald-900/20",
+              //         textClass: "text-emerald-500",
+              //         hoverTextClass: "group-hover:text-emerald-500",
+              //       },
+              //       {
+              //         title: "Authentication",
+              //         desc: "Manajemen pengguna, token otentikasi, enkripsi password, dan role based access.",
+              //         icon: "fa-solid fa-shield-halved",
+              //         href: "ft_auth.html",
+              //         target: "_blank",
+              //         borderClass:
+              //           "hover:border-red-500 dark:hover:border-red-500",
+              //         bgLight: "bg-red-50",
+              //         bgDark: "dark:bg-red-900/20",
+              //         textClass: "text-red-500",
+              //         hoverTextClass: "group-hover:text-red-500",
+              //       },
+              //       {
+              //         title: "API Endpoint",
+              //         desc: "Struktur payload request, header standardisasi, dan pemetaan error response API.",
+              //         icon: "fa-solid fa-cloud-arrow-up",
+              //         href: "ft_api.html",
+              //         target: "_blank",
+              //         borderClass:
+              //           "hover:border-blue-500 dark:hover:border-blue-500",
+              //         bgLight: "bg-blue-50",
+              //         bgDark: "dark:bg-blue-900/20",
+              //         textClass: "text-blue-500",
+              //         hoverTextClass: "group-hover:text-blue-500",
+              //       },
+              //     ],
+              //   },
+            ],
+          };
+        },
+        methods: {
+          initTheme() {
+            const htmlElement = document.documentElement;
+            if (
+              localStorage.theme === "dark" ||
+              (!("theme" in localStorage) &&
+                window.matchMedia("(prefers-color-scheme: dark)").matches)
+            ) {
+              this.isDarkMode = true;
+              htmlElement.classList.add("dark");
+            } else {
+              this.isDarkMode = false;
+              htmlElement.classList.remove("dark");
+            }
+          },
+          toggleTheme() {
+            this.isDarkMode = !this.isDarkMode;
+            const htmlElement = document.documentElement;
+            if (this.isDarkMode) {
+              htmlElement.classList.add("dark");
+              localStorage.theme = "dark";
+            } else {
+              htmlElement.classList.remove("dark");
+              localStorage.theme = "light";
+            }
+          },
+        },
+        mounted() {
+          this.initTheme();
+        },
+      });
+    </script>
+  </body>
+</html>
