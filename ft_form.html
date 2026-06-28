@@ -852,6 +852,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize. FormElementSize: xs = 0.80x, sm = 0.90x, md = 1.00x, lg = 1.12x, xl = 1.25x. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
           },
@@ -1093,7 +1095,18 @@
               default: "false",
               desc: "Mengaktifkan sistem shake otomatis ketika validasi error terjadi pada FormNode yang mendukung animasi shake.",
             },
-
+            {
+              name: "size",
+              type: "FormElementSize",
+              default: "null",
+              desc: "Mendefinisikan dimensi skala rasio (xs, sm, md, lg, xl). md sejajar dengan form input.",
+            },
+            {
+              name: "scale",
+              type: "double",
+              default: "null",
+              desc: "Mengaktifkan skala/ukuran form default secara kostum pada form yang terbungkus dengan formnode.",
+            },
             {
               name: "node(path, {initialValue})",
               type: "FormNode",
@@ -1642,6 +1655,12 @@
               desc: "Widget/String sisipan di ujung kanan area input.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "size",
               type: "FormElementSize?",
               default: "null",
@@ -1691,6 +1710,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Semua widget diasumsikan mendukung sistem ukuran (size) berbasis FormElementSize jika properti size tersedia. FormElementSize: xs = 0.80x, sm = 0.90x, md = 1.00x, lg = 1.12x, xl = 1.25x. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalDecoration:
@@ -1765,6 +1786,12 @@
               desc: "Sisipan kanan.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "size",
               type: "FormElementSize?",
               default: "null",
@@ -1820,6 +1847,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -1943,6 +1972,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -2023,6 +2054,12 @@
               desc: "Skala proporsional elemen form.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "enabled",
               type: "bool",
               default: "true",
@@ -2072,6 +2109,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -2164,6 +2203,12 @@
               desc: "Skala proporsional elemen form.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "enabled",
               type: "bool",
               default: "true",
@@ -2207,6 +2252,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -2287,6 +2334,12 @@
               desc: "Skala proporsional elemen form.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "enabled",
               type: "bool",
               default: "true",
@@ -2354,6 +2407,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -2440,16 +2495,22 @@
               desc: "Sisipan kanan.",
             },
             {
-              name: "size",
-              type: "FormElementSize?",
+              name: "scale",
+              type: "double?",
               default: "null",
-              desc: "Skala proporsional elemen form.",
+              desc: "Skala kostum elemen form.",
             },
             {
               name: "enabled",
               type: "bool",
               default: "true",
               desc: "Status bawaan form.",
+            },
+            {
+              name: "size",
+              type: "FormElementSize?",
+              default: "null",
+              desc: "Skala proporsional elemen form.",
             },
             {
               name: "readOnly",
@@ -2501,6 +2562,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -2579,6 +2642,12 @@
               desc: "Skala proporsional elemen form.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "enabled",
               type: "bool",
               default: "true",
@@ -2628,6 +2697,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -2735,6 +2806,12 @@
               desc: "Ukuran elemen mengikuti sistem global FormElementSize.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "onlyNumber",
               type: "bool",
               default: "true",
@@ -2769,6 +2846,8 @@
           ],
 
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran global berbasis FormElementSize.",
 
@@ -2892,6 +2971,12 @@
               desc: "Skala proporsional editor dan toolbar.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "enabled",
               type: "bool",
               default: "true",
@@ -3013,6 +3098,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize. FormElementSize: xs = 0.80x, sm = 0.90x, md = 1.00x, lg = 1.12x, xl = 1.25x. Size mempengaruhi toolbar, icon, font, padding, radius, spacing, serta seluruh skala UI editor.",
             globalDecoration:
@@ -3123,6 +3210,12 @@
               desc: "Skala dimensi widget dan tombol bulat di dalamnya.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "step",
               type: "double",
               default: "1.0",
@@ -3166,6 +3259,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -3282,12 +3377,17 @@
               default: "null",
               desc: "Widget atau teks di sisi kanan field.",
             },
-
             {
               name: "size",
               type: "FormElementSize?",
               default: "null",
               desc: "Mengatur skala keseluruhan widget seperti tinggi field, ukuran thumb, font, dan spacing.",
+            },
+            {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
             },
 
             {
@@ -3411,6 +3511,8 @@
           ],
 
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran berbasis FormElementSize secara konsisten dengan seluruh ekosistem FormHelperWidget.",
 
@@ -3562,6 +3664,12 @@
               default: "null",
               desc: "Mengatur ukuran keseluruhan widget termasuk spacing, typography, dan elemen visual lainnya.",
             },
+            {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
 
             {
               name: "enabled",
@@ -3691,6 +3799,8 @@
           ],
 
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran berbasis FormElementSize secara konsisten dengan seluruh komponen FormHelperWidget.",
 
@@ -3840,6 +3950,12 @@
               desc: "Skala proporsional elemen form.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "enabled",
               type: "bool",
               default: "true",
@@ -3877,6 +3993,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -3957,6 +4075,12 @@
               desc: "Skala proporsional elemen form.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "firstDate",
               type: "DateTime?",
               default: "null",
@@ -4018,6 +4142,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -4096,6 +4222,12 @@
               desc: "Skala proporsional elemen form.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "firstDate",
               type: "DateTime?",
               default: "null",
@@ -4157,6 +4289,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -4244,9 +4378,15 @@
             },
             {
               name: "size",
-              type: "FormElementSize",
+              type: "FormElementSize?",
               default: "FormElementSize.md",
               desc: "Dimensi skala rasio (xs, sm, md, lg, xl). md akan sejajar absolut dengan form text.",
+            },
+            {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
             },
             {
               name: "enabled",
@@ -4286,6 +4426,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -4364,6 +4506,12 @@
               desc: "Skala proporsional elemen form.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "onChanged",
               type: "ValueChanged<String?>?",
               default: "null",
@@ -4419,6 +4567,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -4514,6 +4664,12 @@
               desc: "Skala proporsional elemen form.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "firstDate",
               type: "DateTime?",
               default: "null",
@@ -4575,6 +4731,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -4666,6 +4824,12 @@
               desc: "Skala proporsional elemen form grup.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "showIcon",
               type: "bool",
               default: "true",
@@ -4727,6 +4891,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -4817,6 +4983,12 @@
               desc: "Skala proporsional elemen.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "enabled",
               type: "bool",
               default: "true",
@@ -4848,6 +5020,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -4941,6 +5115,12 @@
               desc: "Skala proporsional elemen form grup.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "showIcon",
               type: "bool",
               default: "true",
@@ -4984,6 +5164,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -5077,6 +5259,12 @@
               desc: "Skala proporsional seluruh ukuran UI field color picker.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "enabled",
               type: "bool",
               default: "true",
@@ -5138,6 +5326,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran FormElementSize (xs, sm, md, lg, xl) yang mempengaruhi tinggi field, ukuran icon, preview warna, radius, font, dan spacing.",
             globalDecoration:
@@ -5257,6 +5447,12 @@
               desc: "Skala proporsional ukuran field dan elemen gambar.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "widthImageView",
               type: "double",
               default: "90",
@@ -5330,6 +5526,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -5444,6 +5642,12 @@
               desc: "Skala dimensi.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "showIcon",
               type: "bool",
               default: "true",
@@ -5481,6 +5685,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -5570,6 +5776,12 @@
               desc: "Skala proporsional.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "onChanged",
               type: "ValueChanged<T?>?",
               default: "null",
@@ -5619,6 +5831,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -5712,6 +5926,12 @@
               desc: "Skala proporsional.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "onTap",
               type: "VoidCallback?",
               default: "null",
@@ -5755,6 +5975,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -5831,6 +6053,12 @@
               type: "FormElementSize?",
               default: "null",
               desc: "Skala proporsional.",
+            },
+            {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
             },
             {
               name: "onChanged",
@@ -5912,6 +6140,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -6005,6 +6235,12 @@
               desc: "Skala proporsional elemen form dan Modal Bottom Sheet pencariannya.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "hintText",
               type: "String?",
               default: "null",
@@ -6048,6 +6284,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize. Juga mempengaruhi skala di dalam modal (font list, icon search, tinggi tombol).",
             globalDecoration:
@@ -6141,6 +6379,12 @@
               desc: "Skala ukuran form dan popup bottom sheet pencariannya.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "hintText",
               type: "String?",
               default: "null",
@@ -6190,6 +6434,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -6281,6 +6527,12 @@
               desc: "Skala proporsional.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "hintText",
               type: "String?",
               default: "null",
@@ -6324,6 +6576,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -6417,6 +6671,12 @@
               desc: "Skala proporsional.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "showIcon",
               type: "bool",
               default: "true",
@@ -6454,6 +6714,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -6545,6 +6807,12 @@
               desc: "Skala dimensi.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "showIcon",
               type: "bool",
               default: "true",
@@ -6588,6 +6856,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -6678,6 +6948,12 @@
               desc: "Skala proporsional.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "hintText",
               type: "String?",
               default: "null",
@@ -6727,6 +7003,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -6820,6 +7098,12 @@
               desc: "Skala proporsional form.",
             },
             {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
+            {
               name: "enabled",
               type: "bool",
               default: "true",
@@ -6851,6 +7135,8 @@
             },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
             globalDecoration:
@@ -6893,8 +7179,16 @@
               default: "null",
               desc: "Akan otomatis diterapkan jika output builder berupa String atau numerik (dibungkus Text terkalibrasi FormStyle).",
             },
+            {
+              name: "scale",
+              type: "double?",
+              default: "null",
+              desc: "Skala kostum elemen form.",
+            },
           ],
           additionalInfo: {
+            globalScaling:
+              "Mendukung sistem scaling (size) berbasi kostum. double secara kustom. Size mempengaruhi tinggi form, radius, ukuran font, icon, padding, spacing, seluruh skala UI widget.",
             globalSizing:
               "Mendukung sistem ukuran (size) berbasis FormElementSize.",
           },
