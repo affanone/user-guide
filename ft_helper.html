@@ -1002,6 +1002,140 @@
           code: "final bool? isSuccess = await ModalWidget.modal<bool>(\n  context,\n  title: 'Edit Detail Akun',\n  showCancelButton: true,\n  confirmText: 'Simpan Perubahan',\n  child: Form(\n    key: _formKey,\n    child: Column(\n      children: [\n         TextFormField(decoration: const InputDecoration(labelText: 'Nama Lengkap')),\n         TextFormField(decoration: const InputDecoration(labelText: 'Email')),\n      ],\n    ),\n  ),\n  onConfirm: () async {\n    if (!_formKey.currentState!.validate()) return false;\n    \n    // Eksekusi ini otomatis me-render loading spinner di tombol\n    final result = await apiService.updateProfile();\n    \n    if (result.isError) {\n      showToast('Gagal merubah data');\n      return false; // Membiarkan modal tetap tampil untuk direvisi ulang\n    }\n    \n    return true; // Modal ditutup, isLoading selesai, nilai True dikembalikan ke layer pemanggil.\n  },\n  afterClose: () {\n    print('Proses edit selesai & Modal tertutup');\n  }\n);\n\nif (isSuccess == true) {\n  _refreshTable();\n}",
         },
         {
+          id: "CardWidget",
+          group: "Surface",
+          name: "Card Premium",
+          icon: "fa-solid fa-address-card",
+          description:
+            "Widget pengelola tata letak (container) tingkat lanjut yang mengadaptasi desain enterprise dari Modal Premium ke dalam bentuk komponen inline (menyatu dengan halaman). Menawarkan efek bayangan meluas yang elegan, batas melengkung, serta struktur layout bawaan yang cerdas (Header, Scrollable/Flexible Body, dan Footer). Dilengkapi state management internal untuk menangani aksi asynchronous (menampilkan loading spinner pada tombol secara otomatis) tanpa perlu memanggil setState dari parent widget.",
+          mandatoryProps: [],
+          optionalProps: [
+            {
+              name: "child",
+              type: "Widget?",
+              default: "null",
+              description:
+                "Konten utama yang akan dirender di bagian tengah (body) Card. Konten ini dibungkus otomatis dengan padding 24.0 dan SingleChildScrollView agar terhindar dari isu overflow.",
+            },
+            {
+              name: "title",
+              type: "String?",
+              default: "null",
+              description:
+                "Teks yang akan ditampilkan pada sisi kiri atas Header Card dengan ketebalan teks semi-bold.",
+            },
+            {
+              name: "headerActions",
+              type: "List<Widget>?",
+              default: "null",
+              description:
+                "Kumpulan aksi/ikon tambahan yang diletakkan pada Header, berada persis sebelum tombol Close. Sangat ideal untuk menaruh IconButton atau PopupMenuButton.",
+            },
+            {
+              name: "footerActions",
+              type: "List<Widget>?",
+              default: "null",
+              description:
+                "Komponen tombol atau elemen custom yang akan merender ulang keseluruhan area Footer. Jika diisi, tombol bawaan (Confirm dan Cancel) otomatis tidak akan ditampilkan.",
+            },
+            {
+              name: "onConfirm",
+              type: "FutureOr<void> Function()?",
+              default: "null",
+              description:
+                "Callback reaktif yang dipicu ketika tombol konfirmasi utama diklik. Mendukung Async/Await. Tombol akan otomatis beralih ke mode loading (disabled + spinner) selama proses Future berjalan.",
+            },
+            {
+              name: "showCancelButton",
+              type: "bool",
+              default: "false",
+              description:
+                "Menampilkan tombol sekunder dengan style outline di area footer yang biasanya digunakan untuk membatalkan form atau input.",
+            },
+            {
+              name: "onCancel",
+              type: "VoidCallback?",
+              default: "null",
+              description:
+                "Callback sinkron yang dieksekusi saat tombol Cancel ditekan. Sangat berguna untuk membersihkan state form (clear textfield) atau menyembunyikan Card dari layar.",
+            },
+            {
+              name: "confirmText",
+              type: "String",
+              default: "'OK'",
+              description:
+                "Mengubah teks label (caption) default untuk tombol utama aksi konfirmasi (Primary Button).",
+            },
+            {
+              name: "cancelText",
+              type: "String",
+              default: "'Cancel'",
+              description:
+                "Mengubah teks label (caption) default untuk tombol sekunder atau batal.",
+            },
+            {
+              name: "showCloseButton",
+              type: "bool",
+              default: "false",
+              description:
+                "Menampilkan ikon 'X' (tutup) di ujung kanan Header. Visibilitasnya memicu callback `onClose`.",
+            },
+            {
+              name: "onClose",
+              type: "VoidCallback?",
+              default: "null",
+              description:
+                "Callback sinkron yang dipicu ketika ikon tombol Close (X) di area Header ditekan.",
+            },
+            {
+              name: "width",
+              type: "double?",
+              default: "null",
+              description:
+                "Menentukan lebar absolut (fixed width) dari Card. Jika null, Card akan menyesuaikan lebar parent atau constraint yang membungkusnya.",
+            },
+            {
+              name: "height",
+              type: "double?",
+              default: "null",
+              description:
+                "Menentukan tinggi absolut dari Card. Jika diisi, properti FlexFit pada body akan berubah menjadi 'tight' yang memaksa area scrollable mengisi ruang kosong dan mendorong Footer statis ke bagian paling bawah Container.",
+            },
+          ],
+          additionalInfo: {
+            styling:
+              "Pewarnaan elemen Card dan batas garis (border) bereaksi dinamis terhadap Brightness parent. Tema cerah menggunakan background putih murni dengan bayangan lembut, sementara tema gelap menggunakan Color(0xFF1E1E1E) dengan border transparan keputihan (white opacity 0.08).",
+            animation:
+              "Berbeda dengan ModalWidget, CardWidget adalah penyusun layout statis (inline) sehingga tidak memiliki animasi transisi zoom-in atau fade-in bawaan secara default. Disarankan dibungkus dengan AnimatedSwitcher atau AnimatedSize di layer parent jika butuh transisi.",
+          },
+          methods: [],
+          behaviors: [
+            {
+              name: "Internal Async State Blocking",
+              type: "Lifecycle & State",
+              description:
+                "Saat fungsi 'onConfirm' dieksekusi dan me-return Future, widget secara internal memanggil setState untuk merubah properti (isLoading = true). Ini akan mengunci tombol Header (Close) dan Footer (Cancel) menjadi disable, serta mengganti label tombol utama menjadi indikator CircularProgressIndicator berwarna putih.",
+            },
+            {
+              name: "Dynamic Layout Fitting",
+              type: "Layout Strategy",
+              description:
+                "Jika parameter `height` bernilai null, Card akan membungkus tingginya sekecil mungkin sesuai kontennya (MainAxisSize.min, FlexFit.loose). Namun jika `height` ditentukan, Card akan merentangkan dirinya (MainAxisSize.max, FlexFit.tight) memastikan Header selalu di atas dan Footer selalu menempel di bawah.",
+            },
+            {
+              name: "Smart Divider Rendering",
+              type: "UI Filter",
+              description:
+                "Garis pemisah (Divider) antara Header, Body, dan Footer hanya akan dirender (ditampilkan) secara pintar jika elemen yang bersangkutan (title, aksi, atau footer) memang ada/diaktifkan.",
+            },
+          ],
+          specialNotes: [
+            "Best Practice: Manfaatkan `CardWidget` sebagai form pengisian data (Data Entry Card) di layar yang luas (misalnya tablet atau web desktop), di mana menggunakan modal overlay dirasa terlalu mengganggu aliran user experience (UX).",
+            "Limitation: Modifikasi warna primary-button bawaan pada footer saat ini di-hardcode dengan 'Colors.deepOrange'. Jika diperlukan, styling ini bisa diekspos ke parameter konstruktor di masa mendatang.",
+          ],
+          code: "bool _showCard = true;\n\n// ... di dalam method build:\nif (!_showCard) const SizedBox.shrink()\nelse CardWidget(\n  title: 'Edit Detail Akun',\n  showCloseButton: true,\n  showCancelButton: true,\n  confirmText: 'Simpan Perubahan',\n  onClose: () => setState(() => _showCard = false),\n  onCancel: () => setState(() => _showCard = false),\n  child: Form(\n    key: _formKey,\n    child: Column(\n      children: [\n         TextFormField(decoration: const InputDecoration(labelText: 'Nama Lengkap')),\n         TextFormField(decoration: const InputDecoration(labelText: 'Email')),\n      ],\n    ),\n  ),\n  onConfirm: () async {\n    if (!_formKey.currentState!.validate()) return;\n    \n    // Eksekusi ini otomatis me-render loading spinner di tombol primary\n    await apiService.updateProfile();\n    \n    // Menutup (menyembunyikan) card setelah berhasil\n    setState(() => _showCard = false);\n    showToast('Data berhasil disimpan');\n  }\n);",
+        },
+        {
           id: "NoteWidget",
           group: "Alert",
           name: "Note Widget",
@@ -1212,12 +1346,6 @@
               desc: "Batas ketinggian maksimum kotak popup. Jika diset null, maka tinggi dihitung secara dinamis atau dibatasi maksimum 50% dari tinggi layar.",
             },
             {
-              name: "triggerOnRightClick",
-              type: "bool",
-              default: "true",
-              desc: "Jika bernilai true, popup juga dapat dimunculkan melalui klik kanan (Secondary Tap) pada mouse. Sangat berguna untuk implementasi menu konteks standar di desktop.",
-            },
-            {
               name: "padding",
               type: "EdgeInsetsGeometry",
               default: "EdgeInsets.zero",
@@ -1273,7 +1401,7 @@
             "Aksi klik kanan (Secondary Tap) tetap dikendalikan otomatis oleh widget utama pembungkus jika triggerOnRightClick diset true.",
             "Bila ada proses asinkron (seperti validasi atau fetch API), letakkan proses tersebut di dalam child sebelum Anda memanggil `next(true)`.",
           ],
-          code: "PopupWidget(\n  popupWidth: 250,\n  triggerOnRightClick: true,\n  childBuilder: (next) => IconButton(\n    icon: const Icon(Icons.more_vert),\n    onPressed: () {\n      next(true);\n    },\n  ),\n  popupBuilder: (context) => const Column(\n    mainAxisSize: MainAxisSize.min,\n    children: [\n      ListTile(title: Text('Edit'), leading: Icon(Icons.edit)),\n      ListTile(title: Text('Hapus'), leading: Icon(Icons.delete, color: Colors.red)),\n    ],\n  ),\n)",
+          code: "PopupWidget(\n  popupWidth: 250,\n  childBuilder: (next) => IconButton(\n    icon: const Icon(Icons.more_vert),\n    onPressed: () {\n      next(true);\n    },\n  ),\n  popupBuilder: (context) => const Column(\n    mainAxisSize: MainAxisSize.min,\n    children: [\n      ListTile(title: Text('Edit'), leading: Icon(Icons.edit)),\n      ListTile(title: Text('Hapus'), leading: Icon(Icons.delete, color: Colors.red)),\n    ],\n  ),\n)",
         },
         {
           id: "ToastWidget",
