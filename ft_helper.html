@@ -2507,7 +2507,7 @@
           name: "Card Premium",
           icon: "fa-solid fa-address-card",
           description:
-            "Widget pengelola tata letak (container) tingkat lanjut yang mengadaptasi desain enterprise dari Modal Premium ke dalam bentuk komponen inline (menyatu dengan halaman). Menawarkan efek bayangan meluas yang elegan, batas melengkung, serta struktur layout bawaan yang cerdas (Header, Scrollable/Flexible Body, dan Footer). Dilengkapi state management internal untuk menangani aksi asynchronous (menampilkan loading spinner pada tombol secara otomatis) tanpa perlu memanggil setState dari parent widget.",
+            "Widget pengelola tata letak (container) tingkat lanjut yang mengadaptasi desain enterprise ke dalam bentuk komponen inline (menyatu dengan halaman). Menawarkan efek bayangan meluas yang elegan, batas melengkung, serta struktur layout bawaan yang cerdas (Header, Scrollable Body, dan Footer). Komponen ini bersifat stateless dan murni sebagai penyusun layout, sehingga manajemen state (seperti loading atau visibilitas) sepenuhnya dikendalikan oleh parent widget.",
           mandatoryProps: [],
           optionalProps: [
             {
@@ -2529,56 +2529,21 @@
               type: "List<Widget>?",
               default: "null",
               description:
-                "Kumpulan aksi/ikon tambahan yang diletakkan pada Header, berada persis sebelum tombol Close. Sangat ideal untuk menaruh IconButton atau PopupMenuButton.",
+                "Kumpulan aksi/ikon tambahan yang diletakkan pada Header, berada persis sebelum tombol Close. Ideal untuk menaruh IconButton atau PopupMenuButton.",
             },
             {
               name: "footerActions",
               type: "List<Widget>?",
               default: "null",
               description:
-                "Komponen tombol atau elemen custom yang akan merender ulang keseluruhan area Footer. Jika diisi, tombol bawaan (Confirm dan Cancel) otomatis tidak akan ditampilkan.",
-            },
-            {
-              name: "onConfirm",
-              type: "FutureOr<void> Function()?",
-              default: "null",
-              description:
-                "Callback reaktif yang dipicu ketika tombol konfirmasi utama diklik. Mendukung Async/Await. Tombol akan otomatis beralih ke mode loading (disabled + spinner) selama proses Future berjalan.",
-            },
-            {
-              name: "showCancelButton",
-              type: "bool",
-              default: "false",
-              description:
-                "Menampilkan tombol sekunder dengan style outline di area footer yang biasanya digunakan untuk membatalkan form atau input.",
-            },
-            {
-              name: "onCancel",
-              type: "VoidCallback?",
-              default: "null",
-              description:
-                "Callback sinkron yang dieksekusi saat tombol Cancel ditekan. Sangat berguna untuk membersihkan state form (clear textfield) atau menyembunyikan Card dari layar.",
-            },
-            {
-              name: "confirmText",
-              type: "String",
-              default: "'OK'",
-              description:
-                "Mengubah teks label (caption) default untuk tombol utama aksi konfirmasi (Primary Button).",
-            },
-            {
-              name: "cancelText",
-              type: "String",
-              default: "'Cancel'",
-              description:
-                "Mengubah teks label (caption) default untuk tombol sekunder atau batal.",
+                "Kumpulan komponen tombol atau elemen custom yang akan dirender di area Footer. Jika diisi, footer akan otomatis tampil dengan pengaturan alignment ke arah kanan.",
             },
             {
               name: "showCloseButton",
               type: "bool",
               default: "false",
               description:
-                "Menampilkan ikon 'X' (tutup) di ujung kanan Header. Visibilitasnya memicu callback `onClose`.",
+                "Menampilkan ikon 'X' (tutup) di ujung kanan Header.",
             },
             {
               name: "onClose",
@@ -2592,48 +2557,42 @@
               type: "double?",
               default: "null",
               description:
-                "Menentukan lebar absolut (fixed width) dari Card. Jika null, Card akan menyesuaikan lebar parent atau constraint yang membungkusnya.",
+                "Menentukan lebar absolut (fixed width) dari Card. Jika null, Card akan menyesuaikan lebar parent.",
             },
             {
               name: "height",
               type: "double?",
               default: "null",
               description:
-                "Menentukan tinggi absolut dari Card. Jika diisi, properti FlexFit pada body akan berubah menjadi 'tight' yang memaksa area scrollable mengisi ruang kosong dan mendorong Footer statis ke bagian paling bawah Container.",
+                "Menentukan tinggi absolut dari Card. Jika diisi, area body akan mengisi ruang kosong (flex fit tight) dan mendorong Footer ke posisi paling bawah.",
             },
           ],
           additionalInfo: {
             styling:
               "Pewarnaan elemen Card dan batas garis (border) bereaksi dinamis terhadap Brightness parent. Tema cerah menggunakan background putih murni dengan bayangan lembut, sementara tema gelap menggunakan Color(0xFF1E1E1E) dengan border transparan keputihan (white opacity 0.08).",
             animation:
-              "Berbeda dengan ModalWidget, CardWidget adalah penyusun layout statis (inline) sehingga tidak memiliki animasi transisi zoom-in atau fade-in bawaan secara default. Disarankan dibungkus dengan AnimatedSwitcher atau AnimatedSize di layer parent jika butuh transisi.",
+              "CardWidget adalah komponen layout statis (inline). Disarankan dibungkus dengan AnimatedSwitcher atau AnimatedSize pada layer parent untuk transisi yang dinamis.",
           },
           methods: [],
           behaviors: [
             {
-              name: "Internal Async State Blocking",
-              type: "Lifecycle & State",
-              description:
-                "Saat fungsi 'onConfirm' dieksekusi dan me-return Future, widget secara internal memanggil setState untuk merubah properti (isLoading = true). Ini akan mengunci tombol Header (Close) dan Footer (Cancel) menjadi disable, serta mengganti label tombol utama menjadi indikator CircularProgressIndicator berwarna putih.",
-            },
-            {
               name: "Dynamic Layout Fitting",
               type: "Layout Strategy",
               description:
-                "Jika parameter `height` bernilai null, Card akan membungkus tingginya sekecil mungkin sesuai kontennya (MainAxisSize.min, FlexFit.loose). Namun jika `height` ditentukan, Card akan merentangkan dirinya (MainAxisSize.max, FlexFit.tight) memastikan Header selalu di atas dan Footer selalu menempel di bawah.",
+                "Jika `height` bernilai null, Card membungkus kontennya (MainAxisSize.min). Jika `height` ditentukan, Card akan merentangkan diri (MainAxisSize.max) memastikan Footer selalu menempel di bawah.",
             },
             {
               name: "Smart Divider Rendering",
               type: "UI Filter",
               description:
-                "Garis pemisah (Divider) antara Header, Body, dan Footer hanya akan dirender (ditampilkan) secara pintar jika elemen yang bersangkutan (title, aksi, atau footer) memang ada/diaktifkan.",
+                "Garis pemisah (Divider) antara Header, Body, dan Footer hanya akan dirender secara pintar jika elemen yang bersangkutan memang tersedia/aktif.",
             },
           ],
           specialNotes: [
-            "Best Practice: Manfaatkan `CardWidget` sebagai form pengisian data (Data Entry Card) di layar yang luas (misalnya tablet atau web desktop), di mana menggunakan modal overlay dirasa terlalu mengganggu aliran user experience (UX).",
-            "Limitation: Modifikasi warna primary-button bawaan pada footer saat ini di-hardcode dengan 'Colors.deepOrange'. Jika diperlukan, styling ini bisa diekspos ke parameter konstruktor di masa mendatang.",
+            "Best Practice: Gunakan `CardWidget` sebagai komponen kontainer terstruktur untuk form atau informasi detail pada layar yang luas.",
+            "Stateless Design: Komponen ini tidak memiliki internal loading state. Semua logika loading (misalnya pada tombol di footerActions) harus dikelola oleh parent widget melalui state management atau setState.",
           ],
-          code: "bool _showCard = true;\n\n// ... di dalam method build:\nif (!_showCard) const SizedBox.shrink()\nelse CardWidget(\n  title: 'Edit Detail Akun',\n  showCloseButton: true,\n  showCancelButton: true,\n  confirmText: 'Simpan Perubahan',\n  onClose: () => setState(() => _showCard = false),\n  onCancel: () => setState(() => _showCard = false),\n  child: Form(\n    key: _formKey,\n    child: Column(\n      children: [\n         TextFormField(decoration: const InputDecoration(labelText: 'Nama Lengkap')),\n         TextFormField(decoration: const InputDecoration(labelText: 'Email')),\n      ],\n    ),\n  ),\n  onConfirm: () async {\n    if (!_formKey.currentState!.validate()) return;\n    \n    // Eksekusi ini otomatis me-render loading spinner di tombol primary\n    await apiService.updateProfile();\n    \n    // Menutup (menyembunyikan) card setelah berhasil\n    setState(() => _showCard = false);\n    showToast('Data berhasil disimpan');\n  }\n);",
+          code: "CardWidget(\n  title: 'Edit Detail',\n  showCloseButton: true,\n  onClose: () => print('Close'),\n  child: Text('Konten di sini'),\n  footerActions: [\n    TextButton(onPressed: () {}, child: Text('Batal')),\n    FilledButton(onPressed: () {}, child: Text('Simpan')),\n  ],\n);",
         },
         {
           id: "FirestoreService",
