@@ -1183,13 +1183,13 @@
           name: "Popup Menu Reaktif",
           icon: "fa-solid fa-arrow-pointer",
           description:
-            "Widget interaktif yang berfungsi sebagai pemicu (trigger) untuk memunculkan menu pop-up secara kontekstual. Mendukung adaptasi tata letak yang cerdas di mana pop-up akan dirender sebagai dropdown melayang (floating overlay) pada area yang diklik di layar desktop, dan sebagai Bottom Sheet yang nyaman di layar mobile. Menyediakan intersepsi `beforeTap` dan kalkulasi *bounding-box* otomatis agar pop-up tidak pernah terpotong oleh ujung layar.",
+            "Widget interaktif yang berfungsi sebagai pemicu (trigger) untuk memunculkan menu pop-up secara kontekstual. Mendukung adaptasi tata letak yang cerdas di mana pop-up akan dirender sebagai dropdown melayang (floating overlay) pada area yang diklik di layar desktop, dan sebagai Bottom Sheet di layar mobile. Menggunakan pendekatan `childBuilder` untuk Inversion of Control dan akurasi hit-test, dilengkapi state lock pencegah pemanggilan ganda, serta kalkulasi bounding-box otomatis agar pop-up tidak terpotong tepi layar.",
           mandatoryProps: [
             {
-              name: "child",
-              type: "Widget",
+              name: "childBuilder",
+              type: "Widget Function(void Function(bool proceed) next)",
               default: "",
-              desc: "Elemen antarmuka (seperti ikon, tombol, atau teks) yang ketika diklik akan bertindak sebagai pemicu/trigger untuk memunculkan menu popup.",
+              desc: "Fungsi pembangun widget pemicu yang membawa parameter fungsi `next`. Anda wajib memanggil argumen `next(true)` di dalam event widget (seperti `onPressed` atau `onTap`) untuk mengeksekusi kemunculan popup. Menghilangkan risiko bentrok gesture.",
             },
             {
               name: "popupBuilder",
@@ -1203,19 +1203,19 @@
               name: "popupWidth",
               type: "double",
               default: "300",
-              desc: "Nilai pasti lebar menu popup. Properti ini utamanya hanya akan berdampak ketika menu dirender dalam mode floating desktop.",
+              desc: "Nilai pasti lebar menu popup. Properti ini utamanya hanya berdampak ketika menu dirender dalam mode floating desktop.",
             },
             {
               name: "maxPopupHeight",
               type: "double?",
               default: "null",
-              desc: "Batas ketinggian maksimum kotak popup. Jika diset null, maka tinggi akan dihitung secara dinamis atau dibatasi maksimum separuh layar (50% view port).",
+              desc: "Batas ketinggian maksimum kotak popup. Jika diset null, maka tinggi dihitung secara dinamis atau dibatasi maksimum 50% dari tinggi layar.",
             },
             {
               name: "triggerOnRightClick",
               type: "bool",
               default: "true",
-              desc: "Jika bernilai true, popup juga dapat dimunculkan melalui klik kanan (Secondary Tap) pada mouse, sangat berguna untuk implementasi menu konteks (context menu) standar di desktop/web.",
+              desc: "Jika bernilai true, popup juga dapat dimunculkan melalui klik kanan (Secondary Tap) pada mouse. Sangat berguna untuk implementasi menu konteks standar di desktop.",
             },
             {
               name: "padding",
@@ -1229,12 +1229,6 @@
               default: "true",
               desc: "Menentukan apakah klik di area latar (barrier) atau gestur tarik (swipe-down) diizinkan untuk menutup menu popup ini.",
             },
-            {
-              name: "beforeTap",
-              type: "void Function(void Function(bool proceed) next)?",
-              default: "null",
-              desc: "Middleware asinkron atau sinkron (hook) yang dieksekusi tepat setelah widget diklik, tapi sebelum popup benar-benar dirender. Anda wajib memanggil argumen fungsi `next(true)` di dalamnya agar popup bisa terus ditampilkan, atau `next(false)` untuk membatalkan.",
-            },
           ],
           additionalInfo: {
             dependencies: "flutter/material.dart, dart:ui",
@@ -1247,7 +1241,7 @@
               name: "Responsive Floating vs Anchoring",
               type: "UI Reaction",
               default: "",
-              desc: "Ketika layar ≥ 1024px, koordinat sentuhan absolut direkam (_tapPosition) dan diumpankan ke LayoutDelegate untuk memunculkan modal persis di sebelah mouse. Pada layar yang lebih sempit (< 1024px), koordinat sentuhan diabaikan dan popup dimunculkan dari bawah (BottomSheet).",
+              desc: "Ketika layar ≥ 1024px, koordinat sentuhan absolut direkam secara pasif melalui Listener dan diumpankan ke LayoutDelegate untuk memunculkan modal persis di titik pointer. Pada layar < 1024px, popup dimunculkan dari bawah (BottomSheet).",
             },
             {
               name: "Smart Edge Collision Detection",
@@ -1267,12 +1261,19 @@
               default: "",
               desc: "Transisi masuk menggunakan penggabungan efek Blur (backdrop filter), memudar (Fade), Skala (Scale dari 0.98), dan Geser (Slide dari Y 0.02) dengan kurva EaseOutCubic untuk nuansa yang lincah.",
             },
+            {
+              name: "Passive Coordinate Tracking & State Lock",
+              type: "Interaction Core",
+              default: "",
+              desc: "Menggunakan `Listener` murni untuk menangkap posisi secara pasif tanpa menghalangi gesture. Dilengkapi dengan flag internal `_isShowing` untuk memblokir pemanggilan ganda meskipun fungsi next dipanggil berulang secara tidak sengaja.",
+            },
           ],
           specialNotes: [
-            "Widget ini membaca interaksi Tap (Klik Kiri), Secondary Tap (Klik Kanan), dan Long Press (Tahan Lama). Semua gestur memicu kemunculan menu yang sama.",
-            "Bila menggunakan `beforeTap`, popup akan tertahan proses asinkronisasinya hingga developer mengeksekusi parameter `next(true)`. Pastikan Anda menangani logika (seperti API Call) secara efisien agar UI tidak terasa lag.",
+            "Karena menggunakan childBuilder, kontrol penuh aksi klik kiri diserahkan langsung ke widget pemicu. Ini memastikan tidak ada konflik hit-test pada elemen interaktif seperti IconButton atau InkWell.",
+            "Aksi klik kanan (Secondary Tap) tetap dikendalikan otomatis oleh widget utama pembungkus jika triggerOnRightClick diset true.",
+            "Bila ada proses asinkron (seperti validasi atau fetch API), letakkan proses tersebut di dalam child sebelum Anda memanggil `next(true)`.",
           ],
-          code: "PopupWidget(\n  popupWidth: 250,\n  triggerOnRightClick: true,\n  beforeTap: (next) async {\n    // Contoh: Validasi dulu atau ambil data sebelum render popup\n    bool allowShow = await checkPermission();\n    next(allowShow);\n  },\n  popupBuilder: (context) => Column(\n    mainAxisSize: MainAxisSize.min,\n    children: [\n      ListTile(title: Text('Edit'), leading: Icon(Icons.edit)),\n      ListTile(title: Text('Hapus'), leading: Icon(Icons.delete, color: Colors.red)),\n    ],\n  ),\n  child: IconButton(\n    icon: Icon(Icons.more_vert),\n    onPressed: null, // Fungsi dikendalikan oleh PopupWidget\n  ),\n)",
+          code: "PopupWidget(\n  popupWidth: 250,\n  triggerOnRightClick: true,\n  childBuilder: (next) => IconButton(\n    icon: const Icon(Icons.more_vert),\n    onPressed: () {\n      next(true);\n    },\n  ),\n  popupBuilder: (context) => const Column(\n    mainAxisSize: MainAxisSize.min,\n    children: [\n      ListTile(title: Text('Edit'), leading: Icon(Icons.edit)),\n      ListTile(title: Text('Hapus'), leading: Icon(Icons.delete, color: Colors.red)),\n    ],\n  ),\n)",
         },
         {
           id: "ToastWidget",
