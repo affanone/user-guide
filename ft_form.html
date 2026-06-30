@@ -1107,6 +1107,12 @@
               default: "",
               desc: "Mengambil data mentah berdasarkan struktur aslinya. Return bisa berupa String, List, Map, atau List<Map> tergantung bentuk data.",
             },
+            {
+              name: "getAndExtractNumber(path)",
+              type: "num",
+              default: "",
+              desc: "Mengambil data mentah berdasarkan struktur aslinya,lalu mengembalikan nilai numerik dari value tersebut.",
+            },
 
             {
               name: "getString(path)",
@@ -1267,6 +1273,19 @@
               type: "void",
               default: "",
               desc: "Membersihkan value tanpa menghancurkan struktur node. Cache tetap dipertahankan.",
+            },
+
+            {
+              name: "isEmpty(path)",
+              type: "bool",
+              default: "",
+              desc: "Mengecek apakah node/path memiliki value kosong.",
+            },
+            {
+              name: "isNotEmpty(path)",
+              type: "bool",
+              default: "",
+              desc: "Mengecek apakah node/path memiliki value tidak kosong.",
             },
 
             {
