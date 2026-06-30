@@ -1267,6 +1267,80 @@
           code: "PopupWidget(\n  dismissible: false,\n  childBuilder: (next) => ElevatedButton(\n    onPressed: () => next(true),\n    child: const Text('Buka Modal Kunci'),\n  ),\n  popupBuilder: (context, close) => Column(\n    children: [\n      const Text('Data Penting'),\n      IconButton(onPressed: close, icon: const Icon(Icons.close)),\n    ],\n  ),\n)",
         },
         {
+          id: "PopupMenuWidget",
+          group: "Alert",
+          name: "Popup Menu Reusable",
+          icon: "fa-solid fa-ellipsis-vertical",
+          description:
+            "Widget wrapper tingkat tinggi untuk PopupMenuButton. Menghilangkan boilerplate dengan menggunakan struktur data class (PopupMenuData) sehingga pembuatan menu dropdown lebih ringkas, aman secara tipe data (generic type), dan UI selalu konsisten.",
+          mandatoryProps: [
+            {
+              name: "items",
+              type: "List<PopupMenuData<T>>",
+              default: "",
+              desc: "Kumpulan daftar menu yang akan di-render. Berisi nilai, label teks, ikon opsional, dan warna kustom (misal untuk menu destruktif).",
+            },
+            {
+              name: "onSelected",
+              type: "ValueChanged<T>",
+              default: "",
+              desc: "Aksi yang dieksekusi ketika salah satu menu dipilih oleh pengguna. Mengembalikan nilai T yang didefinisikan pada items.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "icon",
+              type: "Widget?",
+              default: "null",
+              desc: "Ikon pemicu popup menu (biasanya Icon(Icons.more_vert)). Jika diisi, child tidak perlu diisi.",
+            },
+            {
+              name: "child",
+              type: "Widget?",
+              default: "null",
+              desc: "Widget kustom pemicu popup jika tidak ingin menggunakan ikon standar. Berguna jika pemicunya adalah tombol teks atau gambar.",
+            },
+            {
+              name: "offset",
+              type: "Offset",
+              default: "Offset(0, 40)",
+              desc: "Titik kordinat munculnya popup relatif terhadap posisi widget pemicu. Default digeser 40 pixel ke bawah agar tidak menutupi tombol pemicu.",
+            },
+            {
+              name: "shape",
+              type: "ShapeBorder?",
+              default: "RoundedRectangleBorder(12)",
+              desc: "Bentuk sudut dan dekorasi background popup. Default menggunakan radius 12 yang lebih modern.",
+            },
+            {
+              name: "color",
+              type: "Color?",
+              default: "null",
+              desc: "Warna background dari panel popup menu.",
+            },
+          ],
+          additionalInfo: {},
+          methods: [],
+          behaviors: [
+            {
+              name: "Dynamic Row Assembly",
+              type: "Render Logic",
+              default: "",
+              desc: "Secara cerdas merakit Row di dalam setiap menu. Jika ikon bernilai null, SizedBox sebagai jarak otomatis tidak akan di-render, sehingga label teks tetap rata kiri dengan presisi.",
+            },
+            {
+              name: "Generic Type Safety",
+              type: "Architecture",
+              default: "",
+              desc: "Tipe data pengembalian menu (T) terikat pada data class, menjamin tidak akan ada kesalahan pemetaan tipe data saat event onSelected ditembakkan.",
+            },
+          ],
+          specialNotes: [
+            "Hanya gunakan SATU antara parameter 'icon' atau 'child'. Jika menggunakan 'icon', Material design akan otomatis memberikan padding sirkular standar IconButton.",
+          ],
+          code: "PopupMenuWidget<String>(\n  icon: const Icon(Icons.more_vert),\n  onSelected: (value) {\n    print('Menu yang dipilih: $value');\n  },\n  items: const [\n    PopupMenuData(\n      value: 'profile',\n      label: 'Profile',\n      icon: Icons.person,\n    ),\n    PopupMenuData(\n      value: 'setting',\n      label: 'Setting',\n      icon: Icons.settings,\n    ),\n    PopupMenuData(\n      value: 'delete',\n      label: 'Hapus Akun',\n      icon: Icons.delete,\n      color: Colors.red,\n    ),\n  ],\n)",
+        },
+        {
           id: "ToastWidget",
           group: "Alert",
           name: "Toast / Snackbar",
