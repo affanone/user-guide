@@ -1723,6 +1723,81 @@
           code: "final resultData = await NavigatorPageWidget.push<String>(\n  context,\n  modalMaxWidth: 700,\n  wrapWithScaffoldIfRoute: true,\n  routeName: '/user/detail',\n  child: FormDetailPengguna(),\n);\n\nif (resultData != null) {\n  print('Kembali dengan data: $resultData');\n}",
         },
         {
+          id: "ButtonWidget",
+          group: "Tools",
+          name: "Button Wrapper",
+          icon: "fa-solid fa-hand-pointer",
+          description:
+            "Widget wrapper super efisien untuk menginjeksi efek ripple (InkWell) dari Material Design pada komponen UI apa pun. Dibangun dengan fokus pada efisiensi memori dengan memanipulasi opacity dan bypass interaksi secara otomatis tanpa memerlukan state management tambahan.",
+          mandatoryProps: [
+            {
+              name: "child",
+              type: "Widget",
+              default: "",
+              desc: "Komponen visual utama yang akan dibungkus dengan efek interaktif. Sangat disarankan menggunakan widget Ink untuk background solid/gambar agar efek ripple tidak tertutup.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "onPressed",
+              type: "VoidCallback?",
+              default: "null",
+              desc: "Aksi yang dieksekusi saat widget diklik sekali (tap).",
+            },
+            {
+              name: "onDoubleTap",
+              type: "VoidCallback?",
+              default: "null",
+              desc: "Aksi yang dieksekusi saat widget diklik dua kali secara cepat.",
+            },
+            {
+              name: "onLongPress",
+              type: "VoidCallback?",
+              default: "null",
+              desc: "Aksi yang dieksekusi saat widget ditekan dan ditahan.",
+            },
+            {
+              name: "onRightClick",
+              type: "VoidCallback?",
+              default: "null",
+              desc: "Aksi yang dieksekusi saat klik kanan (desktop/web) atau tap dua jari (secondary tap).",
+            },
+            {
+              name: "borderRadius",
+              type: "BorderRadius?",
+              default: "null",
+              desc: "Membatasi efek ripple agar tidak meluber keluar dari batas radius yang ditentukan. Sesuaikan dengan radius komponen child.",
+            },
+            {
+              name: "disabled",
+              type: "bool?",
+              default: "false",
+              desc: "Parameter eksplisit untuk mematikan interaksi. Jika true, semua callback akan diabaikan dan widget secara otomatis masuk ke fase visual nonaktif.",
+            },
+          ],
+          additionalInfo: {},
+          methods: [],
+          behaviors: [
+            {
+              name: "Auto Disable Detection",
+              type: "State Logic",
+              default: "",
+              desc: "Jika parameter disabled diset true, atau jika SEMUA callback (onPressed, onDoubleTap, onLongPress, onRightClick) bernilai null, widget secara otomatis mematikan interaksi InkWell dan menurunkan opacity menjadi 0.4.",
+            },
+            {
+              name: "Transparent Material Injection",
+              type: "Render Behavior",
+              default: "",
+              desc: "Membungkus child dengan Material transparan, memastikan ripple effect dapat digambar secara native oleh engine Flutter tanpa menimpa atau merusak komposisi warna pada tree di atasnya.",
+            },
+          ],
+          specialNotes: [
+            "PENTING: Jangan gunakan properti 'color' atau 'decoration' pada Container biasa di dalam child jika ingin efek ripple terlihat. Gunakan widget 'Ink' sebagai pengganti Container untuk menggambar warna latar belakang agar gelombang ripple ter-render di atas warna tersebut.",
+            "Skrip ini murni stateless dan sangat ringan. Menghilangkan pemborosan memori karena tidak menggunakan ValueNotifier atau SetState hanya untuk mengatur status aktif/nonaktif.",
+          ],
+          code: "ButtonWidget(\n  onPressed: () {\n    print('Aksi dieksekusi presisi');\n  },\n  borderRadius: BorderRadius.circular(12),\n  child: Ink(\n    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),\n    decoration: BoxDecoration(\n      color: Colors.blueAccent,\n      borderRadius: BorderRadius.circular(12),\n    ),\n    child: const Row(\n      mainAxisSize: MainAxisSize.min,\n      children: [\n        Icon(Icons.save, color: Colors.white),\n        SizedBox(width: 8),\n        Text(\n          'Simpan',\n          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),\n        ),\n      ],\n    ),\n  ),\n)",
+        },
+        {
           id: "DriftListView",
           group: "Widget",
           name: "Drift List View",
