@@ -1272,11 +1272,11 @@
           name: "Popup Menu Reusable",
           icon: "fa-solid fa-ellipsis-vertical",
           description:
-            "Widget wrapper tingkat tinggi untuk PopupMenuButton. Menghilangkan boilerplate dengan menggunakan struktur data class (PopupMenuData) sehingga pembuatan menu dropdown lebih ringkas, aman secara tipe data (generic type), dan UI selalu konsisten.",
+            "Widget wrapper tingkat tinggi untuk PopupMenuButton. Menghilangkan boilerplate dengan menggunakan struktur data class (PopupMenuDataWidget) sehingga pembuatan menu dropdown lebih ringkas, aman secara tipe data (generic type), dan UI selalu konsisten.",
           mandatoryProps: [
             {
               name: "items",
-              type: "List<PopupMenuData<T>>",
+              type: "List<PopupMenuDataWidget<T>>",
               default: "",
               desc: "Kumpulan daftar menu yang akan di-render. Berisi nilai, label teks, ikon opsional, dan warna kustom (misal untuk menu destruktif).",
             },
@@ -1344,7 +1344,7 @@
           specialNotes: [
             "Hanya gunakan SATU antara parameter 'icon' atau 'child'. Jika menggunakan 'icon', Material design akan otomatis memberikan padding sirkular standar IconButton.",
           ],
-          code: "PopupMenuWidget<String>(\n  icon: const Icon(Icons.more_vert),\n  onSelected: (value) {\n    print('Menu yang dipilih: $value');\n  },\n  items: const [\n    PopupMenuData(\n      value: 'profile',\n      label: 'Profile',\n      icon: Icons.person,\n    ),\n    PopupMenuData(\n      value: 'setting',\n      label: 'Setting',\n      icon: Icons.settings,\n    ),\n    PopupMenuData(\n      value: 'delete',\n      label: 'Hapus Akun',\n      icon: Icons.delete,\n      color: Colors.red,\n    ),\n  ],\n)",
+          code: "PopupMenuWidget<String>(\n  icon: const Icon(Icons.more_vert),\n  onSelected: (value) {\n    print('Menu yang dipilih: $value');\n  },\n  items: const [\n    PopupMenuDataWidget(\n      value: 'profile',\n      label: 'Profile',\n      icon: Icons.person,\n    ),\n    PopupMenuDataWidget(\n      value: 'setting',\n      label: 'Setting',\n      icon: Icons.settings,\n    ),\n    PopupMenuDataWidget(\n      value: 'delete',\n      label: 'Hapus Akun',\n      icon: Icons.delete,\n      color: Colors.red,\n    ),\n  ],\n)",
         },
         {
           id: "ToastWidget",
