@@ -1650,6 +1650,103 @@
           code: "AutoRetryImageWidget(\n  imageUrl: '[https://example.com/images/profile.jpg](https://www.google.com/search?q=https://example.com/images/profile.jpg)',\n  width: 120.0,\n  height: 120.0,\n  delayRetry: 5,\n  maxRetry: 3,\n  colorSpinner: Colors.blueAccent,\n  colorBackground: Colors.grey[200]!,\n  debugMode: false,\n)",
         },
         {
+          id: "KeyHandler",
+          group: "Helper",
+          name: "Smart Key Handler",
+          icon: "fa-solid fa-keyboard",
+          description:
+            "Kelas utilitas statis untuk mengelola, mencegat, dan memvalidasi event keyboard (KeyEvent) secara deklaratif melalui sistem chaining. Mengatasi masalah eksekusi ganda (KeyDown/KeyUp) pada Flutter dan menyederhanakan deteksi kombinasi tombol ('CTRL+SHIFT+A') secara real-time via `HardwareKeyboard`. Versi baru ini langsung mengembalikan `KeyEventResult?` sehingga pemicuan event dapat dirangkai dengan sangat bersih.",
+          mandatoryProps: [
+            {
+              name: "event",
+              type: "KeyEvent",
+              default: "",
+              desc: "Event keyboard mentah yang diterima dari scope `onKeyEvent` (misalnya dari Focus, FocusNode, atau KeyboardListener).",
+            },
+            {
+              name: "shortcut (khusus method ifMatch)",
+              type: "String",
+              default: "",
+              desc: "String representasi kombinasi tombol yang ingin dideteksi. Contoh: 'ENTER', 'A', 'SHIFT+ENTER', 'CTRL+SHIFT+S', atau 'CMD+D'.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "action",
+              type: "KeyAction",
+              default: "KeyAction.down",
+              desc: "Enum untuk menentukan fase event: `down` (saat ditekan), `up` (saat dilepas), atau `both` (keduanya).",
+            },
+            {
+              name: "callback",
+              type: "KeyHandlerCallback?",
+              default: "null",
+              desc: "Fungsi lambda yang menerima argumen `KeyEvent` aktif. Bisa mengembalikan `KeyEventResult?` secara dinamis untuk meng-override status rambatan event, atau tanpa return jika ingin memakai nilai default.",
+            },
+            {
+              name: "matchResult",
+              type: "KeyEventResult",
+              default: "KeyEventResult.handled",
+              desc: "Hasil fallback yang akan dikembalikan jika shortcut cocok dan callback tidak mengembalikan nilai spesifik (mengembalikan null).",
+            },
+          ],
+          additionalInfo: {
+            dependencies:
+              "flutter/widgets.dart (Otomatis mengekspor KeyEvent & KeyEventResult dari services.dart)",
+            architecture_layer: "Static Helper Class, Fluid Chaining Interface",
+          },
+          methods: [
+            {
+              name: "ifEnter(event, {action, callback, matchResult})",
+              returnType: "KeyEventResult?",
+              desc: "Mencegat penekanan tombol Enter atau Numpad Enter. Mengembalikan null jika kriteria tidak terpenuhi.",
+            },
+            {
+              name: "ifBackspace(event, {action, callback, matchResult})",
+              returnType: "KeyEventResult?",
+              desc: "Mencegat penekanan tombol Backspace. Mengembalikan null jika kriteria tidak terpenuhi.",
+            },
+            {
+              name: "ifEscape(event, {action, callback, matchResult})",
+              returnType: "KeyEventResult?",
+              desc: "Mencegat penekanan tombol Escape (Esc). Mengembalikan null jika kriteria tidak terpenuhi.",
+            },
+            {
+              name: "ifSpace(event, {action, callback, matchResult})",
+              returnType: "KeyEventResult?",
+              desc: "Mencegat penekanan tombol Spacebar. Mengembalikan null jika kriteria tidak terpenuhi.",
+            },
+            {
+              name: "ifMatch(event, shortcut, {action, callback, matchResult})",
+              returnType: "KeyEventResult?",
+              desc: "Method dinamis case-insensitive untuk mencocokkan string kombinasi custom (seperti 'CTRL+SHIFT+S').",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Null-Coalescing Fluid Chaining",
+              type: "Developer Experience",
+              desc: "Karena seluruh method mengembalikan `KeyEventResult?` (dan mengembalikan `null` jika tidak match), barisan pengecekan keyboard dapat digabung menggunakan operator `??` tanpa memerlukan blok `if-else` bercabang.",
+            },
+            {
+              name: "Dynamic Callback Overriding",
+              type: "Control Flow",
+              desc: "Eksekusi internal menggunakan formula `callback?.call(event) ?? matchResult`. Ini memberikan fleksibilitas penuh bagi callback untuk mengubah keputusannya di tengah jalan (misal: mengembalikan `ignored` jika form belum valid).",
+            },
+            {
+              name: "Implicit Dependency Export",
+              type: "Architecture",
+              desc: "Menggunakan perintah `export` di balik layar untuk membagikan class `KeyEventResult` dan `KeyEvent`. Membebaskan file UI dari keharusan mengimpor `package:flutter/services.dart` secara manual.",
+            },
+          ],
+          specialNotes: [
+            "Kini penulisan kode jauh lebih deklaratif. Cukup akhiri rangkaian chaining dengan `?? KeyEventResult.ignored` untuk menangkap semua event yang tidak cocok.",
+            "Argumen event pada callback memudahkan Anda jika sewaktu-waktu membutuhkan metadata fisik tambahan dari tombol yang memicu event tersebut.",
+            "Gunakan string 'CMD' atau 'META' untuk memetakan tombol Command pada macOS / iOS secara akurat.",
+          ],
+          code: "Focus(\n  onKeyEvent: (node, event) {\n    // Memanfaatkan fluid chaining menggunakan operator ??\n    return KeyHandler.ifEnter(event, callback: (e) {\n             print('Menyimpan data...');\n           })\n        ?? KeyHandler.ifMatch(event, 'CTRL+SHIFT+S', callback: (e) {\n             _saveDataAs();\n           })\n        ?? KeyHandler.ifEscape(event, action: KeyAction.up, callback: (e) {\n             // Contoh override return secara dinamis di dalam callback\n             if (canCloseModal) {\n               closeModal();\n               return KeyEventResult.handled;\n             }\n             return KeyEventResult.ignored;\n           })\n        ?? KeyEventResult.ignored; // Fallback mutlak jika tidak ada yang cocok\n  },\n  child: YourFormWidget(),\n)",
+        },
+        {
           id: "CropWidget",
           group: "Helper",
           name: "Crop",
