@@ -1433,7 +1433,7 @@
         },
         {
           id: "AutoRetryImageWidget",
-          group: "Tools",
+          group: "Widget",
           name: "Auto Retry Image",
           icon: "fa-solid fa-image",
           description:
@@ -1523,7 +1523,7 @@
         },
         {
           id: "CropWidget",
-          group: "Tools",
+          group: "Helper",
           name: "Crop",
           icon: "fa-solid fa-crop",
           description:
@@ -1683,7 +1683,7 @@
         },
         {
           id: "NavigatorPageWidget",
-          group: "Tools",
+          group: "Widget",
           name: "Responsive Navigator Page",
           icon: "fa-solid fa-route",
           description:
@@ -1798,7 +1798,7 @@
         },
         {
           id: "ButtonWidget",
-          group: "Tools",
+          group: "Widget",
           name: "Button Wrapper",
           icon: "fa-solid fa-hand-pointer",
           description:
@@ -1879,7 +1879,7 @@
         },
         {
           id: "DriftListView",
-          group: "Widget",
+          group: "Layout",
           name: "Drift List View",
           icon: "fa-solid fa-list",
           description:
@@ -1971,8 +1971,8 @@
         },
         {
           id: "buildEmptyWidget",
-          group: "Helper",
-          name: "buildEmptyWidget",
+          group: "Widget",
+          name: "Build Empty",
           icon: "fa-solid fa-folder-open",
           description:
             "Fungsi helper global untuk membangun tampilan status kosong (empty state) yang konsisten dan elegan di seluruh modul aplikasi. Menampilkan tata letak terpusat yang terdiri dari ikon melingkar semi-transparan dan pesan deskriptif teks yang dapat disesuaikan.",
@@ -2020,7 +2020,7 @@
         },
         {
           id: "LoadingWidget",
-          group: "Helper",
+          group: "Alert",
           name: "Loading Widget",
           icon: "fa-solid fa-spinner",
           description:
@@ -2529,7 +2529,7 @@
         },
         {
           id: "GridRowWidget",
-          group: "Widget",
+          group: "Layout",
           name: "Grid System",
           icon: "fa-solid fa-table-columns",
           description:
@@ -2655,6 +2655,87 @@
             "Fitur GridAlign.stretch hanya akan berfungsi sempurna jika constraint vertikal pembungkus parent tidak diatur ke infinite (harus memiliki batasan tinggi yang jelas).",
           ],
           code: "GridRowWidget(\n  justify: GridJustify.spaceBetween,\n  rowGap: 16.0,\n  columnGap: 16.0,\n  children: [\n    GridColWidget(\n      xs: 12,   // Penuh di Mobile\n      md: 6,    // 50% di Tablet\n      lg: 4,    // 33.3% di Desktop\n      child: Container(color: Colors.red, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      lg: 4,\n      child: Container(color: Colors.green, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 12,   // Penuh di Tablet (baris ke-2)\n      lg: 4,    // Sejajar dengan yang lain di Desktop\n      child: Container(color: Colors.blue, height: 100),\n    ),\n  ],\n)",
+        },
+        {
+          id: "ListViewWidget",
+          group: "Layout",
+          name: "Smart Flexible List View",
+          icon: "fa-solid fa-list-ul",
+          description:
+            "Widget helper arsitektural untuk menangani list dinamis tanpa memicu error unbounded height. Secara cerdas beradaptasi dengan sisa ruang layout (menggunakan Flexible) dan merender UI secara efisien melalui lazy loading.",
+          mandatoryProps: [
+            {
+              name: "children",
+              type: "List<Widget>",
+              default: "",
+              desc: "Kumpulan widget yang akan dirender di dalam list. Walaupun menerima List lengkap, sistem akan tetap memprosesnya secara lazy loading.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "separator",
+              type: "Widget?",
+              default: "null",
+              desc: "Widget pembatas antar item. Jika diisi, helper otomatis beralih ke logika ListView.separated. Jika kosong, menggunakan ListView.builder.",
+            },
+            {
+              name: "isFlexible",
+              type: "bool",
+              default: "true",
+              desc: "Jika aktif, list otomatis dibungkus Flexible(fit: FlexFit.loose). Wajib aktif jika widget ini berada di dalam Column untuk mencegah overflow.",
+            },
+            {
+              name: "shrinkWrap",
+              type: "bool",
+              default: "true",
+              desc: "Memaksa tinggi list mengikuti total tinggi konten di dalamnya jika ukurannya lebih kecil dari sisa ruang layar.",
+            },
+            {
+              name: "padding",
+              type: "EdgeInsetsGeometry?",
+              default: "null",
+              desc: "Jarak internal list. Dieksekusi langsung di dalam core ListView agar area sentuh scroll tidak terpotong margin dari luar.",
+            },
+            {
+              name: "physics",
+              type: "ScrollPhysics?",
+              default: "null",
+              desc: "Kontrol perilaku scroll. Gunakan NeverScrollableScrollPhysics() jika list ini diletakkan di dalam struktur parent yang sudah memiliki scroll (seperti SingleChildScrollView).",
+            },
+            {
+              name: "scrollDirection",
+              type: "Axis",
+              default: "Axis.vertical",
+              desc: "Sumbu orientasi scroll. Ubah ke Axis.horizontal jika membutuhkan list yang digeser menyamping.",
+            },
+            {
+              name: "controller",
+              type: "ScrollController?",
+              default: "null",
+              desc: "Controller eksternal untuk memantau atau mengendalikan posisi scroll secara programatis.",
+            },
+          ],
+          additionalInfo: {},
+          methods: [],
+          behaviors: [
+            {
+              name: "Smart Lazy Assembly",
+              type: "Render Logic",
+              default: "",
+              desc: "Mendeteksi secara mandiri keberadaan parameter separator. Sistem akan mengeksekusi ListView.builder atau separated untuk menghemat konsumsi memori alih-alih merender seluruh children sekaligus di awal.",
+            },
+            {
+              name: "Loose Constraint Adaptation",
+              type: "Layout Strategy",
+              default: "",
+              desc: "Ketika isFlexible aktif, list akan menciut jika konten sedikit. Namun jika konten membludak, widget akan menahan diri di batas maksimal parent dan otomatis mengaktifkan scroll internal.",
+            },
+          ],
+          specialNotes: [
+            "Jangan pernah membungkus widget ini dengan Padding dari luar. Selalu gunakan parameter padding internal yang disediakan agar sensitivitas ujung scroll tetap responsif.",
+            "Pastikan isFlexible = false jika widget ini diletakkan langsung di tempat yang tidak memiliki batas constraints (seperti langsung di dalam body Scaffold tanpa dibungkus Column).",
+          ],
+          code: "ListViewWidget(\n  separator: const SizedBox(height: 12),\n  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),\n  children: const [\n    ItemWidget(title: 'Data 1'),\n    ItemWidget(title: 'Data 2'),\n    ItemWidget(title: 'Data 3'),\n  ],\n)",
         },
         {
           id: "CardWidget",
