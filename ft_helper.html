@@ -1432,6 +1432,49 @@
           code: "try {\n  await api.saveData();\n  ToastWidget.success(context, 'Data berhasil disimpan ke database.');\n} catch (e) {\n  ToastWidget.error(context, 'Koneksi gagal. Periksa jaringan Anda.');\n}",
         },
         {
+          id: "InfoLabelAndValueWidget",
+          group: "Widget",
+          name: "Auto-Themed Info Label",
+          icon: "fa-solid fa-circle-info",
+          description:
+            "Widget penampil data key-value. Ditingkatkan menjadi StatelessWidget untuk efisiensi memori dan dibekali kemampuan mendeteksi mode UI (light/dark) secara mandiri dari BuildContext, menghapus ketergantungan pada parameter eksternal.",
+          mandatoryProps: [
+            {
+              name: "infoKey",
+              type: "String",
+              default: "",
+              desc: "Teks label bagian atas. Menggantikan variabel lama 'key' untuk mengamankan struktur dari konflik dengan reserved word bawaan Flutter.",
+            },
+            {
+              name: "value",
+              type: "dynamic",
+              default: "",
+              desc: "Isi informasi bagian bawah. Menerima berbagai tipe data dan otomatis dikonversi ke String pada tahap render untuk mencegah crash aplikasi.",
+            },
+          ],
+          optionalProps: [],
+          additionalInfo: {},
+          methods: [],
+          behaviors: [
+            {
+              name: "Contextual Theme Reading",
+              type: "UI Lifecycle",
+              default: "",
+              desc: "Membaca Theme.of(context).brightness secara instan untuk menyesuaikan warna background, border, dan teks tanpa perlu di-trigger manual.",
+            },
+            {
+              name: "Type Safety Rendering",
+              type: "Data Handling",
+              default: "",
+              desc: "Memaksa konversi .toString() pada parameter value. Menjamin UI tetap aman meski menerima data mentah berupa integer atau double dari API.",
+            },
+          ],
+          specialNotes: [
+            "Widget ini membutuhkan widget tree yang valid dengan MaterialApp/Theme di atasnya agar fungsi pembacaan context mode gelap bisa bekerja presisi.",
+          ],
+          code: "InfoLabelAndValueWidget(\n  infoKey: 'Status Transaksi',\n  value: 'Berhasil',\n),\nInfoLabelAndValueWidget(\n  infoKey: 'Total Nominal',\n  value: 1500000,\n)",
+        },
+        {
           id: "AutoRetryImageWidget",
           group: "Widget",
           name: "Auto Retry Image",
