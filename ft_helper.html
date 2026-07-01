@@ -2549,28 +2549,6 @@
           code: "final docData = {'nama_produk': 'Kopi Gula Aren'};\nfinal generatedKeywords = createKeywords(data: docData, targetKeys: ['nama_produk']);\ndocData['keywords'] = generatedKeywords;\nawait firestore.collection('products').add(docData);",
         },
         {
-          id: "ui-helper-general",
-          group: "Helper",
-          name: "UI Helper & Components",
-          icon: "fa-solid fa-layer-group",
-          description:
-            "Bantuan render antarmuka grafis (GUI) mini yang mengekstrak komponen layout berulang agar UI code tetap bersih dan rapi.",
-          mandatoryProps: [],
-          optionalProps: [],
-          additionalInfo: {},
-          methods: [
-            {
-              name: "widgetInfoRow",
-              type: "Container Function",
-              default: "",
-              desc: "Me-return widget Container siap pakai yang menyusun key (label atas) dan value (nilai bawah). Mendukung pengaturan latar belakang dan warna teks yang responsif terhadap variabel darkMode.",
-            },
-          ],
-          behaviors: [],
-          specialNotes: [],
-          code: "widgetInfoRow(Theme.of(context).brightness == Brightness.dark, 'Nama Staf', 'Budi Santoso');",
-        },
-        {
           id: "GridRowWidget",
           group: "Layout",
           name: "Grid System",
