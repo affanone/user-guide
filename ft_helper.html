@@ -1180,7 +1180,7 @@
         {
           id: "PopupWidget",
           group: "Widget",
-          name: "Popup Menu Reaktif",
+          name: "Popup Reaktif",
           icon: "fa-solid fa-arrow-pointer",
           description:
             "Widget interaktif pemicu (trigger) untuk menampilkan menu pop-up kontekstual. Mendukung adaptasi cerdas: floating overlay pada desktop (dengan kalkulasi bounding-box otomatis) dan Bottom Sheet pada mobile. Kini dilengkapi dengan fungsi 'close' terenkapsulasi untuk kontrol programatik, serta mekanisme 'Static Modal' (PopScope) untuk mencegah penutupan paksa via keyboard/backdrop.",
@@ -1240,6 +1240,12 @@
               type: "VoidCallback?",
               default: "null",
               desc: "Fungsi callback asinkron yang dieksekusi secara otomatis tepat setelah popup atau sheet telah sepenuhnya tertutup dari layar.",
+            },
+            {
+              name: "onPresented",
+              type: "VoidCallback?",
+              default: "null",
+              desc: "Fungsi callback yang dieksekusi setelah animasi transisi pembukaan popup atau sheet telah selesai sepenuhnya dan UI siap untuk diinteraksi oleh pengguna.",
             },
           ],
           additionalInfo: {
