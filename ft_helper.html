@@ -1187,13 +1187,13 @@
           mandatoryProps: [
             {
               name: "childBuilder",
-              type: "Widget Function(void Function([T data]) next)",
+              type: "Widget Function(void Function([T? data]) next)",
               default: "",
               desc: "Fungsi pembangun widget pemicu. Panggil `next()` atau `next(data)` di dalam event widget untuk mengeksekusi popup dan mengirimkan payload data.",
             },
             {
               name: "popupBuilder",
-              type: "Widget Function(BuildContext context, VoidCallback close, T data)",
+              type: "Widget Function(BuildContext context, VoidCallback close, T? data)",
               default: "",
               desc: "Fungsi callback pembangun konten popup. Menyediakan parameter `close` untuk penutupan manual dan `data` yang diteruskan dari pemicu.",
             },
@@ -1237,13 +1237,13 @@
             },
             {
               name: "onPresented",
-              type: "void Function(T data)?",
+              type: "void Function(T? data)?",
               default: "null",
               desc: "Fungsi callback yang dieksekusi setelah animasi transisi pembukaan popup selesai, menyertakan referensi payload data yang dilempar dari trigger.",
             },
             {
               name: "onDismissed",
-              type: "void Function(T data)?",
+              type: "void Function(T? data)?",
               default: "null",
               desc: "Fungsi callback asinkron yang dieksekusi secara otomatis tepat setelah popup tertutup, menyertakan referensi payload data.",
             },
