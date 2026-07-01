@@ -1643,6 +1643,12 @@
               desc: "Mesin modifikasi teks (contoh: toUpperCase, trim) sebelum data masuk ke node.",
             },
             {
+              name: "onKeyEvent",
+              type: "KeyEventResult Function(FocusNode node, KeyEvent event)?",
+              default: "null",
+              desc: "Event keyboard: Menangkap aksi tombol keyboard seperti Enter, Escape, Tab, atau shortcut lainnya melalui FocusNode.",
+            },
+            {
               name: "icon",
               type: "IconData?",
               default: "null",
@@ -2469,6 +2475,12 @@
               type: "ValueTransformer<String>?",
               default: "null",
               desc: "Mesin modifikasi teks secara instan sebelum data masuk ke node.",
+            },
+            {
+              name: "onKeyEvent",
+              type: "KeyEventResult Function(FocusNode node, KeyEvent event)?",
+              default: "null",
+              desc: "Event keyboard: Menangkap aksi tombol keyboard seperti Enter, Escape, Tab, atau shortcut lainnya melalui FocusNode.",
             },
             {
               name: "icon",
@@ -5976,6 +5988,12 @@
               type: "ValueTransformer<num?>?",
               default: "null",
               desc: "Modifikasi nilai (contoh: kompresi desimal) sebelum masuk ke node.",
+            },
+            {
+              name: "onKeyEvent",
+              type: "KeyEventResult Function(FocusNode node, KeyEvent event)?",
+              default: "null",
+              desc: "Event keyboard: Menangkap aksi tombol keyboard seperti Enter, Escape, Tab, atau shortcut lainnya melalui FocusNode.",
             },
             {
               name: "icon",
