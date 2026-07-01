@@ -1784,6 +1784,12 @@
               desc: "Memodifikasi input data sebelum masuk state.",
             },
             {
+              name: "onKeyEvent",
+              type: "KeyEventResult Function(FocusNode node, KeyEvent event)?",
+              default: "null",
+              desc: "Event keyboard: Menangkap aksi tombol keyboard seperti Enter, Escape, Tab, atau shortcut lainnya melalui FocusNode.",
+            },
+            {
               name: "prefix",
               type: "dynamic",
               default: "null",
@@ -1919,6 +1925,12 @@
               desc: "Memodifikasi input data sebelum masuk state.",
             },
             {
+              name: "onKeyEvent",
+              type: "KeyEventResult Function(FocusNode node, KeyEvent event)?",
+              default: "null",
+              desc: "Event keyboard: Menangkap aksi tombol keyboard seperti Enter, Escape, Tab, atau shortcut lainnya melalui FocusNode.",
+            },
+            {
               name: "prefix",
               type: "dynamic",
               default: "null",
@@ -2040,6 +2052,12 @@
               type: "ValueTransformer<String>?",
               default: "null",
               desc: "Memodifikasi input data sebelum masuk state.",
+            },
+            {
+              name: "onKeyEvent",
+              type: "KeyEventResult Function(FocusNode node, KeyEvent event)?",
+              default: "null",
+              desc: "Event keyboard: Menangkap aksi tombol keyboard seperti Enter, Escape, Tab, atau shortcut lainnya melalui FocusNode.",
             },
             {
               name: "prefix",
@@ -2579,7 +2597,7 @@
         {
           id: "address",
           group: "Input Teks & Angka",
-          name: "Address Field",
+          name: "Address",
           icon: "fa-solid fa-location-dot",
           description:
             "Input alamat multi-baris berbasis FormTextAreaWidget yang telah dioptimalkan untuk penulisan lokasi, alamat rumah, atau deskripsi tempat. Secara bawaan menggunakan ikon lokasi dan mendukung kontrol penuh melalui FormNode, validasi, transformer, serta sistem dekorasi global FormStyle.",
@@ -2626,6 +2644,12 @@
               type: "ValueTransformer<String>?",
               default: "null",
               desc: "Mesin transformasi teks.",
+            },
+            {
+              name: "onKeyEvent",
+              type: "KeyEventResult Function(FocusNode node, KeyEvent event)?",
+              default: "null",
+              desc: "Event keyboard: Menangkap aksi tombol keyboard seperti Enter, Escape, Tab, atau shortcut lainnya melalui FocusNode.",
             },
             {
               name: "prefix",
