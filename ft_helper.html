@@ -1200,6 +1200,12 @@
           ],
           optionalProps: [
             {
+              name: "dismissDuration",
+              type: "Duration?",
+              default: "null",
+              desc: "Durasi penundaan sebelum memicu onDismissed. Berguna untuk menangani konflik lifecycle pada widget kompleks saat pembersihan data.",
+            },
+            {
               name: "popupWidth",
               type: "double?",
               default: "300",
@@ -1281,7 +1287,7 @@
             "Gunakan payload parameter `data` jika Anda memiliki widget yang di-render berulang kali dalam map/list, agar referensi item spesifik dapat diakses langsung oleh popup, onPresented, dan onDismissed.",
             "Pada mode mobile, tinggi popup secara otomatis beradaptasi dengan konten namun dibatasi 90% tinggi layar jika `maxPopupHeight` tidak ditentukan.",
           ],
-          code: "PopupWidget<String>(\n  dismissible: false,\n  childBuilder: (next) => ElevatedButton(\n    onPressed: () => next(\"ID_NODE_123\"),\n    child: const Text('Buka Modal Kunci'),\n  ),\n  popupBuilder: (context, close, data) => Column(\n    children: [\n      Text('Data Penting: $data'),\n      IconButton(onPressed: close, icon: const Icon(Icons.close)),\n    ],\n  ),\n  onPresented: (data) {\n    // Inisialisasi controller berdasarkan data (ID_NODE_123)\n  },\n  onDismissed: (data) {\n    // Dispose controller berdasarkan data (ID_NODE_123)\n  },\n)",
+          code: "PopupWidget<String>(\n  dismissible: false,\n  dismissDuration: const Duration(milliseconds: 300),\n  childBuilder: (next) => ElevatedButton(\n    onPressed: () => next(\"ID_NODE_123\"),\n    child: const Text('Buka Modal Kunci'),\n  ),\n  popupBuilder: (context, close, data) => Column(\n    children: [\n      Text('Data Penting: $data'),\n      IconButton(onPressed: close, icon: const Icon(Icons.close)),\n    ],\n  ),\n  onPresented: (data) {\n    // Inisialisasi controller berdasarkan data (ID_NODE_123)\n  },\n  onDismissed: (data) {\n    // Dispose controller berdasarkan data (ID_NODE_123)\n  },\n)",
         },
         {
           id: "PopupMenuWidget",
