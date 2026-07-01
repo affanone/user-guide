@@ -1183,19 +1183,19 @@
           name: "Popup Reaktif",
           icon: "fa-solid fa-arrow-pointer",
           description:
-            "Widget interaktif pemicu (trigger) untuk menampilkan menu pop-up kontekstual. Mendukung adaptasi cerdas: floating overlay pada desktop (dengan kalkulasi bounding-box otomatis) dan Bottom Sheet pada mobile. Kini dilengkapi dengan fungsi 'close' terenkapsulasi untuk kontrol programatik, serta mekanisme 'Static Modal' (PopScope) untuk mencegah penutupan paksa via keyboard/backdrop.",
+            "Widget interaktif pemicu (trigger) untuk menampilkan menu pop-up kontekstual. Mendukung adaptasi cerdas: floating overlay pada desktop (dengan kalkulasi bounding-box otomatis) dan Bottom Sheet pada mobile. Kini mendukung Generic Type (<T>) sebagai jembatan untuk melewatkan referensi data langsung dari pemicu ke siklus hidup popup (builder, onPresented, onDismissed) guna optimalisasi resource tanpa variabel global. Dilengkapi kontrol programatik 'close' dan mekanisme 'Static Modal'.",
           mandatoryProps: [
             {
               name: "childBuilder",
-              type: "Widget Function(void Function(bool proceed) next)",
+              type: "Widget Function(void Function([T? data]) next)",
               default: "",
-              desc: "Fungsi pembangun widget pemicu. Wajib memanggil `next(true)` di dalam event widget untuk mengeksekusi popup.",
+              desc: "Fungsi pembangun widget pemicu. Panggil `next()` atau `next(data)` di dalam event widget untuk mengeksekusi popup dan mengirimkan payload data.",
             },
             {
               name: "popupBuilder",
-              type: "PopupBuilder (BuildContext context, VoidCallback close)",
+              type: "Widget Function(BuildContext context, VoidCallback close, T? data)",
               default: "",
-              desc: "Fungsi callback pembangun konten popup. Wajib menyertakan parameter `close` untuk menutup popup secara programatik.",
+              desc: "Fungsi callback pembangun konten popup. Menyediakan parameter `close` untuk penutupan manual dan `data` yang diteruskan dari pemicu.",
             },
           ],
           optionalProps: [
@@ -1236,16 +1236,16 @@
               desc: "Jika false, popup tidak bisa ditutup via ESC, tombol back, atau klik backdrop (Static Modal). Penutupan hanya bisa dilakukan melalui fungsi `close()`.",
             },
             {
-              name: "onDismissed",
-              type: "VoidCallback?",
+              name: "onPresented",
+              type: "void Function(T? data)?",
               default: "null",
-              desc: "Fungsi callback asinkron yang dieksekusi secara otomatis tepat setelah popup atau sheet telah sepenuhnya tertutup dari layar.",
+              desc: "Fungsi callback yang dieksekusi setelah animasi transisi pembukaan popup selesai, menyertakan referensi payload data yang dilempar dari trigger.",
             },
             {
-              name: "onPresented",
-              type: "VoidCallback?",
+              name: "onDismissed",
+              type: "void Function(T? data)?",
               default: "null",
-              desc: "Fungsi callback yang dieksekusi setelah animasi transisi pembukaan popup atau sheet telah selesai sepenuhnya dan UI siap untuk diinteraksi oleh pengguna.",
+              desc: "Fungsi callback asinkron yang dieksekusi secara otomatis tepat setelah popup tertutup, menyertakan referensi payload data.",
             },
           ],
           additionalInfo: {
@@ -1255,6 +1255,11 @@
           },
           methods: [],
           behaviors: [
+            {
+              name: "State Isolation & Forwarding",
+              type: "Architecture",
+              desc: "Menggunakan generic type <T> untuk mem-passing referensi data dinamis antar widget tanpa harus membebani global state management. Berguna untuk membuat dan membuang state (misal: Node Controller) hanya di saat popup aktif.",
+            },
             {
               name: "Programmatic Control",
               type: "Interaction Core",
@@ -1272,11 +1277,11 @@
             },
           ],
           specialNotes: [
-            "Wajib menggunakan `popupBuilder: (context, close) => ...` untuk mendapatkan akses ke fungsi penutupan manual.",
+            "Wajib memanggil argument `close` di dalam `popupBuilder` jika ingin menyediakan penutupan manual pada UI.",
+            "Gunakan payload parameter `data` jika Anda memiliki widget yang di-render berulang kali dalam map/list, agar referensi item spesifik dapat diakses langsung oleh popup, onPresented, dan onDismissed.",
             "Pada mode mobile, tinggi popup secara otomatis beradaptasi dengan konten namun dibatasi 90% tinggi layar jika `maxPopupHeight` tidak ditentukan.",
-            "Gunakan `dismissible: false` untuk skenario form krusial yang memerlukan validasi sebelum ditutup.",
           ],
-          code: "PopupWidget(\n  dismissible: false,\n  childBuilder: (next) => ElevatedButton(\n    onPressed: () => next(true),\n    child: const Text('Buka Modal Kunci'),\n  ),\n  popupBuilder: (context, close) => Column(\n    children: [\n      const Text('Data Penting'),\n      IconButton(onPressed: close, icon: const Icon(Icons.close)),\n    ],\n  ),\n)",
+          code: "PopupWidget<String>(\n  dismissible: false,\n  childBuilder: (next) => ElevatedButton(\n    onPressed: () => next(\"ID_NODE_123\"),\n    child: const Text('Buka Modal Kunci'),\n  ),\n  popupBuilder: (context, close, data) => Column(\n    children: [\n      Text('Data Penting: $data'),\n      IconButton(onPressed: close, icon: const Icon(Icons.close)),\n    ],\n  ),\n  onPresented: (data) {\n    // Inisialisasi controller berdasarkan data (ID_NODE_123)\n  },\n  onDismissed: (data) {\n    // Dispose controller berdasarkan data (ID_NODE_123)\n  },\n)",
         },
         {
           id: "PopupMenuWidget",
