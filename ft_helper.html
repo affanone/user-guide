@@ -1003,7 +1003,7 @@
         },
         {
           id: "NoteWidget",
-          group: "Alert",
+          group: "Widget",
           name: "Note Widget",
           icon: "fa-solid fa-circle-info",
           description:
@@ -1101,7 +1101,7 @@
         },
         {
           id: "PillWidget",
-          group: "Alert",
+          group: "Widget",
           name: "Pill Badge Widget",
           icon: "fa-solid fa-capsules",
           description:
@@ -1234,6 +1234,12 @@
               type: "bool",
               default: "true",
               desc: "Jika false, popup tidak bisa ditutup via ESC, tombol back, atau klik backdrop (Static Modal). Penutupan hanya bisa dilakukan melalui fungsi `close()`.",
+            },
+            {
+              name: "onDismissed",
+              type: "VoidCallback?",
+              default: "null",
+              desc: "Fungsi callback asinkron yang dieksekusi secara otomatis tepat setelah popup atau sheet telah sepenuhnya tertutup dari layar.",
             },
           ],
           additionalInfo: {
