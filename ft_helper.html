@@ -1432,15 +1432,15 @@
           code: "try {\n  await api.saveData();\n  ToastWidget.success(context, 'Data berhasil disimpan ke database.');\n} catch (e) {\n  ToastWidget.error(context, 'Koneksi gagal. Periksa jaringan Anda.');\n}",
         },
         {
-          id: "InfoLabelAndValueWidget",
+          id: "InfoCardWidget",
           group: "Widget",
-          name: "Auto-Themed Info Label",
+          name: "Info Card",
           icon: "fa-solid fa-circle-info",
           description:
             "Widget penampil data key-value. Ditingkatkan menjadi StatelessWidget untuk efisiensi memori dan dibekali kemampuan mendeteksi mode UI (light/dark) secara mandiri dari BuildContext, menghapus ketergantungan pada parameter eksternal.",
           mandatoryProps: [
             {
-              name: "infoKey",
+              name: "label",
               type: "String",
               default: "",
               desc: "Teks label bagian atas. Menggantikan variabel lama 'key' untuk mengamankan struktur dari konflik dengan reserved word bawaan Flutter.",
@@ -1472,7 +1472,7 @@
           specialNotes: [
             "Widget ini membutuhkan widget tree yang valid dengan MaterialApp/Theme di atasnya agar fungsi pembacaan context mode gelap bisa bekerja presisi.",
           ],
-          code: "InfoLabelAndValueWidget(\n  infoKey: 'Status Transaksi',\n  value: 'Berhasil',\n),\nInfoLabelAndValueWidget(\n  infoKey: 'Total Nominal',\n  value: 1500000,\n)",
+          code: "InfoLabelAndValueWidget(\n  label: 'Status Transaksi',\n  value: 'Berhasil',\n),\nInfoLabelAndValueWidget(\n  label: 'Total Nominal',\n  value: 1500000,\n)",
         },
         {
           id: "AutoRetryImageWidget",
