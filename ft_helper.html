@@ -156,7 +156,7 @@
   >
     <div id="app" class="flex flex-col h-screen">
       <nav
-        class="glass-header z-20 px-6 py-4 flex justify-between items-center fixed w-full top-0"
+        class="glass-header z-50 px-6 py-4 flex justify-between items-center fixed w-full top-0"
       >
         <a href="/" class="flex items-center gap-4">
           <div
@@ -175,6 +175,64 @@
         </a>
 
         <div class="flex items-center gap-4">
+          <div class="relative hidden md:block">
+            <div class="relative flex items-center">
+              <i class="fa-solid fa-search absolute left-3 text-gray-400"></i>
+              <input
+                ref="searchInput"
+                v-model="searchQuery"
+                @input="handleSearch"
+                @keydown="onSearchKeyDown"
+                @focus="isSearchOpen = searchQuery.length > 0"
+                @blur="closeSearch"
+                type="text"
+                placeholder="Pencarian... (Ctrl+F)"
+                class="pl-9 pr-8 py-2 w-72 bg-gray-100 dark:bg-gray-800 border-transparent focus:border-primary dark:focus:border-primary border focus:ring-1 focus:ring-primary rounded-lg text-sm text-gray-700 dark:text-gray-200 outline-none transition-all"
+              />
+              <div
+                v-if="searchQuery"
+                @click="clearSearch"
+                class="absolute right-3 cursor-pointer text-gray-400 hover:text-gray-600"
+              >
+                <i class="fa-solid fa-times text-xs"></i>
+              </div>
+            </div>
+
+            <div
+              v-show="isSearchOpen && searchResults.length > 0"
+              class="absolute top-full mt-2 w-full bg-white dark:bg-cardDark border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden z-50 flex flex-col max-h-[350px]"
+            >
+              <div class="overflow-y-auto flex-1 p-2" ref="searchScroll">
+                <div
+                  v-for="(result, index) in searchResults"
+                  :key="result.id"
+                  @mousedown.prevent="selectSearchResult(result)"
+                  @mouseenter="selectedSearchIndex = index"
+                  :class="['p-3 rounded-lg cursor-pointer transition-colors', selectedSearchIndex === index ? 'bg-orange-50 dark:bg-orange-900/20 border-l-4 border-primary' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50 border-l-4 border-transparent']"
+                >
+                  <div class="flex items-center gap-3 mb-1">
+                    <i :class="result.icon + ' text-primary w-4'"></i>
+                    <h4
+                      class="font-bold text-sm text-gray-800 dark:text-gray-200"
+                      v-html="highlightText(result.name)"
+                    ></h4>
+                  </div>
+                  <p
+                    class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2"
+                    v-html="highlightText(result.description)"
+                  ></p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              v-show="isSearchOpen && searchQuery && searchResults.length === 0"
+              class="absolute top-full mt-2 w-full bg-white dark:bg-cardDark border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 text-center z-50"
+            >
+              <p class="text-sm text-gray-500">Tidak ada komponen ditemukan.</p>
+            </div>
+          </div>
+
           <button
             @click="toggleTheme"
             class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
@@ -632,9 +690,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
 
     <script>
-      // ==========================================
-      // GANTI DATA JSON ANDA DI SINI
-      // ==========================================
       const docsData = [
         {
           id: "AlertWidget",
@@ -3033,6 +3088,84 @@
           code: "CardWidget(\n  title: 'Edit Detail',\n  showCloseButton: true,\n  onClose: () => print('Close'),\n  child: Text('Konten di sini'),\n  footerActions: [\n    TextButton(onPressed: () {}, child: Text('Batal')),\n    FilledButton(onPressed: () {}, child: Text('Simpan')),\n  ],\n);",
         },
         {
+          id: "socket-helper-chunk-ecosystem",
+          group: "Service",
+          name: "Socket Helper & Chunking Engine",
+          icon: "fa-solid fa-network-wired",
+          description:
+            "Kelas pembantu untuk koneksi dan komunikasi dengan server via socket.io yang menyediakan fitur reaktif, auto-reconnect, retry queue, interceptor, logging, dan sinkronisasi CHUNKING[cite: 72]. Ini merupakan satu kesatuan ekosistem terpadu antara klien (Flutter) dan server (Node.js) untuk mentransmisikan dan merakit lalu lintas data masif secara presisi[cite: 1, 67].",
+          mandatoryProps: [],
+          optionalProps: [],
+          additionalInfo: {
+            "Dependencies Flutter": "socket_io_client [cite: 67]",
+            "Dependencies Node.js": "fs, path [cite: 1]",
+          },
+          methods: [
+            {
+              name: "connect (Flutter)",
+              type: "static Future<SocketConnection?>",
+              default: "",
+              desc: "Menghubungkan ke server Socket.IO dengan pengaturan opsional seperti token, auth, dan query, sembari mengaktifkan auto-connect[cite: 77, 80, 81]. Menyediakan fallback HttpOverrides bawaan untuk menembus/by-pass validasi sertifikat bad-cert pada host 'ws.uinmadura.ac.id'[cite: 68, 77].",
+            },
+            {
+              name: "send (Flutter)",
+              type: "static Future<bool>",
+              default: "",
+              desc: "Mengirim payload data ke server tanpa menunggu balasan (fire-and-forget)[cite: 91]. Jika socket terdeteksi sedang offline, data secara pintar dimasukkan ke dalam antrean memori internal untuk dikirim ulang secara otomatis saat terhubung kembali[cite: 93].",
+            },
+            {
+              name: "sendChunk (Flutter)",
+              type: "static Future<dynamic>",
+              default: "",
+              desc: "Memecah objek besar (File mentah atau JSON Map) menjadi struktur data List of bytes, lalu mentransmisikannya lapis demi lapis sebagai string base64 sekuensial kepada server sesuai batasan ukuran[cite: 96, 99, 108].",
+            },
+            {
+              name: "getStream (Flutter)",
+              type: "static Stream<dynamic>",
+              default: "",
+              desc: "Mendengarkan event socket sebagai aliran Stream yang terus terbuka dan memancarkan (emit) data secara berkelanjutan[cite: 120, 121].",
+            },
+            {
+              name: "getOnce (Flutter)",
+              type: "static Future<dynamic>",
+              default: "",
+              desc: "Menyiapkan listener pasif, mengirimkan data, menangguhkan eksekusi asinkron, dan otomatis mencabut/mematikan listener seketika setelah tepat satu balasan spesifik berhasil ditangkap dari server[cite: 129, 130].",
+            },
+            {
+              name: "Constructor (Node.js)",
+              type: "class Chunk",
+              default: "",
+              desc: "Menginisiasi antarmuka pendengar (listener) chunk di sisi server Node.js. Menahan status pada Map '#transfers' berdasarkan eventName dan transferId klien[cite: 2, 3]. Menetapkan 'maxSize' batas ukuran kelewat-batas default sebesar 10MB dan rute reassembly ke folder 'uploads'[cite: 4, 5].",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Offline Emit Queuing",
+              type: "Reliability",
+              default: "",
+              desc: "Permintaan komunikasi yang dikirim saat aplikasi tidak terhubung jaringan tidak akan memicu error gagal kirim, melainkan digantung di dalam memori internal (_emitQueue) untuk kemudian di-flush/dieksekusi seluruh antreannya saat status jaringan kembali pulih[cite: 75, 82, 93].",
+            },
+            {
+              name: "Global Payload Interceptor",
+              type: "Middleware",
+              default: "",
+              desc: "Menyediakan fungsi static setInterceptor untuk mencegat atau membungkus ulang (wrap) data dengan informasi tambahan secara global tepat sebelum perintah emisi (_socket?.emit) dilepaskan ke jaringan[cite: 89, 149, 151].",
+            },
+            {
+              name: "Server-side Streaming & Garbage Collection",
+              type: "Memory Management",
+              default: "",
+              desc: "Kepingan biner (buffer) dari klien langsung dituang ke sistem disk OS menggunakan pendekatan fs.createWriteStream untuk jenis pengunggahan dokumen/file (mencegah overflow RAM)[cite: 12, 18]. Setelah perakitan beres atau timeout (30.000 ms), fungsi pembersihan (#cleanup) bertugas menyapu bersih semua temporary event listeners[cite: 3, 58, 60].",
+            },
+          ],
+          specialNotes: [
+            "Auto Directory Builder (Node.js): Pada metode chunking yang ditujukan untuk menyimpan file, apabila rute penyimpanan (saveDir) belum tersedia di mesin server, algoritma akan otomatis membangun direktorinya dengan setelan { recursive: true }[cite: 8, 9].",
+            "Threshold Rejection (Node.js): Saat server menerima total data yang divalidasi melanggar batasan ukuran opsi maxSize yang diizinkan, server langsung memotong aliran proses dan menembakkan galat 'max_size_exceeded' kembali kepada klien[cite: 16].",
+            "String Reassembly Engine (Node.js): Jika transferId dideklarasikan sebagai transmisi non-file (seperti JSON berukuran raksasa), Node.js server akan menempelkan semua keping Buffer (Buffer.concat), mengonversinya kembali menjadi tipe string format utf8, dan melakukan perakitan balik ke bentuk Object via JSON.parse()[cite: 33, 35, 36].",
+          ],
+          code: "// --- [1. SISI NODE.JS / SERVER] --- \n// Mengolah Datanya & Menerima Kepingan Chunk\nconst { Chunk } = require('./Chunk');\n\nio.on('connection', (socket) => {\n  console.log('Klien terkoneksi:', socket.id);\n\n  // Inisiasi Handler Engine untuk File Besar (Misal: Video/Dokumen)\n  const uploadEngine = new Chunk('UPLOAD_BIG_DATA', socket, {\n    maxSize: 50 * 1024 * 1024, // Batasi penerimaan maskimal 50MB\n    saveDir: path.join(__dirname, 'storage_data') // Otomatis bikin folder ini jika belum ada\n  });\n\n  // Cara Mengolah Datanya Setelah 100% Dirakit Server\n  uploadEngine.done((result, transferId) => {\n    if (result.status && result.isFile) {\n      console.log('Mantap! File berhasil di-reassembly di lokasi disk:', result.data);\n      // Aksi Database: Disini Anda bisa simpan 'result.data' path lokal ini ke MySQL/MongoDB\n    } else if (result.status && !result.isFile) {\n       console.log('Menerima String/JSON Utuh dari klien:', result.data);\n       // Aksi Database: Lakukan batch-insert JSON object ini\n    }\n  });\n});\n\n\n// --- [2. SISI FLUTTER / KLIEN] ---\n// Cara Menggunakan SocketHelper & Menyuplai Data ke Server\nimport 'dart:io';\nimport 'socket_helper.dart';\n\nvoid main() async {\n  // 1. Hubungkan Flutter SocketHelper ke endpoint Node.js kita\n  await SocketHelper.connect('https://ws.uinmadura.ac.id', token: 'jwt-auth-token');\n\n  // 2. Siapkan file masif berukuran besar\n  File hugeFile = File('/storage/emulated/0/Download/presentasi_proyek.mp4');\n\n  try {\n    // 3. Panggil chunking engine untuk menembakkan potongan data sekuensial\n    final response = await SocketHelper.sendChunk(\n      'UPLOAD_BIG_DATA',\n      hugeFile, \n      onProgress: (double percent) {\n        // Perbarui state UI Loading Bar\n        print('Mengunggah... ${percent.toStringAsFixed(1)}% selesai');\n      }\n    );\n    \n    print('Pengunggahan selesai, respons backend: $response');\n  } catch (err) {\n    print('Pengunggahan dibatalkan/Gagal karena: $err');\n  }\n}",
+        },
+        {
           id: "FirestoreService",
           group: "Service",
           name: "Firestore Service",
@@ -3283,6 +3416,10 @@
           activeComponent: docsData.length > 0 ? docsData[0] : null,
           isDarkMode: false,
           copied: false,
+          searchQuery: "",
+          searchResults: [],
+          isSearchOpen: false,
+          selectedSearchIndex: -1,
         },
         computed: {
           groupedComponents() {
@@ -3291,76 +3428,15 @@
               return acc;
             }, {});
           },
-          compProperties() {
-            if (!this.activeComponent) return [];
-            return (
-              (this.activeComponent.additionalInfo &&
-                this.activeComponent.additionalInfo.properties) ||
-              []
-            );
-          },
           compMethods() {
-            if (!this.activeComponent) return [];
-            return (
-              this.activeComponent.methods ||
-              (this.activeComponent.additionalInfo &&
-                this.activeComponent.additionalInfo.methods) ||
-              []
-            );
+            if (!this.activeComponent || !this.activeComponent.methods)
+              return [];
+            return this.activeComponent.methods;
           },
         },
-        methods: {
-          formatInfoKey(key) {
-            return key;
-            // .replace(/_/g, " ") // Mengganti underscore jadi spasi (grid_col -> grid col)
-            // .replace(/([A-Z])/g, " $1") // Memberi spasi sebelum huruf kapital (camelCase)
-            // .replace(/^./, (str) => str.toUpperCase()); // Membesarkan huruf pertama
-          },
-          copyCode() {
-            if (!this.activeComponent || !this.activeComponent.code) return;
-            const el = document.createElement("textarea");
-            el.value = this.activeComponent.code;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand("copy");
-            document.body.removeChild(el);
 
-            this.copied = true;
-            setTimeout(() => {
-              this.copied = false;
-            }, 2000);
-          },
-          updatePrismTheme() {
-            const link = document.getElementById("prism-theme-link");
-            link.href = this.isDarkMode
-              ? "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
-              : "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css";
-          },
-          triggerHighlight() {
-            if (window.Prism) {
-              Prism.highlightAll();
-            }
-          },
-          selectComponent(comp) {
-            this.activeComponent = comp;
-            setTimeout(() => {
-              $("main").animate({ scrollTop: 0 }, 300);
-            }, 50);
-          },
-          toggleTheme() {
-            this.isDarkMode = !this.isDarkMode;
-            const html = document.documentElement;
-            if (this.isDarkMode) {
-              html.classList.add("dark");
-              localStorage.theme = "dark";
-            } else {
-              html.classList.remove("dark");
-              localStorage.theme = "light";
-            }
-            this.updatePrismTheme();
-          },
-        },
         mounted() {
+          window.addEventListener("keydown", this.handleGlobalSearch);
           if (
             localStorage.theme === "dark" ||
             (!("theme" in localStorage) &&
@@ -3378,6 +3454,129 @@
           this.$nextTick(() => {
             this.triggerHighlight();
           });
+        },
+        beforeDestroy() {
+          window.removeEventListener("keydown", this.handleGlobalSearch);
+        },
+        methods: {
+          handleGlobalSearch(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
+              e.preventDefault();
+              if (this.$refs.searchInput) {
+                this.$refs.searchInput.focus();
+              }
+            }
+          },
+          handleSearch() {
+            if (!this.searchQuery.trim()) {
+              this.searchResults = [];
+              this.isSearchOpen = false;
+              return;
+            }
+            const q = this.searchQuery.toLowerCase();
+            this.searchResults = this.components.filter(
+              (c) =>
+                c.name.toLowerCase().includes(q) ||
+                c.description.toLowerCase().includes(q)
+            );
+            this.isSearchOpen = true;
+            this.selectedSearchIndex = this.searchResults.length > 0 ? 0 : -1;
+          },
+          onSearchKeyDown(e) {
+            if (!this.isSearchOpen || this.searchResults.length === 0) return;
+
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              this.selectedSearchIndex =
+                (this.selectedSearchIndex + 1) % this.searchResults.length;
+              this.scrollToSearchSelection();
+            } else if (e.key === "ArrowUp") {
+              e.preventDefault();
+              this.selectedSearchIndex =
+                (this.selectedSearchIndex - 1 + this.searchResults.length) %
+                this.searchResults.length;
+              this.scrollToSearchSelection();
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              if (this.selectedSearchIndex >= 0) {
+                this.selectSearchResult(
+                  this.searchResults[this.selectedSearchIndex]
+                );
+              }
+            } else if (e.key === "Escape") {
+              this.clearSearch();
+              this.$refs.searchInput.blur();
+            }
+          },
+          scrollToSearchSelection() {
+            this.$nextTick(() => {
+              const container = this.$refs.searchScroll;
+              if (container && container.children[this.selectedSearchIndex]) {
+                const el = container.children[this.selectedSearchIndex];
+                const offsetBottom = el.offsetTop + el.offsetHeight;
+                const scrollBottom =
+                  container.scrollTop + container.offsetHeight;
+
+                if (offsetBottom > scrollBottom) {
+                  container.scrollTop = offsetBottom - container.offsetHeight;
+                } else if (el.offsetTop < container.scrollTop) {
+                  container.scrollTop = el.offsetTop;
+                }
+              }
+            });
+          },
+          selectSearchResult(comp) {
+            this.selectComponent(comp);
+            this.clearSearch();
+            if (this.$refs.searchInput) {
+              this.$refs.searchInput.blur();
+            }
+          },
+          clearSearch() {
+            this.searchQuery = "";
+            this.searchResults = [];
+            this.isSearchOpen = false;
+            this.selectedSearchIndex = -1;
+          },
+          closeSearch() {
+            setTimeout(() => {
+              this.isSearchOpen = false;
+            }, 200);
+          },
+          highlightText(text) {
+            if (!this.searchQuery) return text;
+            const regex = new RegExp(`(${this.searchQuery})`, "gi");
+            return text.replace(
+              regex,
+              '<span class="bg-orange-200 dark:bg-orange-900/60 text-orange-900 dark:text-orange-100 rounded px-0.5">$1</span>'
+            );
+          },
+          selectComponent(comp) {
+            this.activeComponent = comp;
+          },
+          toggleTheme() {
+            this.isDarkMode = !this.isDarkMode;
+            if (this.isDarkMode) {
+              document.documentElement.classList.add("dark");
+            } else {
+              document.documentElement.classList.remove("dark");
+            }
+          },
+          formatInfoKey(key) {
+            return key.replace(/([A-Z])/g, " $1").trim();
+          },
+          copyCode() {
+            navigator.clipboard.writeText(this.activeComponent.code);
+            this.copied = true;
+            setTimeout(() => {
+              this.copied = false;
+            }, 2000);
+          },
+          triggerHighlight() {
+            this.$nextTick(() => {
+              Prism.highlightAll();
+            });
+          },
         },
       });
     </script>
