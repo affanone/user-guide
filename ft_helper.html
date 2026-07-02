@@ -1750,12 +1750,6 @@
               default: "KeyAction.down",
               desc: "Enum untuk menentukan fase event yang akan direspon: `down` (saat ditekan), `up` (saat dilepas), atau `both` (keduanya). Disetel ke `down` secara default untuk mencegah eksekusi ganda.",
             },
-            {
-              name: "callback",
-              type: "VoidCallback?",
-              default: "null",
-              desc: "Fungsi lambda (tanpa argumen) opsional yang akan otomatis dieksekusi *hanya* jika tombol atau kombinasi yang ditekan cocok dengan kriteria.",
-            },
           ],
           additionalInfo: {
             dependencies:
@@ -1765,27 +1759,27 @@
           },
           methods: [
             {
-              name: "isEnter(event, {action, callback})",
+              name: "isEnter(event, {action})",
               returnType: "bool",
               desc: "Mendeteksi secara spesifik penekanan tombol Enter (mencakup Enter reguler dan Numpad Enter).",
             },
             {
-              name: "isBackspace(event, {action, callback})",
+              name: "isBackspace(event, {action})",
               returnType: "bool",
               desc: "Mendeteksi secara spesifik penekanan tombol Backspace.",
             },
             {
-              name: "isEscape(event, {action, callback})",
+              name: "isEscape(event, {action})",
               returnType: "bool",
               desc: "Mendeteksi secara spesifik penekanan tombol Escape (Esc).",
             },
             {
-              name: "isSpace(event, {action, callback})",
+              name: "isSpace(event, {action})",
               returnType: "bool",
               desc: "Mendeteksi secara spesifik penekanan tombol Spasi (Spacebar).",
             },
             {
-              name: "isMatch(event, shortcut, {action, callback})",
+              name: "isMatch(event, shortcut, {action})",
               returnType: "bool",
               desc: "Method utama yang bersifat dinamis untuk mencocokkan event dengan string kombinasi (contoh: 'CTRL+SHIFT+D'). Case-insensitive dan otomatis memisahkan modifier dengan tombol utama.",
             },
@@ -1817,7 +1811,7 @@
             "Selalu letakkan `return KeyEventResult.ignored;` di baris paling akhir dari fungsi `onKeyEvent` sebagai fallback wajib.",
             "Untuk kebutuhan perangkat Apple/Mac, gunakan string 'CMD' atau 'META' sebagai pengganti 'CTRL'.",
           ],
-          code: "Focus(\n  onKeyEvent: (node, event) {\n    // Skenario 1: Helper Spesifik (Lebih cepat dieksekusi)\n    if (KeyHandler.isEnter(event, callback: () {\n      print('Menyimpan form...');\n    })) {\n      return KeyEventResult.handled;\n    }\n\n    // Skenario 2: Kombinasi Custom (Shortcut)\n    if (KeyHandler.isMatch(event, 'CTRL+SHIFT+S', callback: () {\n      _saveDataAs();\n    })) {\n      return KeyEventResult.handled;\n    }\n\n    // Skenario 3: Merespon saat tombol dilepas (Up Event)\n    if (KeyHandler.isEscape(event, action: KeyAction.up, callback: () {\n      closeModal();\n    })) {\n      return KeyEventResult.handled;\n    }\n\n    // Fallback wajib: Abaikan event jika tidak ada yang cocok di atas\n    return KeyEventResult.ignored;\n  },\n  child: YourFormWidget(),\n)",
+          code: "Focus(\n  onKeyEvent: (node, event) {\n    // Skenario 1: Helper Spesifik (Lebih cepat dieksekusi)\n    if (KeyHandler.isEnter(event)) {\n      print('Menyimpan form...');\n      return KeyEventResult.handled;\n    }\n\n    // Skenario 2: Kombinasi Custom (Shortcut)\n    if (KeyHandler.isMatch(event, 'CTRL+SHIFT+S')) {\n      _saveDataAs();\n      return KeyEventResult.handled;\n    }\n\n    // Skenario 3: Merespon saat tombol dilepas (Up Event)\n    if (KeyHandler.isEscape(event, action: KeyAction.up)) {\n      closeModal();\n      return KeyEventResult.handled;\n    }\n\n    // Fallback wajib: Abaikan event jika tidak ada yang cocok di atas\n    return KeyEventResult.ignored;\n  },\n  child: YourFormWidget(),\n)",
         },
         {
           id: "CropWidget",
