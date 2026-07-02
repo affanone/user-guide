@@ -156,7 +156,7 @@
   >
     <div id="app" class="flex flex-col h-screen">
       <nav
-        class="glass-header z-20 px-6 py-4 flex justify-between items-center fixed w-full top-0"
+        class="glass-header z-50 px-6 py-4 flex justify-between items-center fixed w-full top-0"
       >
         <div class="flex items-center gap-4">
           <div
@@ -175,6 +175,63 @@
         </div>
 
         <div class="flex items-center gap-4">
+          <div class="relative hidden md:block">
+            <div class="relative flex items-center">
+              <i class="fa-solid fa-search absolute left-3 text-gray-400"></i>
+              <input
+                ref="searchInput"
+                v-model="searchQuery"
+                @input="handleSearch"
+                @keydown="onSearchKeyDown"
+                @focus="isSearchOpen = searchQuery.length > 0"
+                @blur="closeSearch"
+                type="text"
+                placeholder="Pencarian... (Ctrl+F)"
+                class="pl-9 pr-8 py-2 w-72 bg-gray-100 dark:bg-gray-800 border-transparent focus:border-primary dark:focus:border-primary border focus:ring-1 focus:ring-primary rounded-lg text-sm text-gray-700 dark:text-gray-200 outline-none transition-all"
+              />
+              <div
+                v-if="searchQuery"
+                @click="clearSearch"
+                class="absolute right-3 cursor-pointer text-gray-400 hover:text-gray-600"
+              >
+                <i class="fa-solid fa-times text-xs"></i>
+              </div>
+            </div>
+
+            <div
+              v-show="isSearchOpen && searchResults.length > 0"
+              class="absolute top-full mt-2 w-full bg-white dark:bg-cardDark border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl overflow-hidden z-50 flex flex-col max-h-[350px]"
+            >
+              <div class="overflow-y-auto flex-1 p-2" ref="searchScroll">
+                <div
+                  v-for="(result, index) in searchResults"
+                  :key="result.id"
+                  @mousedown.prevent="selectSearchResult(result)"
+                  @mouseenter="selectedSearchIndex = index"
+                  :class="['p-3 rounded-lg cursor-pointer transition-colors', selectedSearchIndex === index ? 'bg-orange-50 dark:bg-orange-900/20 border-l-4 border-primary' : 'hover:bg-gray-50 dark:hover:bg-gray-800/50 border-l-4 border-transparent']"
+                >
+                  <div class="flex items-center gap-3 mb-1">
+                    <i :class="result.icon + ' text-primary w-4'"></i>
+                    <h4
+                      class="font-bold text-sm text-gray-800 dark:text-gray-200"
+                      v-html="highlightText(result.name)"
+                    ></h4>
+                  </div>
+                  <p
+                    class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2"
+                    v-html="highlightText(result.description)"
+                  ></p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              v-show="isSearchOpen && searchQuery && searchResults.length === 0"
+              class="absolute top-full mt-2 w-full bg-white dark:bg-cardDark border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl p-4 text-center z-50"
+            >
+              <p class="text-sm text-gray-500">Tidak ada komponen ditemukan.</p>
+            </div>
+          </div>
           <button
             @click="toggleTheme"
             class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
@@ -282,8 +339,8 @@
                 <h3
                   class="text-indigo-800 dark:text-indigo-300 font-bold mb-3 flex items-center gap-2"
                 >
-                  <i class="fa-solid fa-circle-info"></i>
-                  Informasi Global & Dukungan
+                  <i class="fa-solid fa-circle-info"></i> Informasi Global &
+                  Dukungan
                 </h3>
 
                 <ul
@@ -7183,6 +7240,11 @@
           activeComponent: docsData.length > 0 ? docsData[0] : null,
           isDarkMode: false,
           copied: false,
+          // Variabel Pencarian
+          searchQuery: "",
+          searchResults: [],
+          isSearchOpen: false,
+          selectedSearchIndex: -1,
         },
         computed: {
           groupedComponents() {
@@ -7209,6 +7271,31 @@
               []
             );
           },
+        },
+        mounted() {
+          // Event listener shortcut pencarian global (Ctrl+F)
+          window.addEventListener("keydown", this.handleGlobalSearch);
+
+          if (
+            localStorage.theme === "dark" ||
+            (!("theme" in localStorage) &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches)
+          ) {
+            this.isDarkMode = true;
+            document.documentElement.classList.add("dark");
+          } else {
+            this.isDarkMode = false;
+            document.documentElement.classList.remove("dark");
+          }
+
+          this.updatePrismTheme();
+          this.$nextTick(() => {
+            this.triggerHighlight();
+          });
+        },
+        beforeDestroy() {
+          // Bersihkan event listener saat komponen dihancurkan
+          window.removeEventListener("keydown", this.handleGlobalSearch);
         },
         methods: {
           formatInfoKey(key) {
@@ -7259,25 +7346,99 @@
             }
             this.updatePrismTheme();
           },
-        },
-        mounted() {
-          if (
-            localStorage.theme === "dark" ||
-            (!("theme" in localStorage) &&
-              window.matchMedia("(prefers-color-scheme: dark)").matches)
-          ) {
-            this.isDarkMode = true;
-            document.documentElement.classList.add("dark");
-          } else {
-            this.isDarkMode = false;
-            document.documentElement.classList.remove("dark");
-          }
+          // === METODE PENCARIAN START ===
+          handleGlobalSearch(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
+              e.preventDefault();
+              if (this.$refs.searchInput) {
+                this.$refs.searchInput.focus();
+              }
+            }
+          },
+          handleSearch() {
+            if (!this.searchQuery.trim()) {
+              this.searchResults = [];
+              this.isSearchOpen = false;
+              return;
+            }
+            const q = this.searchQuery.toLowerCase();
+            this.searchResults = this.components.filter(
+              (c) =>
+                c.name.toLowerCase().includes(q) ||
+                c.description.toLowerCase().includes(q)
+            );
+            this.isSearchOpen = true;
+            this.selectedSearchIndex = this.searchResults.length > 0 ? 0 : -1;
+          },
+          onSearchKeyDown(e) {
+            if (!this.isSearchOpen || this.searchResults.length === 0) return;
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              this.selectedSearchIndex =
+                (this.selectedSearchIndex + 1) % this.searchResults.length;
+              this.scrollToSearchSelection();
+            } else if (e.key === "ArrowUp") {
+              e.preventDefault();
+              this.selectedSearchIndex =
+                (this.selectedSearchIndex - 1 + this.searchResults.length) %
+                this.searchResults.length;
+              this.scrollToSearchSelection();
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              if (this.selectedSearchIndex >= 0) {
+                this.selectSearchResult(
+                  this.searchResults[this.selectedSearchIndex]
+                );
+              }
+            } else if (e.key === "Escape") {
+              this.clearSearch();
+              this.$refs.searchInput.blur();
+            }
+          },
+          scrollToSearchSelection() {
+            this.$nextTick(() => {
+              const container = this.$refs.searchScroll;
+              if (container && container.children[this.selectedSearchIndex]) {
+                const el = container.children[this.selectedSearchIndex];
+                const offsetBottom = el.offsetTop + el.offsetHeight;
+                const scrollBottom =
+                  container.scrollTop + container.offsetHeight;
 
-          this.updatePrismTheme();
-
-          this.$nextTick(() => {
-            this.triggerHighlight();
-          });
+                if (offsetBottom > scrollBottom) {
+                  container.scrollTop = offsetBottom - container.offsetHeight;
+                } else if (el.offsetTop < container.scrollTop) {
+                  container.scrollTop = el.offsetTop;
+                }
+              }
+            });
+          },
+          selectSearchResult(comp) {
+            this.selectComponent(comp);
+            this.clearSearch();
+            if (this.$refs.searchInput) {
+              this.$refs.searchInput.blur();
+            }
+          },
+          clearSearch() {
+            this.searchQuery = "";
+            this.searchResults = [];
+            this.isSearchOpen = false;
+            this.selectedSearchIndex = -1;
+          },
+          closeSearch() {
+            setTimeout(() => {
+              this.isSearchOpen = false;
+            }, 200);
+          },
+          highlightText(text) {
+            if (!this.searchQuery) return text;
+            const regex = new RegExp(`(${this.searchQuery})`, "gi");
+            return text.replace(
+              regex,
+              '<span class="bg-orange-200 dark:bg-orange-900/60 text-orange-900 dark:text-orange-100 rounded px-0.5">$1</span>'
+            );
+          },
+          // === METODE PENCARIAN END ===
         },
       });
     </script>
