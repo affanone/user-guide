@@ -73,12 +73,14 @@
         --text-main: #1f2937;
         --text-muted: #6b7280;
         --border-color: #e5e7eb;
+        --bg-color: #f3f4f6;
       }
 
       html.dark {
         --text-main: #f9fafb;
         --text-muted: #9ca3af;
         --border-color: #374151;
+        --bg-color: #111827;
       }
 
       body {
@@ -800,7 +802,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const fileName = urlParams.get("ug");
             const targetFile = fileName ? `${fileName}.json` : "helper.json";
-            const version = new Date().getTime();
+            const version = urlParams.get("version") || "1.0.0";
 
             try {
               const response = await fetch(`data/${targetFile}?v=${version}`, {
@@ -812,6 +814,7 @@
                 );
               const data = await response.json();
               this.appInfo = data.appInfo;
+              this.appInfo.version = version;
               this.components = data.docsData;
               this.isLoading = false;
               this.handlePopState();

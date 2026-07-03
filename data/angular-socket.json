@@ -3,7 +3,7 @@
         "prefix": "S",
         "title": "Angular Socket.IO Infrastructure",
         "description": "Pusat dokumentasi library TypeScript Angular untuk komunikasi realtime berbasis Socket.IO dengan backend Node.js. Menyediakan referensi service koneksi socket, event bus Pub/Sub, mekanisme request-response asinkron, manajemen listener, serta sistem chunking data untuk transmisi payload besar secara aman dan efisien.",
-        "version": "v1.0"
+        "version": "1.0.0"
     },
     "docsData": [
         {

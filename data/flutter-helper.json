@@ -3,7 +3,7 @@
         "prefix": "U",
         "title": "Widget Utilitas",
         "description": "Pusat dokumentasi widget utilitas Flutter yang mencakup referensi API, parameter, konfigurasi, callback, perilaku, serta contoh implementasi untuk setiap komponen.",
-        "version": "v3.0"
+        "version": "1.0.0"
     },
     "docsData": [
         {
