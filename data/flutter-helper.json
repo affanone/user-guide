@@ -225,6 +225,18 @@
             ],
             "optionalProps": [
                 {
+                    "name": "inEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Konfigurasi transisi saat komponen masuk ke layar (fase IN). Sistem akan otomatis menjalankan animasi secara maju (forward) dari nilai status 0.0 menuju 1.0 menggunakan kurva yang ditentukan."
+                },
+                {
+                    "name": "outEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Konfigurasi transisi saat komponen keluar dari layar (fase OUT). Sistem akan mendeteksi perubahan fase dan membalikkan arah animasi (reverse) secara otomatis, sambil menyuntikkan flag isOut agar widget tahu arah gerak keluarnya."
+                },
+                {
                     "name": "child",
                     "type": "Widget?",
                     "default": "null",
@@ -436,6 +448,7 @@
                     "AnimationEffect.zoomOut() -> Efek skala mengecil. Saat IN, mengecil dari ukuran besar (1.5) ke normal (1.0). Saat OUT, membesar dari normal ke (1.5) sambil menghilang.",
                     "AnimationEffect.elasticZoom() -> Variasi zoomIn dengan manipulasi skala ekstrem menggunakan kurva simulasi pegas fisik (Curves.elasticOut) agar terlihat memantul/bouncy.",
                     "AnimationEffect.flipY() -> Rotasi sinematik 3D pada sumbu vertikal dengan kesadaran arah gerak (isOut). Saat IN berputar dari 90° ke 0°, saat OUT meneruskan momentum dari 0° ke -90°.",
+                    "AnimationEffect.flipX() -> Rotasi sinematik 3D pada sumbu horizontal dengan kesadaran arah gerak (isOut). Saat IN berputar dari 90° ke 0°, saat OUT meneruskan momentum dari 0° ke -90°.",
                     "AnimationEffect.slideUp() -> Transisi pergeseran vertikal berkesinambungan. Saat IN masuk dari bawah ke tengah, saat OUT keluar dari tengah melesat meneruskan ke atas.",
                     "AnimationEffect.slideDown() -> Transisi pergeseran vertikal berkesinambungan. Saat IN masuk dari atas ke tengah, saat OUT keluar dari tengah melesat meneruskan ke bawah.",
                     "AnimationEffect.slideLeft() -> Transisi pergeseran horizontal berkesinambungan. Saat IN masuk dari kanan ke tengah, saat OUT keluar dari tengah melesat meneruskan ke kiri.",
@@ -605,6 +618,24 @@
                 }
             ],
             "optionalProps": [
+                {
+                    "name": "inEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Konfigurasi transisi saat komponen masuk ke layar (fase IN). Sistem akan otomatis menjalankan animasi secara maju (forward) dari nilai status 0.0 menuju 1.0 menggunakan kurva yang ditentukan."
+                },
+                {
+                    "name": "outEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Konfigurasi transisi saat komponen keluar dari layar (fase OUT). Sistem akan mendeteksi perubahan fase dan membalikkan arah animasi (reverse) secara otomatis, sambil menyuntikkan flag isOut agar widget tahu arah gerak keluarnya."
+                },
+                {
+                    "name": "forceFullScreen",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika bernilai true, memaksa tampilan untuk selalu menjadi halaman penuh (full screen) dan mengabaikan bentuk modal terlepas dari seberapa besar ukuran lebar layar pengguna."
+                },
                 {
                     "name": "modalMaxWidth",
                     "type": "double",
