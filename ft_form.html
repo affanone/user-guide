@@ -77,13 +77,16 @@
         width: 8px;
         height: 8px;
       }
+
       ::-webkit-scrollbar-track {
         background: transparent;
       }
+
       ::-webkit-scrollbar-thumb {
         background: #d1d5db;
         border-radius: 4px;
       }
+
       html.dark ::-webkit-scrollbar-thumb {
         background: #4b5563;
       }
@@ -93,6 +96,7 @@
         backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--border-color);
       }
+
       html.dark .glass-header {
         background: rgba(31, 41, 55, 0.8);
       }
@@ -114,6 +118,7 @@
         padding: 1.5rem !important;
         padding-left: 3.5rem !important;
       }
+
       .line-numbers .line-numbers-rows {
         top: 0rem !important;
         left: -58px !important;
@@ -122,6 +127,7 @@
         padding: 0 !important;
         margin: 0 !important;
       }
+
       .line-numbers-rows > span:before {
         color: var(--text-muted) !important;
         padding-right: 0.8em !important;
@@ -131,6 +137,7 @@
       .fade-leave-active {
         transition: opacity 0.3s, transform 0.3s;
       }
+
       .fade-enter,
       .fade-leave-to {
         opacity: 0;
@@ -140,17 +147,20 @@
       .sidebar-link {
         transition: all 0.2s ease;
       }
+
       .sidebar-link:hover,
       .sidebar-link.active {
         background-color: rgba(255, 87, 34, 0.1);
         color: #ff5722;
         border-right: 3px solid #ff5722;
       }
+
       html.dark .sidebar-link.active {
         background-color: rgba(255, 87, 34, 0.2);
       }
     </style>
   </head>
+
   <body
     class="bg-bgLight dark:bg-bgDark antialiased min-h-screen overflow-hidden"
   >
@@ -162,7 +172,7 @@
           <div
             class="w-10 h-10 bg-gradient-to-br from-primary to-orange-400 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg shadow-orange-500/30"
           >
-            F
+            {{ appInfo.prefix }}
           </div>
           <div>
             <h1 class="text-xl font-bold tracking-tight">
@@ -232,6 +242,7 @@
               <p class="text-sm text-gray-500">Tidak ada komponen ditemukan.</p>
             </div>
           </div>
+
           <button
             @click="toggleTheme"
             class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
@@ -272,6 +283,7 @@
                 <li v-for="comp in group" :key="comp.id">
                   <button
                     @click="selectComponent(comp)"
+                    :id="'menu-' + comp.id"
                     :class="['w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium sidebar-link mb-1 flex items-center gap-3', activeComponent && activeComponent.id === comp.id ? 'active' : 'text-gray-600 dark:text-gray-300']"
                   >
                     <i :class="comp.icon + ' w-4 text-center opacity-70'"></i>
@@ -337,24 +349,107 @@
                 class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 rounded-2xl p-6 mb-8"
               >
                 <h3
-                  class="text-indigo-800 dark:text-indigo-300 font-bold mb-3 flex items-center gap-2"
+                  class="text-indigo-800 dark:text-indigo-300 font-bold mb-4 flex items-center gap-2"
                 >
-                  <i class="fa-solid fa-circle-info"></i> Informasi Global &
-                  Dukungan
+                  <i class="fa-solid fa-circle-info"></i>
+                  Informasi Tambahan & Metadata
                 </h3>
 
-                <ul
-                  class="list-disc list-inside text-indigo-700 dark:text-indigo-200/80 space-y-2 text-sm leading-relaxed ml-1"
-                >
-                  <li
+                <div class="space-y-5">
+                  <div
                     v-for="(value, key) in activeComponent.additionalInfo"
                     :key="key"
-                    v-if="value"
+                    v-if="value !== null && value !== ''"
                   >
-                    <strong>{{ formatInfoKey(key) }}:</strong>
-                    {{ value }}
-                  </li>
-                </ul>
+                    <h4
+                      class="font-semibold text-indigo-900 dark:text-indigo-200 mb-2 capitalize"
+                    >
+                      {{ formatInfoKey(key) }}
+                    </h4>
+
+                    <div
+                      v-if="Array.isArray(value)"
+                      class="ml-4 bg-white/60 dark:bg-black/20 rounded-xl p-4 border border-indigo-100/50 dark:border-indigo-800/30"
+                    >
+                      <ul class="space-y-4">
+                        <li
+                          v-for="(item, idx) in value"
+                          :key="idx"
+                          class="flex flex-col border-b border-indigo-100 dark:border-indigo-800/50 pb-4 last:border-0 last:pb-0"
+                        >
+                          <template
+                            v-if="typeof item === 'object' && item !== null"
+                          >
+                            <div
+                              class="flex items-baseline gap-2 flex-wrap mb-1"
+                            >
+                              <code
+                                v-if="item.name"
+                                class="text-indigo-700 dark:text-indigo-300 font-bold text-sm"
+                                >{{ item.name }}</code
+                              >
+                              <span
+                                v-if="item.type"
+                                class="text-xs text-indigo-500/80 font-mono"
+                                >{{ item.type }}</span
+                              >
+                              <span
+                                v-if="item.default && item.default !== 'null' && item.default !== ''"
+                                class="text-[10px] px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700/50"
+                              >
+                                default: {{ item.default }}
+                              </span>
+                            </div>
+                            <p
+                              v-if="item.desc"
+                              class="text-sm text-indigo-600 dark:text-indigo-200/80 mt-1 leading-relaxed"
+                            >
+                              {{ item.desc }}
+                            </p>
+                          </template>
+
+                          <template v-else>
+                            <span
+                              class="text-sm text-indigo-700 dark:text-indigo-200/80 flex items-center gap-2"
+                            >
+                              <i
+                                class="fa-solid fa-check text-indigo-400 text-xs"
+                              ></i>
+                              {{ item }}
+                            </span>
+                          </template>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div
+                      v-else-if="typeof value === 'object' && value !== null"
+                      class="ml-4 bg-white/60 dark:bg-black/20 rounded-xl p-4 border border-indigo-100/50 dark:border-indigo-800/30"
+                    >
+                      <ul class="space-y-2">
+                        <li
+                          v-for="(objValue, objKey) in value"
+                          :key="objKey"
+                          class="text-sm text-indigo-700 dark:text-indigo-200/80 flex items-start gap-2"
+                        >
+                          <i
+                            class="fa-solid fa-chevron-right text-indigo-400 text-[10px] mt-1.5"
+                          ></i>
+                          <span
+                            ><strong>{{ objKey }}:</strong> {{ objValue }}</span
+                          >
+                        </li>
+                      </ul>
+                    </div>
+
+                    <p
+                      v-else
+                      class="text-sm text-indigo-700 dark:text-indigo-200/80 leading-relaxed ml-4 border-l-2 border-indigo-300 dark:border-indigo-700 pl-3"
+                    >
+                      {{ value }}
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div
@@ -487,47 +582,34 @@
               </div>
 
               <div
-                v-if="compProperties.length > 0"
+                v-if="activeComponent.behaviors && activeComponent.behaviors.length > 0"
                 class="bg-white dark:bg-cardDark rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-8"
               >
                 <h3
-                  class="text-lg font-bold mb-4 flex items-center gap-2 text-cyan-600 dark:text-cyan-400"
+                  class="text-lg font-bold mb-4 flex items-center gap-2 text-green-600 dark:text-green-400"
                 >
-                  <i class="fa-solid fa-cubes text-sm"></i> Properties / Getters
+                  <i class="fa-solid fa-bolt text-sm"></i> Behaviors & Lifecycle
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div
-                    v-for="prop in compProperties"
-                    :key="prop.name"
+                    v-for="bhv in activeComponent.behaviors"
+                    :key="bhv.name"
                     class="flex flex-col border-b border-gray-100 dark:border-gray-800 pb-3"
                   >
                     <div class="flex items-baseline gap-2 flex-wrap">
                       <code
-                        class="text-cyan-600 dark:text-cyan-400 font-medium text-sm"
-                        >{{ prop.name }}</code
+                        class="text-green-600 dark:text-green-400 font-medium text-sm"
+                        >{{ bhv.name }}</code
                       >
                       <span class="text-xs text-gray-400 font-mono"
-                        >{{ prop.type }}</span
+                        >{{ bhv.type }}</span
                       >
                     </div>
                     <p
                       class="text-sm text-gray-600 dark:text-gray-400 mt-1 leading-relaxed"
                     >
-                      {{ prop.desc }}
+                      {{ bhv.desc }}
                     </p>
-                    <div
-                      v-if="prop.example"
-                      class="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1d1f21]"
-                    >
-                      <div
-                        class="px-3 py-2 text-[11px] font-mono border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-white dark:bg-[#2d2d2d]"
-                      >
-                        Example
-                      </div>
-                      <pre
-                        class="m-0 language-dart"
-                      ><code class="language-dart">{{ prop.example }}</code></pre>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -561,19 +643,6 @@
                     >
                       {{ method.desc }}
                     </p>
-                    <div
-                      v-if="method.example"
-                      class="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#1d1f21]"
-                    >
-                      <div
-                        class="px-3 py-2 text-[11px] font-mono border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-white dark:bg-[#2d2d2d]"
-                      >
-                        Example
-                      </div>
-                      <pre
-                        class="m-0 language-dart"
-                      ><code class="language-dart">{{ method.example }}</code></pre>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -7231,16 +7300,16 @@
         el: "#app",
         data: {
           appInfo: {
+            prefix: "F",
             title: "FormHelperWidget",
             description:
               "Dokumentasi UI/UX lengkap, referensi parameter wajib dan opsional untuk package Flutter Form Custom buatan Anda.",
             version: "v3.0 (Transformer & Pixel-Perfect)",
           },
           components: docsData,
-          activeComponent: docsData.length > 0 ? docsData[0] : null,
+          activeComponent: null,
           isDarkMode: false,
           copied: false,
-          // Variabel Pencarian
           searchQuery: "",
           searchResults: [],
           isSearchOpen: false,
@@ -7253,29 +7322,18 @@
               return acc;
             }, {});
           },
-          compProperties() {
-            if (!this.activeComponent) return [];
-            return (
-              this.activeComponent.properties ||
-              (this.activeComponent.additionalInfo &&
-                this.activeComponent.additionalInfo.properties) ||
-              []
-            );
-          },
           compMethods() {
-            if (!this.activeComponent) return [];
-            return (
-              this.activeComponent.methods ||
-              (this.activeComponent.additionalInfo &&
-                this.activeComponent.additionalInfo.methods) ||
-              []
-            );
+            if (!this.activeComponent || !this.activeComponent.methods)
+              return [];
+            return this.activeComponent.methods;
           },
         },
+        created() {
+          this.handlePopState();
+        },
         mounted() {
-          // Event listener shortcut pencarian global (Ctrl+F)
+          window.addEventListener("popstate", this.handlePopState);
           window.addEventListener("keydown", this.handleGlobalSearch);
-
           if (
             localStorage.theme === "dark" ||
             (!("theme" in localStorage) &&
@@ -7289,64 +7347,16 @@
           }
 
           this.updatePrismTheme();
+
           this.$nextTick(() => {
             this.triggerHighlight();
           });
         },
         beforeDestroy() {
-          // Bersihkan event listener saat komponen dihancurkan
           window.removeEventListener("keydown", this.handleGlobalSearch);
+          window.removeEventListener("popstate", this.handlePopState);
         },
         methods: {
-          formatInfoKey(key) {
-            return key;
-            // .replace(/([A-Z])/g, " $1")
-            // .replace(/^./, (str) => str.toUpperCase());
-          },
-          copyCode() {
-            if (!this.activeComponent || !this.activeComponent.code) return;
-            const el = document.createElement("textarea");
-            el.value = this.activeComponent.code;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand("copy");
-            document.body.removeChild(el);
-
-            this.copied = true;
-            setTimeout(() => {
-              this.copied = false;
-            }, 2000);
-          },
-          updatePrismTheme() {
-            const link = document.getElementById("prism-theme-link");
-            link.href = this.isDarkMode
-              ? "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
-              : "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css";
-          },
-          triggerHighlight() {
-            if (window.Prism) {
-              Prism.highlightAll();
-            }
-          },
-          selectComponent(comp) {
-            this.activeComponent = comp;
-            setTimeout(() => {
-              $("main").animate({ scrollTop: 0 }, 300);
-            }, 50);
-          },
-          toggleTheme() {
-            this.isDarkMode = !this.isDarkMode;
-            const html = document.documentElement;
-            if (this.isDarkMode) {
-              html.classList.add("dark");
-              localStorage.theme = "dark";
-            } else {
-              html.classList.remove("dark");
-              localStorage.theme = "light";
-            }
-            this.updatePrismTheme();
-          },
-          // === METODE PENCARIAN START ===
           handleGlobalSearch(e) {
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
               e.preventDefault();
@@ -7372,6 +7382,7 @@
           },
           onSearchKeyDown(e) {
             if (!this.isSearchOpen || this.searchResults.length === 0) return;
+
             if (e.key === "ArrowDown") {
               e.preventDefault();
               this.selectedSearchIndex =
@@ -7438,7 +7449,71 @@
               '<span class="bg-orange-200 dark:bg-orange-900/60 text-orange-900 dark:text-orange-100 rounded px-0.5">$1</span>'
             );
           },
-          // === METODE PENCARIAN END ===
+          scrollToActiveMenu() {
+            this.$nextTick(() => {
+              if (!this.activeComponent) return;
+              const menuEl = document.getElementById(
+                "menu-" + this.activeComponent.id
+              );
+              console.log(menuEl);
+              if (menuEl) {
+                menuEl.scrollIntoView({ block: "center", behavior: "smooth" });
+              }
+            });
+          },
+          selectComponent(comp) {
+            this.activeComponent = comp;
+            const url = new URL(window.location);
+            url.searchParams.set("id", comp.id);
+            window.history.pushState({}, "", url);
+            const mainArea = document.querySelector("main");
+            if (mainArea) {
+              setTimeout(() => {
+                mainArea.scrollTo({ top: 0, behavior: "instant" });
+              }, 300);
+            }
+          },
+          toggleTheme() {
+            this.isDarkMode = !this.isDarkMode;
+            if (this.isDarkMode) {
+              document.documentElement.classList.add("dark");
+            } else {
+              document.documentElement.classList.remove("dark");
+            }
+          },
+          formatInfoKey(key) {
+            return key.replace(/([A-Z])/g, " $1").trim();
+          },
+          copyCode() {
+            navigator.clipboard.writeText(this.activeComponent.code);
+            this.copied = true;
+            setTimeout(() => {
+              this.copied = false;
+            }, 2000);
+          },
+          triggerHighlight() {
+            this.$nextTick(() => {
+              Prism.highlightAll();
+            });
+          },
+          handlePopState() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get("id");
+            if (id) {
+              const found = this.components.find((c) => c.id === id);
+              this.activeComponent = found
+                ? found
+                : this.components.length > 0
+                ? this.components[0]
+                : null;
+            } else {
+              this.activeComponent =
+                this.components.length > 0 ? this.components[0] : null;
+            }
+            setTimeout(() => {
+              this.scrollToActiveMenu();
+            }, 200);
+          },
         },
       });
     </script>

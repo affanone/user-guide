@@ -162,7 +162,7 @@
           <div
             class="w-10 h-10 bg-gradient-to-br from-primary to-orange-400 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg shadow-orange-500/30"
           >
-            F
+            {{ appInfo.prefix }}
           </div>
           <div>
             <h1 class="text-xl font-bold tracking-tight">
@@ -273,6 +273,7 @@
                 <li v-for="comp in group" :key="comp.id">
                   <button
                     @click="selectComponent(comp)"
+                    :id="'menu-' + comp.id"
                     :class="['w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium sidebar-link mb-1 flex items-center gap-3', activeComponent && activeComponent.id === comp.id ? 'active' : 'text-gray-600 dark:text-gray-300']"
                   >
                     <i :class="comp.icon + ' w-4 text-center opacity-70'"></i>
@@ -3526,13 +3527,14 @@
         el: "#app",
         data: {
           appInfo: {
+            prefix: "U",
             title: "Widget Utilitas",
             description:
               "Pusat dokumentasi widget utilitas Flutter yang mencakup referensi API, parameter, konfigurasi, callback, perilaku, serta contoh implementasi untuk setiap komponen.",
             version: "v3.0",
           },
           components: docsData,
-          activeComponent: docsData.length > 0 ? docsData[0] : null,
+          activeComponent: null,
           isDarkMode: false,
           copied: false,
           searchQuery: "",
@@ -3553,8 +3555,11 @@
             return this.activeComponent.methods;
           },
         },
-
+        created() {
+          this.handlePopState();
+        },
         mounted() {
+          window.addEventListener("popstate", this.handlePopState);
           window.addEventListener("keydown", this.handleGlobalSearch);
           if (
             localStorage.theme === "dark" ||
@@ -3576,6 +3581,7 @@
         },
         beforeDestroy() {
           window.removeEventListener("keydown", this.handleGlobalSearch);
+          window.removeEventListener("popstate", this.handlePopState);
         },
         methods: {
           handleGlobalSearch(e) {
@@ -3670,8 +3676,29 @@
               '<span class="bg-orange-200 dark:bg-orange-900/60 text-orange-900 dark:text-orange-100 rounded px-0.5">$1</span>'
             );
           },
+          scrollToActiveMenu() {
+            this.$nextTick(() => {
+              if (!this.activeComponent) return;
+              const menuEl = document.getElementById(
+                "menu-" + this.activeComponent.id
+              );
+              console.log(menuEl);
+              if (menuEl) {
+                menuEl.scrollIntoView({ block: "center", behavior: "smooth" });
+              }
+            });
+          },
           selectComponent(comp) {
             this.activeComponent = comp;
+            const url = new URL(window.location);
+            url.searchParams.set("id", comp.id);
+            window.history.pushState({}, "", url);
+            const mainArea = document.querySelector("main");
+            if (mainArea) {
+              setTimeout(() => {
+                mainArea.scrollTo({ top: 0, behavior: "instant" });
+              }, 300);
+            }
           },
           toggleTheme() {
             this.isDarkMode = !this.isDarkMode;
@@ -3695,6 +3722,24 @@
             this.$nextTick(() => {
               Prism.highlightAll();
             });
+          },
+          handlePopState() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get("id");
+            if (id) {
+              const found = this.components.find((c) => c.id === id);
+              this.activeComponent = found
+                ? found
+                : this.components.length > 0
+                ? this.components[0]
+                : null;
+            } else {
+              this.activeComponent =
+                this.components.length > 0 ? this.components[0] : null;
+            }
+            setTimeout(() => {
+              this.scrollToActiveMenu();
+            }, 200);
           },
         },
       });
