@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FormHelperWidget - User Guide</title>
+    <title>User Guide</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -766,6 +767,15 @@
             if (!this.activeComponent || !this.activeComponent.methods)
               return [];
             return this.activeComponent.methods;
+          },
+        },
+        watch: {
+          activeComponent(newComp) {
+            if (newComp) {
+              document.title = `${newComp.name} - ${this.appInfo.title}`;
+            } else {
+              document.title = this.appInfo.title || "User Guide";
+            }
           },
         },
         created() {
