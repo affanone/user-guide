@@ -800,13 +800,16 @@
             const urlParams = new URLSearchParams(window.location.search);
             const fileName = urlParams.get("ug");
             const targetFile = fileName ? `${fileName}.json` : "helper.json";
+            const version = new Date().getTime();
+
             try {
-              const response = await fetch(`data/${targetFile}`);
+              const response = await fetch(`data/${targetFile}?v=${version}`, {
+                cache: "no-store",
+              });
               if (!response.ok)
                 throw new Error(
                   `File ${targetFile} tidak ditemukan (Error ${response.status}).`
                 );
-
               const data = await response.json();
               this.appInfo = data.appInfo;
               this.components = data.docsData;
