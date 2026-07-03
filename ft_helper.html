@@ -3656,6 +3656,9 @@
             if (this.$refs.searchInput) {
               this.$refs.searchInput.blur();
             }
+            setTimeout(() => {
+              this.scrollToActiveMenu();
+            }, 200);
           },
           clearSearch() {
             this.searchQuery = "";
