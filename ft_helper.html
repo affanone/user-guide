@@ -1057,6 +1057,284 @@
           code: "final bool? isSuccess = await ModalWidget.modal<bool>(\n  context,\n  title: 'Edit Detail Akun',\n  showCancelButton: true,\n  confirmText: 'Simpan Perubahan',\n  child: Form(\n    key: _formKey,\n    child: Column(\n      children: [\n         TextFormField(decoration: const InputDecoration(labelText: 'Nama Lengkap')),\n         TextFormField(decoration: const InputDecoration(labelText: 'Email')),\n      ],\n    ),\n  ),\n  onConfirm: () async {\n    if (!_formKey.currentState!.validate()) return false;\n    \n    // Eksekusi ini otomatis me-render loading spinner di tombol\n    final result = await apiService.updateProfile();\n    \n    if (result.isError) {\n      showToast('Gagal merubah data');\n      return false; // Membiarkan modal tetap tampil untuk direvisi ulang\n    }\n    \n    return true; // Modal ditutup, isLoading selesai, nilai True dikembalikan ke layer pemanggil.\n  },\n  afterClose: () {\n    print('Proses edit selesai & Modal tertutup');\n  }\n);\n\nif (isSuccess == true) {\n  _refreshTable();\n}",
         },
         {
+          id: "AnimationWidget",
+          group: "Widget",
+          name: "Animation Wrapper",
+          icon: "fa-solid fa-wand-magic-sparkles",
+          description:
+            "Widget wrapper cerdas untuk menyuntikkan efek animasi murni secara mulus tanpa mengganggu struktur fisik layout (margin/padding/ukuran). Dilengkapi dengan preset animasi premium (Elastic, Bounce, 3D Flip, dll) dan mendukung siklus IN/OUT, pengulangan (looping), serta kontrol manual untuk komponen seperti Modal atau Dialog.",
+          mandatoryProps: [
+            {
+              name: "child",
+              type: "Widget",
+              default: "",
+              desc: "Komponen visual utama yang akan dibungkus dengan efek animasi. Tidak ada batasan jenis widget, bisa berupa teks, tombol, container, maupun layout kompleks.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "inEffect",
+              type: "AnimationEffect?",
+              default: "null",
+              desc: "Konfigurasi efek animasi saat widget pertama kali muncul (fase IN). Dideklarasikan menggunakan fungsi preset seperti AnimationEffect.elasticZoomIn() atau AnimationEffect.slideIn().",
+            },
+            {
+              name: "outEffect",
+              type: "AnimationEffect?",
+              default: "null",
+              desc: "Konfigurasi efek animasi saat widget menghilang (fase OUT). Akan tereksekusi otomatis jika properti 'repeat' aktif, atau dapat dipicu secara manual.",
+            },
+            {
+              name: "repeat",
+              type: "bool",
+              default: "false",
+              desc: "Jika diset true, widget akan memainkan animasi IN dan OUT secara terus-menerus tanpa henti. Sangat cocok untuk efek pulsing atau indikator.",
+            },
+            {
+              name: "delayRepeat",
+              type: "Duration",
+              default: "Duration.zero",
+              desc: "Waktu jeda (delay) antara selesainya sebuah fase animasi dengan dimulainya fase animasi berikutnya. Hanya bekerja jika properti 'repeat' bernilai true.",
+            },
+            {
+              name: "autoPlay",
+              type: "bool",
+              default: "true",
+              desc: "Menentukan apakah efek animasi IN langsung dimainkan secara otomatis saat widget pertama kali dirender di layar. Jika false, animasi menunggu perintah eksekusi.",
+            },
+          ],
+          additionalInfo: {},
+          methods: [
+            {
+              name: "playOut",
+              returnType: "Future<void>",
+              parameters: [],
+              desc: "Metode asinkronus yang dipanggil melalui GlobalKey untuk memainkan efek OUT secara manual. Wajib digunakan sebelum mengeksekusi Navigator.pop() agar modal/popup tertutup dengan animasi elegan.",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Phase Separation Control",
+              type: "State Logic",
+              default: "",
+              desc: "Fase animasi IN dan OUT dikelola pada state yang terisolasi. Hal ini mencegah tumpang tindih animasi yang dapat menyebabkan UI terlihat patah-patah (glitch) saat efek transisi sedang berjalan.",
+            },
+            {
+              name: "Hardware Accelerated Rendering",
+              type: "Render Behavior",
+              default: "",
+              desc: "Menggunakan native Transition Widgets (FadeTransition, ScaleTransition, SlideTransition) bawaan Flutter. Memanipulasi matriks transformasi langsung di layer GPU tanpa melakukan re-build berulang pada komponen child.",
+            },
+            {
+              name: "Bouncy & Physics-based Curve",
+              type: "Animation Engine",
+              default: "",
+              desc: "Preset animasi tidak menggunakan kurva linear yang kaku, melainkan mengadopsi fisika natural (elasticOut, easeOutBack) sehingga menghasilkan efek pantulan 'premium' secara default.",
+            },
+          ],
+          specialNotes: [
+            "PENTING (Untuk Modal/Dialog): Modal default Flutter akan langsung menghancurkan widget saat ditutup. Gunakan `GlobalKey<AnimationWidgetState>` pada wrapper ini, lalu jalankan `await myKey.currentState?.playOut();` sebelum memanggil `Navigator.pop(context)`.",
+            "Kelas AnimationEffect terpisah bertindak sebagai 'Preset Library'. Anda bisa menambahkan efek kustom Anda sendiri (seperti wobble atau shake) hanya dengan menambahkan static method baru di dalam kelas tersebut tanpa mengubah arsitektur inti AnimationWidget.",
+          ],
+          code: "AnimationWidget(\n  inEffect: AnimationEffect.elasticZoomIn(duration: const Duration(milliseconds: 800)),\n  outEffect: AnimationEffect.fadeOut(duration: const Duration(milliseconds: 300)),\n  repeat: true,\n  delayRepeat: const Duration(seconds: 2),\n  child: Container(\n    padding: const EdgeInsets.all(16),\n    decoration: BoxDecoration(\n      color: Colors.purpleAccent,\n      borderRadius: BorderRadius.circular(16),\n      boxShadow: const [\n        BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 4))\n      ],\n    ),\n    child: const Text(\n      'Super Premium Animation',\n      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),\n    ),\n  ),\n)",
+        },
+        {
+          id: "ButtonWidget",
+          group: "Widget",
+          name: "Button Wrapper",
+          icon: "fa-solid fa-hand-pointer",
+          description:
+            "Widget wrapper super efisien untuk menginjeksi efek ripple (InkWell) dari Material Design pada komponen UI apa pun. Dibangun dengan fokus pada efisiensi memori dengan memanipulasi opacity dan bypass interaksi secara otomatis tanpa memerlukan state management tambahan.",
+          mandatoryProps: [
+            {
+              name: "child",
+              type: "Widget",
+              default: "",
+              desc: "Komponen visual utama yang akan dibungkus dengan efek interaktif. Sangat disarankan menggunakan widget Ink untuk background solid/gambar agar efek ripple tidak tertutup.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "onPressed",
+              type: "VoidCallback?",
+              default: "null",
+              desc: "Aksi yang dieksekusi saat widget diklik sekali (tap).",
+            },
+            {
+              name: "onDoubleTap",
+              type: "VoidCallback?",
+              default: "null",
+              desc: "Aksi yang dieksekusi saat widget diklik dua kali secara cepat.",
+            },
+            {
+              name: "onLongPress",
+              type: "VoidCallback?",
+              default: "null",
+              desc: "Aksi yang dieksekusi saat widget ditekan dan ditahan.",
+            },
+            {
+              name: "onRightClick",
+              type: "VoidCallback?",
+              default: "null",
+              desc: "Aksi yang dieksekusi saat klik kanan (desktop/web) atau tap dua jari (secondary tap).",
+            },
+            {
+              name: "borderRadius",
+              type: "BorderRadius?",
+              default: "null",
+              desc: "Membatasi efek ripple agar tidak meluber keluar dari batas radius yang ditentukan. Sesuaikan dengan radius komponen child.",
+            },
+            {
+              name: "disabled",
+              type: "bool?",
+              default: "false",
+              desc: "Parameter eksplisit untuk mematikan interaksi. Jika true, semua callback akan diabaikan dan widget secara otomatis masuk ke fase visual nonaktif.",
+            },
+            {
+              name: "tooltip",
+              type: "String?",
+              default: "''",
+              desc: "Teks petunjuk yang muncul saat widget ditekan lama. Default diatur ke string kosong untuk mematikan tooltip bawaan sistem Material yang mengganggu.",
+            },
+          ],
+          additionalInfo: {},
+          methods: [],
+          behaviors: [
+            {
+              name: "Auto Disable Detection",
+              type: "State Logic",
+              default: "",
+              desc: "Jika parameter disabled diset true, atau jika SEMUA callback (onPressed, onDoubleTap, onLongPress, onRightClick) bernilai null, widget secara otomatis mematikan interaksi InkWell dan menurunkan opacity menjadi 0.4.",
+            },
+            {
+              name: "Transparent Material Injection",
+              type: "Render Behavior",
+              default: "",
+              desc: "Membungkus child dengan Material transparan, memastikan ripple effect dapat digambar secara native oleh engine Flutter tanpa menimpa atau merusak komposisi warna pada tree di atasnya.",
+            },
+          ],
+          specialNotes: [
+            "PENTING: Jangan gunakan properti 'color' atau 'decoration' pada Container biasa di dalam child jika ingin efek ripple terlihat. Gunakan widget 'Ink' sebagai pengganti Container untuk menggambar warna latar belakang agar gelombang ripple ter-render di atas warna tersebut.",
+            "Skrip ini murni stateless dan sangat ringan. Menghilangkan pemborosan memori karena tidak menggunakan ValueNotifier atau SetState hanya untuk mengatur status aktif/nonaktif.",
+          ],
+          code: "ButtonWidget(\n  onPressed: () {\n    print('Aksi dieksekusi presisi');\n  },\n  borderRadius: BorderRadius.circular(12),\n  child: Ink(\n    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),\n    decoration: BoxDecoration(\n      color: Colors.blueAccent,\n      borderRadius: BorderRadius.circular(12),\n    ),\n    child: const Row(\n      mainAxisSize: MainAxisSize.min,\n      children: [\n        Icon(Icons.save, color: Colors.white),\n        SizedBox(width: 8),\n        Text(\n          'Simpan',\n          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),\n        ),\n      ],\n    ),\n  ),\n)",
+        },
+        {
+          id: "NavigatorPageWidget",
+          group: "Widget",
+          name: "Responsive Navigator Page",
+          icon: "fa-solid fa-route",
+          description:
+            "Widget utilitas navigasi responsif yang secara cerdas merender komponen berdasarkan lebar layar (breakpoint). Pada layar desktop (lebar ≥ 1024px), konten dirender sebagai dialog/modal melayang bergaya premium dengan efek frosted glass. Sementara pada layar mobile (< 1024px), konten dirender sebagai halaman penuh (full-page) menggunakan MaterialPageRoute konvensional.",
+          mandatoryProps: [
+            {
+              name: "context",
+              type: "BuildContext",
+              default: "",
+              desc: "Konteks aplikasi saat ini yang memiliki akses ke Navigator dan MediaQuery.",
+            },
+            {
+              name: "child",
+              type: "Widget",
+              default: "",
+              desc: "Konten widget utama (misal: halaman form, detail, atau komponen utuh) yang akan dirender di dalam layar modal desktop maupun rute layar penuh mobile.",
+            },
+          ],
+          optionalProps: [
+            {
+              name: "modalMaxWidth",
+              type: "double",
+              default: "600",
+              desc: "Batasan lebar maksimum (max width) dari jendela modal ketika ditampilkan pada mode layar desktop.",
+            },
+            {
+              name: "modalMaxHeight",
+              type: "double?",
+              default: "null",
+              desc: "Batasan tinggi maksimum jendela modal pada mode desktop. Jika null, akan otomatis diatur sebesar 90% dari total tinggi layar (view port).",
+            },
+            {
+              name: "isDismissible",
+              type: "bool",
+              default: "true",
+              desc: "Jika bernilai true, khusus pada mode modal desktop, pengguna dapat mengetuk latar belakang luar (barrier) untuk menutup modal.",
+            },
+            {
+              name: "barrierColor",
+              type: "Color?",
+              default: "null",
+              desc: "Warna overlay penutup layar belakang modal pada mode desktop. Jika null, sistem akan mengotomatiskan warnanya berdasarkan tema (terang/gelap).",
+            },
+            {
+              name: "routeName",
+              type: "String?",
+              default: "null",
+              desc: "Nama identitas rute logis untuk sistem navigasi. Digunakan sebagai argumen 'name' pada class RouteSettings (berguna untuk analitik log rute).",
+            },
+            {
+              name: "wrapWithScaffoldIfRoute",
+              type: "bool",
+              default: "false",
+              desc: "Hanya berlaku pada mode mobile (navigator push). Jika true, secara otomatis membungkus konten widget child ke dalam Scaffold agar memiliki layout latar dan app bar dasar yang valid secara material.",
+            },
+            {
+              name: "backgroundColor",
+              type: "Color?",
+              default: "null",
+              desc: "Warna latar belakang untuk Scaffold pada mode mobile. Jika null, akan menyesuaikan berdasarkan tema bawaan.",
+            },
+          ],
+          additionalInfo: {
+            dependencies: "flutter/material.dart, dart:ui",
+            enums: "PopupMode (modal, navigator, inline)",
+          },
+          methods: [
+            {
+              name: "push<T>",
+              type: "static Future<T?>",
+              default: "",
+              desc: "Metode utama untuk berpindah antarmuka yang akan memutuskan secara kondisional apakah me-render tampilan sebagai GeneralDialog (Desktop) atau MaterialPageRoute (Mobile).",
+            },
+            {
+              name: "pushReplacementx<T, TO>",
+              type: "static Future<T?>",
+              default: "",
+              desc: "Pintasan (Syntactic Sugar) yang akan menutup (pop) entri navigasi saat ini kemudian menimpa (replace) dengan NavigatorPageWidget.push yang baru. Berguna untuk perpindahan halaman linier seperti Next Step Wizard tanpa menumpuk riwayat stack layer rute.",
+            },
+            {
+              name: "pushReturnMode",
+              type: "static void",
+              default: "",
+              desc: "Varian push lanjutan untuk kasus khusus di mana widget di dalam child sangat membutuhkan konteks terkait 'di mode apa' widget tersebut sedang berada, yang akan dilempar melalui Builder Callback yang me-return enum PopupMode (modal atau navigator).",
+            },
+          ],
+          behaviors: [
+            {
+              name: "Responsive Split Routing",
+              type: "Architecture",
+              default: "",
+              desc: "Ketika lebar view port layar mencapai lebih dari sama dengan (>=) 1024px, maka aliran kode (flow code) otomatis di-bypass (dialihkan) untuk mengeksekusi showGeneralDialog. Jika lebih rendah, sistem akan membangun MaterialPageRoute.",
+            },
+            {
+              name: "Dark Mode Barrier Frosting",
+              type: "UI Reaction",
+              default: "",
+              desc: "Apabila di mode terang, overlay barrier modal berwarna hitam transparan (0.4 opacity). Apabila di mode gelap, efeknya ditransformasi menjadi pelindung putih tipis dengan transparansi 0.04 yang bersinergi dengan filter pemburaman layar (frosted blur).",
+            },
+            {
+              name: "Intrinsic Constraint Adaptation",
+              type: "UI Reaction",
+              default: "",
+              desc: "Ukuran box container modal di-skalakan secara statis sehingga apabila konten (child) lebih pendek, modal akan mengikuti tinggi minimum dengan aman. Tinggi batas maksimal dilimit oleh perhitungan MediaQuery 90% secara proporsional.",
+            },
+          ],
+          specialNotes: [
+            "Peringatan Trik UI Desktop: Karena layer Modal Desktop dibungkus Material() dengan clipBehavior 'Clip.antiAlias' untuk melengkungkan sudut, menyisipkan widget turunan (child) berupa Scaffold secara utuh *di dalam* modal desktop bisa menyebabkan double backgroundColor (putih di atas putih) atau overflow margin (Scaffold mencoba memakan layar utuh). Sebaiknya rancang form/child secara fleksibel (tidak terikat Scaffold secara instan).",
+            "Warning: pushReturnMode hanya me-return void (fire and forget), sehingga ia tidak ditujukan jika Anda mengharapkan respons await result layaknya navigator.",
+          ],
+          code: "final resultData = await NavigatorPageWidget.push<String>(\n  context,\n  modalMaxWidth: 700,\n  wrapWithScaffoldIfRoute: true,\n  routeName: '/user/detail',\n  child: FormDetailPengguna(),\n);\n\nif (resultData != null) {\n  print('Kembali dengan data: $resultData');\n}",
+        },
+        {
           id: "NoteWidget",
           group: "Widget",
           name: "Note Widget",
@@ -1972,202 +2250,6 @@
             "Bypass otomatis untuk resolusi: Pastikan parameter `quality` diset dengan bijak. Render canvas dart:ui akan menampung seluruh piksel gambar dalam memori selama proses konversi ke format data PNG/JPG.",
           ],
           code: "final io.File? croppedFile = await CropWidget.crop(\n  context,\n  image: originalFile,\n  title: 'Edit Foto Profil',\n  circleCrop: true,\n  quality: 0.85,\n  format: CropImageFormat.jpg,\n  primaryColor: Colors.blueAccent,\n  beforeSave: (file) async {\n    // Contoh: Tambahkan pengecekan ukuran maksimal atau upload\n    return true;\n  },\n);\n\nif (croppedFile != null) {\n  print('Berhasil crop: ${croppedFile.path}');\n}",
-        },
-        {
-          id: "NavigatorPageWidget",
-          group: "Widget",
-          name: "Responsive Navigator Page",
-          icon: "fa-solid fa-route",
-          description:
-            "Widget utilitas navigasi responsif yang secara cerdas merender komponen berdasarkan lebar layar (breakpoint). Pada layar desktop (lebar ≥ 1024px), konten dirender sebagai dialog/modal melayang bergaya premium dengan efek frosted glass. Sementara pada layar mobile (< 1024px), konten dirender sebagai halaman penuh (full-page) menggunakan MaterialPageRoute konvensional.",
-          mandatoryProps: [
-            {
-              name: "context",
-              type: "BuildContext",
-              default: "",
-              desc: "Konteks aplikasi saat ini yang memiliki akses ke Navigator dan MediaQuery.",
-            },
-            {
-              name: "child",
-              type: "Widget",
-              default: "",
-              desc: "Konten widget utama (misal: halaman form, detail, atau komponen utuh) yang akan dirender di dalam layar modal desktop maupun rute layar penuh mobile.",
-            },
-          ],
-          optionalProps: [
-            {
-              name: "modalMaxWidth",
-              type: "double",
-              default: "600",
-              desc: "Batasan lebar maksimum (max width) dari jendela modal ketika ditampilkan pada mode layar desktop.",
-            },
-            {
-              name: "modalMaxHeight",
-              type: "double?",
-              default: "null",
-              desc: "Batasan tinggi maksimum jendela modal pada mode desktop. Jika null, akan otomatis diatur sebesar 90% dari total tinggi layar (view port).",
-            },
-            {
-              name: "isDismissible",
-              type: "bool",
-              default: "true",
-              desc: "Jika bernilai true, khusus pada mode modal desktop, pengguna dapat mengetuk latar belakang luar (barrier) untuk menutup modal.",
-            },
-            {
-              name: "barrierColor",
-              type: "Color?",
-              default: "null",
-              desc: "Warna overlay penutup layar belakang modal pada mode desktop. Jika null, sistem akan mengotomatiskan warnanya berdasarkan tema (terang/gelap).",
-            },
-            {
-              name: "routeName",
-              type: "String?",
-              default: "null",
-              desc: "Nama identitas rute logis untuk sistem navigasi. Digunakan sebagai argumen 'name' pada class RouteSettings (berguna untuk analitik log rute).",
-            },
-            {
-              name: "wrapWithScaffoldIfRoute",
-              type: "bool",
-              default: "false",
-              desc: "Hanya berlaku pada mode mobile (navigator push). Jika true, secara otomatis membungkus konten widget child ke dalam Scaffold agar memiliki layout latar dan app bar dasar yang valid secara material.",
-            },
-            {
-              name: "backgroundColor",
-              type: "Color?",
-              default: "null",
-              desc: "Warna latar belakang untuk Scaffold pada mode mobile. Jika null, akan menyesuaikan berdasarkan tema bawaan.",
-            },
-          ],
-          additionalInfo: {
-            dependencies: "flutter/material.dart, dart:ui",
-            enums: "PopupMode (modal, navigator, inline)",
-          },
-          methods: [
-            {
-              name: "push<T>",
-              type: "static Future<T?>",
-              default: "",
-              desc: "Metode utama untuk berpindah antarmuka yang akan memutuskan secara kondisional apakah me-render tampilan sebagai GeneralDialog (Desktop) atau MaterialPageRoute (Mobile).",
-            },
-            {
-              name: "pushReplacementx<T, TO>",
-              type: "static Future<T?>",
-              default: "",
-              desc: "Pintasan (Syntactic Sugar) yang akan menutup (pop) entri navigasi saat ini kemudian menimpa (replace) dengan NavigatorPageWidget.push yang baru. Berguna untuk perpindahan halaman linier seperti Next Step Wizard tanpa menumpuk riwayat stack layer rute.",
-            },
-            {
-              name: "pushReturnMode",
-              type: "static void",
-              default: "",
-              desc: "Varian push lanjutan untuk kasus khusus di mana widget di dalam child sangat membutuhkan konteks terkait 'di mode apa' widget tersebut sedang berada, yang akan dilempar melalui Builder Callback yang me-return enum PopupMode (modal atau navigator).",
-            },
-          ],
-          behaviors: [
-            {
-              name: "Responsive Split Routing",
-              type: "Architecture",
-              default: "",
-              desc: "Ketika lebar view port layar mencapai lebih dari sama dengan (>=) 1024px, maka aliran kode (flow code) otomatis di-bypass (dialihkan) untuk mengeksekusi showGeneralDialog. Jika lebih rendah, sistem akan membangun MaterialPageRoute.",
-            },
-            {
-              name: "Dark Mode Barrier Frosting",
-              type: "UI Reaction",
-              default: "",
-              desc: "Apabila di mode terang, overlay barrier modal berwarna hitam transparan (0.4 opacity). Apabila di mode gelap, efeknya ditransformasi menjadi pelindung putih tipis dengan transparansi 0.04 yang bersinergi dengan filter pemburaman layar (frosted blur).",
-            },
-            {
-              name: "Intrinsic Constraint Adaptation",
-              type: "UI Reaction",
-              default: "",
-              desc: "Ukuran box container modal di-skalakan secara statis sehingga apabila konten (child) lebih pendek, modal akan mengikuti tinggi minimum dengan aman. Tinggi batas maksimal dilimit oleh perhitungan MediaQuery 90% secara proporsional.",
-            },
-          ],
-          specialNotes: [
-            "Peringatan Trik UI Desktop: Karena layer Modal Desktop dibungkus Material() dengan clipBehavior 'Clip.antiAlias' untuk melengkungkan sudut, menyisipkan widget turunan (child) berupa Scaffold secara utuh *di dalam* modal desktop bisa menyebabkan double backgroundColor (putih di atas putih) atau overflow margin (Scaffold mencoba memakan layar utuh). Sebaiknya rancang form/child secara fleksibel (tidak terikat Scaffold secara instan).",
-            "Warning: pushReturnMode hanya me-return void (fire and forget), sehingga ia tidak ditujukan jika Anda mengharapkan respons await result layaknya navigator.",
-          ],
-          code: "final resultData = await NavigatorPageWidget.push<String>(\n  context,\n  modalMaxWidth: 700,\n  wrapWithScaffoldIfRoute: true,\n  routeName: '/user/detail',\n  child: FormDetailPengguna(),\n);\n\nif (resultData != null) {\n  print('Kembali dengan data: $resultData');\n}",
-        },
-        {
-          id: "ButtonWidget",
-          group: "Widget",
-          name: "Button Wrapper",
-          icon: "fa-solid fa-hand-pointer",
-          description:
-            "Widget wrapper super efisien untuk menginjeksi efek ripple (InkWell) dari Material Design pada komponen UI apa pun. Dibangun dengan fokus pada efisiensi memori dengan memanipulasi opacity dan bypass interaksi secara otomatis tanpa memerlukan state management tambahan.",
-          mandatoryProps: [
-            {
-              name: "child",
-              type: "Widget",
-              default: "",
-              desc: "Komponen visual utama yang akan dibungkus dengan efek interaktif. Sangat disarankan menggunakan widget Ink untuk background solid/gambar agar efek ripple tidak tertutup.",
-            },
-          ],
-          optionalProps: [
-            {
-              name: "onPressed",
-              type: "VoidCallback?",
-              default: "null",
-              desc: "Aksi yang dieksekusi saat widget diklik sekali (tap).",
-            },
-            {
-              name: "onDoubleTap",
-              type: "VoidCallback?",
-              default: "null",
-              desc: "Aksi yang dieksekusi saat widget diklik dua kali secara cepat.",
-            },
-            {
-              name: "onLongPress",
-              type: "VoidCallback?",
-              default: "null",
-              desc: "Aksi yang dieksekusi saat widget ditekan dan ditahan.",
-            },
-            {
-              name: "onRightClick",
-              type: "VoidCallback?",
-              default: "null",
-              desc: "Aksi yang dieksekusi saat klik kanan (desktop/web) atau tap dua jari (secondary tap).",
-            },
-            {
-              name: "borderRadius",
-              type: "BorderRadius?",
-              default: "null",
-              desc: "Membatasi efek ripple agar tidak meluber keluar dari batas radius yang ditentukan. Sesuaikan dengan radius komponen child.",
-            },
-            {
-              name: "disabled",
-              type: "bool?",
-              default: "false",
-              desc: "Parameter eksplisit untuk mematikan interaksi. Jika true, semua callback akan diabaikan dan widget secara otomatis masuk ke fase visual nonaktif.",
-            },
-            {
-              name: "tooltip",
-              type: "String?",
-              default: "''",
-              desc: "Teks petunjuk yang muncul saat widget ditekan lama. Default diatur ke string kosong untuk mematikan tooltip bawaan sistem Material yang mengganggu.",
-            },
-          ],
-          additionalInfo: {},
-          methods: [],
-          behaviors: [
-            {
-              name: "Auto Disable Detection",
-              type: "State Logic",
-              default: "",
-              desc: "Jika parameter disabled diset true, atau jika SEMUA callback (onPressed, onDoubleTap, onLongPress, onRightClick) bernilai null, widget secara otomatis mematikan interaksi InkWell dan menurunkan opacity menjadi 0.4.",
-            },
-            {
-              name: "Transparent Material Injection",
-              type: "Render Behavior",
-              default: "",
-              desc: "Membungkus child dengan Material transparan, memastikan ripple effect dapat digambar secara native oleh engine Flutter tanpa menimpa atau merusak komposisi warna pada tree di atasnya.",
-            },
-          ],
-          specialNotes: [
-            "PENTING: Jangan gunakan properti 'color' atau 'decoration' pada Container biasa di dalam child jika ingin efek ripple terlihat. Gunakan widget 'Ink' sebagai pengganti Container untuk menggambar warna latar belakang agar gelombang ripple ter-render di atas warna tersebut.",
-            "Skrip ini murni stateless dan sangat ringan. Menghilangkan pemborosan memori karena tidak menggunakan ValueNotifier atau SetState hanya untuk mengatur status aktif/nonaktif.",
-          ],
-          code: "ButtonWidget(\n  onPressed: () {\n    print('Aksi dieksekusi presisi');\n  },\n  borderRadius: BorderRadius.circular(12),\n  child: Ink(\n    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),\n    decoration: BoxDecoration(\n      color: Colors.blueAccent,\n      borderRadius: BorderRadius.circular(12),\n    ),\n    child: const Row(\n      mainAxisSize: MainAxisSize.min,\n      children: [\n        Icon(Icons.save, color: Colors.white),\n        SizedBox(width: 8),\n        Text(\n          'Simpan',\n          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),\n        ),\n      ],\n    ),\n  ),\n)",
         },
         {
           id: "DriftListView",
