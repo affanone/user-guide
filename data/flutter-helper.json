@@ -936,6 +936,18 @@
                     "desc": "Lebar menu popup pada mode desktop."
                 },
                 {
+                    "name": "inEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Custom efek animasi masuk. Jika dikosongkan, sistem akan otomatis memilihkan efek terbaik berdasarkan posisi (misal: posisi 'top' akan menggunakan 'slideDown')."
+                },
+                {
+                    "name": "outEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Custom efek animasi keluar. Jika dikosongkan, sistem otomatis memberikan efek keluar natural yang sejalan dengan posisi asalnya."
+                },
+                {
                     "name": "maxPopupWidth",
                     "type": "double?",
                     "default": "null",
