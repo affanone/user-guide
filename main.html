@@ -772,12 +772,11 @@
           },
         },
         watch: {
-          activeComponent(newComp) {
-            if (newComp) {
-              document.title = `${newComp.name} - ${this.appInfo.title}`;
-            } else {
-              document.title = this.appInfo.title || "User Guide";
-            }
+          activeComponent: {
+            immediate: true,
+            handler() {
+              this.triggerHighlight();
+            },
           },
         },
         created() {
@@ -798,6 +797,15 @@
           window.removeEventListener("popstate", this.handlePopState);
         },
         methods: {
+          triggerHighlight() {
+            this.$nextTick(() => {
+              setTimeout(() => {
+                if (window.Prism) {
+                  window.Prism.highlightAll();
+                }
+              }, 50);
+            });
+          },
           async fetchDocumentationData() {
             const urlParams = new URLSearchParams(window.location.search);
             const fileName = urlParams.get("ug");
@@ -927,7 +935,10 @@
                 "menu-" + this.activeComponent.id
               );
               if (menuEl) {
-                menuEl.scrollIntoView({ block: "center", behavior: "smooth" });
+                menuEl.scrollIntoView({
+                  block: "center",
+                  behavior: "smooth",
+                });
               }
             });
           },
