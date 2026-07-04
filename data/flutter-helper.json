@@ -939,13 +939,13 @@
                     "name": "inEffect",
                     "type": "AnimationEffect?",
                     "default": "null",
-                    "desc": "Custom efek animasi masuk. Jika dikosongkan, sistem akan otomatis memilihkan efek terbaik berdasarkan posisi (misal: posisi 'top' akan menggunakan 'slideDown')."
+                    "desc": "Menentukan efek animasi kustom saat popup/widget pertama kali muncul (masuk) ke layar. Jika dibiarkan null, sistem akan menggunakan animasi masuk bawaan (seperti efek Fade & Scale lambat pada Desktop, atau Slide-up pada Mobile)."
                 },
                 {
                     "name": "outEffect",
                     "type": "AnimationEffect?",
                     "default": "null",
-                    "desc": "Custom efek animasi keluar. Jika dikosongkan, sistem otomatis memberikan efek keluar natural yang sejalan dengan posisi asalnya."
+                    "desc": "Menentukan efek animasi kustom saat popup/widget ditutup (keluar) dari layar. Jika dibiarkan null, sistem akan otomatis me-rewind animasi inEffect, atau menggunakan animasi penutupan bawaan jika keduanya null."
                 },
                 {
                     "name": "maxPopupWidth",
