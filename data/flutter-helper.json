@@ -1088,92 +1088,133 @@
         {
             "id": "ToastWidget",
             "group": "Alert",
-            "name": "Toast / Snackbar",
+            "name": "Premium Overlay Toast",
             "icon": "fa-solid fa-message",
-            "description": "Widget utilitas statis untuk menampilkan notifikasi mengambang (snackbar/toast) di layar dengan desain modern yang dibalut bayangan halus (drop shadow). Memiliki durasi tayang otomatis selama 3 detik dan mensupport berbagai indikasi warna seperti sukses, error, atau peringatan. Menggantikan antarmuka SnackBar default material agar terlihat lebih premium.",
+            "description": "Widget utilitas tingkat tinggi untuk menampilkan notifikasi mengambang (toast) secara independen di atas seluruh UI menggunakan sistem Overlay. Sepenuhnya lepas dari batasan Scaffold/SnackBar bawaan, mendukung penempatan posisi bebas (9 arah), responsif terhadap ukuran layar, serta terintegrasi dengan AnimationWidget untuk transisi masuk dan keluar yang super mulus.",
             "mandatoryProps": [
                 {
                     "name": "context",
                     "type": "BuildContext",
                     "default": "",
-                    "desc": "Konteks aplikasi tempat notifikasi ini akan ditempelkan. Wajib memiliki hierarki induk Scaffold agar ScaffoldMessenger dapat menemukan tempat untuk merender SnackBar."
+                    "desc": "Konteks aplikasi tempat notifikasi ini akan ditempelkan. Tidak lagi membutuhkan Scaffold, cukup berada di bawah hierarki MaterialApp karena menggunakan Overlay."
                 },
                 {
                     "name": "message",
                     "type": "String",
                     "default": "",
-                    "desc": "Teks pesan yang ingin Anda tampilkan kepada pengguna."
+                    "desc": "Teks pesan yang ingin ditampilkan. (Parameter ini wajib untuk method shortcut seperti success, info, warning, danger)."
+                },
+                {
+                    "name": "child",
+                    "type": "Widget",
+                    "default": "",
+                    "desc": "Komponen UI kustom penuh. (Parameter ini wajib khusus untuk pemanggilan base method show() jika tidak menggunakan shortcut berbasis string)."
                 }
             ],
             "optionalProps": [
                 {
-                    "name": "isError",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Jika true, warna latar belakang akan berubah menjadi merah tua dengan ikon silang (error), dirancang untuk memberikan informasi operasi yang gagal."
+                    "name": "position",
+                    "type": "ToastPosition",
+                    "default": "ToastPosition.bottom",
+                    "desc": "Menentukan lokasi munculnya toast. Memiliki 9 opsi letak (leftTop, top, rightTop, leftCenter, center, rightCenter, leftBottom, bottom, rightBottom)."
                 },
                 {
-                    "name": "isWarning",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Jika true, warna latar belakang akan berubah menjadi oranye dengan ikon peringatan, ditujukan untuk memperingatkan pengguna atas tindakan tertentu."
+                    "name": "duration",
+                    "type": "Duration",
+                    "default": "Duration(seconds: 3)",
+                    "desc": "Menentukan durasi tayang toast sebelum menghilang secara otomatis. Properti ini hanya berlaku jika autoClose bernilai true."
                 },
                 {
-                    "name": "icon",
-                    "type": "IconData?",
+                    "name": "autoClose",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Jika true, toast akan menghilang secara otomatis setelah durasi tertentu. Jika false, toast akan tampil permanen di layar hingga pengguna menutupnya secara manual melalui tombol close."
+                },
+                {
+                    "name": "inEffect",
+                    "type": "AnimationEffect?",
                     "default": "null",
-                    "desc": "Menimpa (override) ikon default yang ditampilkan. Jika null, sistem akan mengotomatiskan penempatan ikon berdasarkan state error/warning/success."
+                    "desc": "Custom efek animasi masuk. Jika dikosongkan, sistem akan otomatis memilihkan efek terbaik berdasarkan posisi (misal: posisi 'top' akan menggunakan 'slideDown')."
+                },
+                {
+                    "name": "outEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Custom efek animasi keluar. Jika dikosongkan, sistem otomatis memberikan efek keluar natural yang sejalan dengan posisi asalnya."
                 }
             ],
             "additionalInfo": {
-                "dependencies": "google_fonts"
+                "dependencies": "google_fonts, animation_widget"
             },
             "methods": [
                 {
                     "name": "show",
                     "type": "static void",
                     "default": "",
-                    "desc": "Method utama untuk menampilkan toast. Berisi keseluruhan logika pemanggilan ScaffoldMessenger dan styling Container."
+                    "desc": "Method dasar (Base API) untuk merender custom widget apapun secara melayang dengan dukungan penuh animasi dan timer."
                 },
                 {
                     "name": "success",
                     "type": "static void",
                     "default": "",
-                    "desc": "Shortcut/Syntactic sugar untuk memanggil toast sukses dengan latar abu-abu gelap dan ikon ceklis warna oranye."
+                    "desc": "Shortcut pemanggil toast dengan latar hijau terang dan ikon ceklis untuk indikasi operasi berhasil."
                 },
                 {
-                    "name": "error",
+                    "name": "info",
                     "type": "static void",
                     "default": "",
-                    "desc": "Shortcut/Syntactic sugar untuk memanggil toast dengan mode isError = true secara instan."
+                    "desc": "Shortcut pemanggil toast dengan latar biru terang dan ikon info untuk menyampaikan informasi netral/panduan."
                 },
                 {
                     "name": "warning",
                     "type": "static void",
                     "default": "",
-                    "desc": "Shortcut/Syntactic sugar untuk memanggil toast dengan mode isWarning = true secara instan."
+                    "desc": "Shortcut pemanggil toast dengan latar oranye dan ikon peringatan untuk indikasi peringatan kewaspadaan."
+                },
+                {
+                    "name": "danger",
+                    "type": "static void",
+                    "default": "",
+                    "desc": "Shortcut pemanggil toast dengan latar merah terang dan ikon silang/error untuk indikasi kegagalan operasi sistem."
+                },
+                {
+                    "name": "dismissCurrentToast",
+                    "type": "static Future<void>",
+                    "default": "",
+                    "desc": "Menutup toast yang sedang aktif secara elegan dengan menunggu animasi outEffect selesai sebelum menghapus memori Overlay."
+                },
+                {
+                    "name": "hideCurrentToast",
+                    "type": "static void",
+                    "default": "",
+                    "desc": "Menghapus toast secara instan tanpa animasi (Digunakan secara internal untuk mencegah penumpukan/spam saat dipanggil berkali-kali)."
                 }
             ],
             "behaviors": [
                 {
-                    "name": "Queue Cancellation",
-                    "type": "UI Lifecycle",
+                    "name": "Smart Responsive Fallback",
+                    "type": "UI Layout",
                     "default": "",
-                    "desc": "Setiap kali toast dipanggil, sistem akan mengeksekusi `scaffoldMessenger.hideCurrentSnackBar()` secara otomatis. Hal ini mencegah terjadinya tumpukan antrian (queue) notifikasi yang terlalu panjang saat pengguna menekan tombol berkali-kali dengan cepat."
+                    "desc": "Jika aplikasi dijalankan di layar sempit (mobile/di bawah 600px), posisi sudut ekstrim (seperti leftTop atau rightBottom) akan otomatis dinormalkan ke tengah (top atau bottom) agar simetris dan tidak memotong layar."
                 },
                 {
-                    "name": "Fixed Text Color Constraint",
-                    "type": "Styling",
+                    "name": "Intelligent Auto-Animation",
+                    "type": "Animation Defaulting",
                     "default": "",
-                    "desc": "Tanpa mempedulikan tema Brightness perangkat saat ini (Light/Dark mode), warna teks selalu diset menjadi Colors.white. Hal ini karena latar belakang bawaan toast yang dirender selalu berwarna gelap atau solid tajam (Merah/Oranye/Abu Tua)."
+                    "desc": "Sistem mendeteksi posisi `ToastPosition`. Jika ditaruh di atas, default animasinya akan merosot dari atas. Jika ditaruh di tengah, defaultnya menggunakan Zoom. Mengurangi kebutuhan menulis kode animasi manual berulang kali."
+                },
+                {
+                    "name": "Overlay Replacement (Anti-Spam)",
+                    "type": "Memory Management",
+                    "default": "",
+                    "desc": "Mencegah fenomena antrean notifikasi panjang (Queue Spam). Jika tombol diklik 10 kali, toast sebelumnya langsung dihapus dan diganti dengan toast paling baru, memastikan UI tidak ter-block."
                 }
             ],
             "specialNotes": [
-                "Best Practice: Manfaatkan static method `success`, `error`, dan `warning` dibandingkan memanggil `show` secara manual dengan parameter flag booleannya agar kode Anda lebih mudah dibaca (clean code).",
-                "Limitation: Modifikasi durasi tayang di-hardcode ke `Duration(seconds: 3)`. Tidak bisa diubah via parameter saat memanggil API saat ini tanpa memodifikasi class internalnya.",
-                "Peringatan: Pastikan `context` yang Anda gunakan berada di bawah `Scaffold` dalam widget tree. Context dari level paling atas (seperti sebelum MaterialApp/Scaffold) akan memicu exception dari ScaffoldMessenger."
+                "Arsitektur Baru: Sepenuhnya membuang ScaffoldMessenger bawaan Flutter. Kini menggunakan OverlayEntry sehingga toast melayang absolut di koordinat layar tanpa terpengaruh padding keyboard atau bottom navigation bar.",
+                "Bisa digunakan untuk memunculkan layout custom yang kompleks dengan memanggil `ToastWidget.show()` dan menyuplai parameter `child`."
             ],
-            "code": "try {\n  await api.saveData();\n  ToastWidget.success(context, 'Data berhasil disimpan ke database.');\n} catch (e) {\n  ToastWidget.error(context, 'Koneksi gagal. Periksa jaringan Anda.');\n}"
+            "code": "// Contoh Pemanggilan Cepat (Shortcut API)\ntry {\n  await api.saveData();\n  ToastWidget.success(\n    context, \n    'Data berhasil disimpan ke database!',\n    position: ToastPosition.top,\n  );\n} catch (e) {\n  ToastWidget.danger(\n    context, \n    'Gagal menyimpan data.',\n    inEffect: AnimationEffect.elasticZoomIn(),\n  );\n}\n\n// Contoh Pemanggilan Custom Widget\nToastWidget.show(\n  context,\n  position: ToastPosition.center,\n  child: Container(\n    padding: const EdgeInsets.all(16),\n    color: Colors.purple,\n    child: const Text('Custom Toast Melayang!', style: TextStyle(color: Colors.white)),\n  ),\n);"
         },
         {
             "id": "SmartInfoWidget",
