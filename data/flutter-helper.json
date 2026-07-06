@@ -2580,13 +2580,13 @@
             "group": "Layout",
             "name": "Smart Flexible List View",
             "icon": "fa-solid fa-list-ul",
-            "description": "Widget helper arsitektural untuk menangani list dinamis tanpa memicu error unbounded height. Secara cerdas beradaptasi dengan sisa ruang layout (menggunakan Flexible) dan merender UI secara efisien melalui lazy loading.",
+            "description": "Widget helper arsitektural untuk menangani list dinamis tanpa memicu error unbounded height. Beradaptasi dengan sisa ruang layout (menggunakan Flexible) dan mengontrol perakitan (mounting) UI di layar.",
             "mandatoryProps": [
                 {
                     "name": "children",
                     "type": "List<Widget>",
                     "default": "",
-                    "desc": "Kumpulan widget yang akan dirender di dalam list. Walaupun menerima List lengkap, sistem akan tetap memprosesnya secara lazy loading."
+                    "desc": "Kumpulan widget yang akan dirender di dalam list. Perhatikan: karena menerima List yang sudah terinstansiasi, komponen ini lebih cocok untuk data dalam jumlah kecil-menengah, bukan infinite data."
                 }
             ],
             "optionalProps": [
@@ -2634,13 +2634,26 @@
                 }
             ],
             "additionalInfo": {},
-            "methods": [],
+            "methods": [
+                {
+                    "name": "Scroll to Top",
+                    "type": "ScrollAction",
+                    "default": "",
+                    "desc": "Injeksi ScrollController dari parent, lalu panggil: controller.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);"
+                },
+                {
+                    "name": "Scroll to Bottom",
+                    "type": "ScrollAction",
+                    "default": "",
+                    "desc": "Pastikan UI ter-render sempurna, lalu panggil dari parent: controller.animateTo(controller.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);"
+                }
+            ],
             "behaviors": [
                 {
                     "name": "Smart Lazy Assembly",
                     "type": "Render Logic",
                     "default": "",
-                    "desc": "Mendeteksi secara mandiri keberadaan parameter separator. Sistem akan mengeksekusi ListView.builder atau separated untuk menghemat konsumsi memori alih-alih merender seluruh children sekaligus di awal."
+                    "desc": "Mendeteksi secara mandiri keberadaan parameter separator. Sistem akan mengeksekusi ListView.builder atau separated untuk merender (mount) item hanya ketika masuk ke dalam viewport layar."
                 },
                 {
                     "name": "Loose Constraint Adaptation",
@@ -2651,23 +2664,24 @@
             ],
             "specialNotes": [
                 "Jangan pernah membungkus widget ini dengan Padding dari luar. Selalu gunakan parameter padding internal yang disediakan agar sensitivitas ujung scroll tetap responsif.",
-                "Pastikan isFlexible = false jika widget ini diletakkan langsung di tempat yang tidak memiliki batas constraints (seperti langsung di dalam body Scaffold tanpa dibungkus Column)."
+                "Pastikan isFlexible = false jika widget ini diletakkan langsung di tempat yang tidak memiliki batas constraints (seperti langsung di dalam body Scaffold tanpa dibungkus Column).",
+                "Peringatan Memori: Penggunaan parameter 'children: List<Widget>' berarti seluruh widget tersebut sudah dibangun (instantiated) di memori RAM oleh parent. ListView.builder di dalam widget ini hanya menunda proses render visual (mounting), BUKAN menghemat memori instansiasi."
             ],
-            "code": "ListViewWidget(\n  separator: const SizedBox(height: 12),\n  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),\n  children: const [\n    ItemWidget(title: 'Data 1'),\n    ItemWidget(title: 'Data 2'),\n    ItemWidget(title: 'Data 3'),\n  ],\n)"
+            "code": "// Di dalam State class Parent Widget:\n// final ScrollController _listController = ScrollController();\n//\n// Aksi Tombol:\n// ElevatedButton(\n//   onPressed: () => _listController.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut),\n//   child: const Text('Kembali ke Atas'),\n// )\n\nListViewWidget(\n  controller: _listController,\n  separator: const SizedBox(height: 12),\n  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),\n  children: const [\n    ItemWidget(title: 'Data 1'),\n    ItemWidget(title: 'Data 2'),\n    ItemWidget(title: 'Data 3'),\n  ],\n)"
         },
         {
             "id": "CardWidget",
             "group": "Widget",
             "name": "Card Premium",
             "icon": "fa-solid fa-address-card",
-            "description": "Widget pengelola tata letak (container) tingkat lanjut yang mengadaptasi desain enterprise ke dalam bentuk komponen inline (menyatu dengan halaman). Menawarkan efek bayangan meluas yang elegan, batas melengkung, serta struktur layout bawaan yang cerdas (Header, Scrollable Body, dan Footer). Komponen ini bersifat stateless dan murni sebagai penyusun layout, sehingga manajemen state (seperti loading atau visibilitas) sepenuhnya dikendalikan oleh parent widget.",
+            "description": "Widget pengelola tata letak (container) tingkat lanjut yang mengadaptasi desain enterprise ke dalam bentuk komponen inline. Menawarkan efek bayangan meluas yang elegan, batas melengkung, serta struktur layout bawaan yang cerdas (Header, Scrollable/Fixed Body, dan Footer). Sangat ideal sebagai fondasi formulir atau penyajian data kompleks.",
             "mandatoryProps": [],
             "optionalProps": [
                 {
                     "name": "child",
                     "type": "Widget?",
                     "default": "null",
-                    "desc": "Konten utama yang akan dirender di bagian tengah (body) Card. Konten ini dibungkus otomatis dengan padding 24.0 dan SingleChildScrollView agar terhindar dari isu overflow."
+                    "desc": "Konten utama yang akan dirender di bagian tengah (body) Card. Konten ini otomatis diberikan padding 24.0."
                 },
                 {
                     "name": "title",
@@ -2698,6 +2712,12 @@
                     "type": "double?",
                     "default": "null",
                     "desc": "Menentukan tinggi absolut dari Card. Jika diisi, area body akan mengisi ruang kosong (flex fit tight) dan mendorong Footer ke posisi paling bawah."
+                },
+                {
+                    "name": "isScrollable",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Secara default, konten akan dibungkus oleh SingleChildScrollView untuk mencegah isu overflow (cocok untuk Column/Form biasa). Set menjadi false jika child Anda adalah ListView/GridView yang sudah memiliki scroll engine mandiri untuk menghindari konflik nested scroll."
                 }
             ],
             "additionalInfo": {
@@ -2717,13 +2737,19 @@
                     "type": "UI Filter",
                     "default": "",
                     "desc": "Garis pemisah (Divider) antara Header, Body, dan Footer hanya akan dirender secara pintar jika elemen data pembentuknya memang tersedia/aktif."
+                },
+                {
+                    "name": "Scroll Engine Adaptation",
+                    "type": "Layout Flow",
+                    "default": "",
+                    "desc": "Widget mendeteksi state isScrollable untuk membebaskan scroll mandiri pada child bertipe ListView, sehingga terhindar dari Unbounded Height Exception (RenderBox Error) yang umum terjadi di Flutter saat menumpuk scrollview."
                 }
             ],
             "specialNotes": [
                 "Best Practice: Gunakan CardWidget sebagai komponen kontainer terstruktur untuk form atau informasi detail pada layar yang luas.",
                 "Stateless Design: Komponen ini tidak memiliki internal loading state. Semua logika loading (misalnya pada tombol di footerActions) harus dikelola oleh parent widget melalui state management."
             ],
-            "code": "CardWidget(\n  title: 'Edit Detail',\n  child: const Text('Konten di sini'),\n  footerActions: [\n    TextButton(onPressed: () {}, child: const Text('Batal')),\n    FilledButton(onPressed: () {}, child: const Text('Simpan')),\n  ],\n)"
+            "code": "// 1. Mode Standar (Dengan Auto Scroll)\nCardWidget(\n  title: 'Edit Detail',\n  child: Column(\n    children: [ /* Banyak form input */ ],\n  ),\n  footerActions: [\n    TextButton(onPressed: () {}, child: const Text('Batal')),\n    FilledButton(onPressed: () {}, child: const Text('Simpan')),\n  ],\n)\n\n// 2. Mode Fix (Mematikan Scroll agar sinkron dengan ListView)\nCardWidget(\n  title: 'Daftar Karyawan',\n  isScrollable: false, // MATIKAN AGAR TIDAK KONFLIK\n  child: ListView.separated(\n    shrinkWrap: true,\n    itemCount: 10,\n    itemBuilder: (ctx, i) => Text('Karyawan $i'),\n    separatorBuilder: (ctx, i) => Divider(),\n  ),\n)"
         },
         {
             "id": "socket-helper-chunk-ecosystem",
