@@ -1233,7 +1233,7 @@
             "group": "Widget",
             "name": "Smart Info",
             "icon": "fa-solid fa-list-ul",
-            "description": "Widget penampil informasi/biodata dinamis tingkat lanjut. Mampu mendeteksi tipe data (termasuk Widget) secara cerdas, mendukung orientasi vertikal dan horizontal dengan opsi reverse, perataan teks dan widget yang sangat fleksibel, fitur truncate (pemotongan teks) otomatis, manipulasi skala rasio tanpa padding absolut, serta dilengkapi dengan sistem pembagi (Divider) adaptif antar item. Dirancang untuk langsung disematkan ke dalam container atau layout apapun dengan rapi.",
+            "description": "Widget penampil informasi/biodata dinamis tingkat lanjut. Mampu mendeteksi tipe data (termasuk Widget) secara cerdas, mendukung orientasi vertikal dan horizontal dengan opsi reverse, perataan teks dan widget yang sangat fleksibel, fitur truncate (pemotongan teks) otomatis, manipulasi skala rasio tanpa padding absolut, serta dilengkapi dengan sistem pembagi (Divider) adaptif yang mendukung style garis lurus, putus-putus, maupun titik-titik secara native tanpa package tambahan.",
             "mandatoryProps": [
                 {
                     "name": "data",
@@ -1277,7 +1277,7 @@
                     "name": "spacing",
                     "type": "double",
                     "default": "12.0",
-                    "desc": "Jarak spasi vertikal antar item data di dalam list. Jika showDivider aktif, nilai ini akan menjadi tinggi total area Divider."
+                    "desc": "Jarak spasi vertikal antar item data di dalam list. Jika showDivider aktif, nilai ini akan menjadi tinggi total (ruang kosong) area Divider."
                 },
                 {
                     "name": "scale",
@@ -1322,6 +1322,12 @@
                     "desc": "Menentukan apakah garis pemisah (Divider) akan ditampilkan di antara setiap item data."
                 },
                 {
+                    "name": "dividerStyle",
+                    "type": "SmartDividerStyle",
+                    "default": "SmartDividerStyle.solid",
+                    "desc": "Menentukan jenis garis pembagi. Enum yang didukung: solid (garis lurus), dashed (garis putus-putus proporsional), dotted (titik-titik bulat)."
+                },
+                {
                     "name": "dividerColor",
                     "type": "Color?",
                     "default": "null",
@@ -1331,10 +1337,12 @@
                     "name": "dividerThickness",
                     "type": "double",
                     "default": "1.0",
-                    "desc": "Mengatur tingkat ketebalan dari garis pemisah (Divider)."
+                    "desc": "Mengatur tingkat ketebalan dari garis pemisah (Divider). Skala akan otomatis mengatur ukuran dashed dan dotted agar tetap rapi."
                 }
             ],
-            "additionalInfo": {},
+            "additionalInfo": {
+                "dependencies": "Tidak memerlukan package eksternal. Sepenuhnya dibangun menggunakan core Canvas native Flutter demi performa rendering maksimal."
+            },
             "methods": [],
             "behaviors": [
                 {
@@ -1366,14 +1374,21 @@
                     "type": "Layout Logic",
                     "default": "",
                     "desc": "Jika showDivider aktif, susunan widget tree akan otomatis menyisipkan komponen Divider dengan efisiensi tinggi pada daftar elemen tanpa menggunakan padding berlebih, menjaga performa rendering tetap optimal."
+                },
+                {
+                    "name": "Native Render Pipeline",
+                    "type": "Performance Optimization",
+                    "default": "",
+                    "desc": "Garis pembagi dashed dan dotted dirender langsung melalui CustomPainter dan operasi matematika canvas tingkat rendah, menghemat resource memori secara drastis dibandingkan me-render deretan widget statis secara berulang."
                 }
             ],
             "specialNotes": [
                 "Jika label bernilai null atau string kosong (''), ruang label akan otomatis dihilangkan sepenuhnya tanpa meninggalkan sisa spasi kosong.",
                 "Untuk penyelarasan data bentuk grid/tabel menggunakan layout horizontal, sangat disarankan mendefinisikan nilai `labelWidth`.",
-                "Komponen pembagi (Divider) tidak akan dirender di bawah item paling terakhir dalam daftar data."
+                "Komponen pembagi (Divider) tidak akan dirender di bawah item paling terakhir dalam daftar data.",
+                "Ukuran dan rentang spasi pada divider (dashed/dotted) dihitung otomatis secara proporsional berdasarkan `dividerThickness` dan `scale`."
             ],
-            "code": "SmartInfoWidget(\n  layout: Axis.horizontal,\n  labelWidth: 100,\n  spacing: 16,\n  scale: 1.1,\n  valueMaxLines: 2,\n  showDivider: true,\n  dividerThickness: 1.5,\n  horizontalVerticalAlign: CrossAxisAlignment.center,\n  data: [\n    const InfoItemWidget(label: 'Nama Lengkap', value: 'John Doe'),\n    const InfoItemWidget(label: 'Status Aktif', value: true),\n    InfoItemWidget(label: 'Tindakan', value: ElevatedButton(onPressed: () {}, child: const Text('Edit'))),\n    const InfoItemWidget(label: 'Alamat', value: 'Jalan Pahlawan Kemerdekaan No. 123, Blok C, Jakarta Selatan, 12345'),\n  ],\n)"
+            "code": "SmartInfoWidget(\n  layout: Axis.horizontal,\n  labelWidth: 100,\n  spacing: 16,\n  scale: 1.1,\n  valueMaxLines: 2,\n  showDivider: true,\n  dividerStyle: SmartDividerStyle.dashed,\n  dividerThickness: 1.5,\n  horizontalVerticalAlign: CrossAxisAlignment.center,\n  data: [\n    const InfoItemWidget(label: 'Nama Lengkap', value: 'John Doe'),\n    const InfoItemWidget(label: 'Status Aktif', value: true),\n    InfoItemWidget(label: 'Tindakan', value: ElevatedButton(onPressed: () {}, child: const Text('Edit'))),\n    const InfoItemWidget(label: 'Alamat', value: 'Jalan Pahlawan Kemerdekaan No. 123, Blok C, Jakarta Selatan, 12345'),\n  ],\n)"
         },
         {
             "id": "AutoRetryImageWidget",
