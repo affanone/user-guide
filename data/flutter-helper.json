@@ -826,6 +826,114 @@
             "code": "Column(\n  children: [\n    NoteWidget.info('Silakan lengkapi data profil Anda sebelum melanjutkan.'),\n    NoteWidget.warning('Password yang Anda masukkan kurang kuat.', showIcon: true),\n    NoteWidget.danger('Gagal terhubung ke server database.'),\n    NoteWidget.success('Data berhasil disimpan secara permanen.'),\n    \n    // Penggunaan constructor manual (custom)\n    NoteWidget(\n      message: 'Pesan dengan warna custom',\n      color: Colors.purple,\n      icon: Icons.lightbulb_outline,\n    ),\n  ],\n)"
         },
         {
+            "id": "SmartTipWidget",
+            "group": "Widget",
+            "name": "Smart Tip Widget",
+            "icon": "fa-solid fa-lightbulb",
+            "description": "Widget pengingat, tips, atau panduan onboarding sebaris (inline) berdesain premium yang dilengkapi sistem persistensi lokal otomatis (SharedPreferences). Menggunakan mekanisme penutupan pintar 2 tahap (animasi transisi disusul penciutan ruang layout secara gradual). Mengisolasi penyimpanan menggunakan namespace internal khusus agar aman dari benturan key data.",
+            "mandatoryProps": [
+                {
+                    "name": "id",
+                    "type": "String",
+                    "default": "",
+                    "desc": "ID unik penanda state penyimpanan lokal. Berfungsi sebagai key pembeda utama di SharedPreferences agar status penutupan permanen tidak saling tumpang tindih antar-widget."
+                },
+                {
+                    "name": "message (atau child)",
+                    "type": "String? | Widget?",
+                    "default": "null",
+                    "desc": "Konten utama widget. Anda wajib menyuplai salah satu. Gunakan message untuk teks string sederhana, atau child jika layout tips memerlukan struktur kompleks (misal RichText atau gambar)."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "icon",
+                    "type": "IconData?",
+                    "default": "Icons.lightbulb_outline_rounded",
+                    "desc": "Ikon dekoratif di sudut kiri atas untuk merepresentasikan jenis petunjuk atau ide informasi."
+                },
+                {
+                    "name": "themeColor",
+                    "type": "Color",
+                    "default": "Colors.blue",
+                    "desc": "Warna tema utama yang akan diaplikasikan pada garis aksen vertikal kiri, warna ikon, dan teks tombol aksi interaksi."
+                },
+                {
+                    "name": "showDismissButton",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah tombol interaksi penutupan permanen ('Jangan Tampilkan Lagi') dimunculkan atau disembunyikan dari layar."
+                },
+                {
+                    "name": "dismissText",
+                    "type": "String",
+                    "default": "'Jangan Tampilkan Lagi'",
+                    "desc": "String label teks kustom untuk tombol penutup widget."
+                },
+                {
+                    "name": "onDismissed",
+                    "type": "VoidCallback?",
+                    "default": "null",
+                    "desc": "Callback event yang dieksekusi setelah rangkaian proses transisi outEffect dan penciutan ukuran selesai sepenuhnya. Sangat ideal untuk memicu logika eksternal lanjutan."
+                },
+                {
+                    "name": "inEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Efek transisi animasi masuk saat widget pertama kali dirender. Jika null (bawaan), widget akan langsung muncul seketika secara snappy tanpa animasi gerakan."
+                },
+                {
+                    "name": "outEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Efek transisi animasi keluar saat tombol aksi diklik, berjalan sepersekian detik tepat sebelum layout utama diruntuhkan oleh AnimatedSize."
+                }
+            ],
+            "additionalInfo": {
+                "dependencies": "shared_preferences, AnimationWidget, AnimationEffect"
+            },
+            "methods": [
+                {
+                    "name": "resetTip",
+                    "type": "static Future<bool>",
+                    "default": "",
+                    "desc": "Fungsi utilitas untuk menghapus status penutupan permanen pada satu ID spesifik, sehingga tips terkait dapat kembali tampil di layar pengguna."
+                },
+                {
+                    "name": "resetAllTips",
+                    "type": "static Future<void>",
+                    "default": "",
+                    "desc": "Fungsi utilitas global untuk menyapu bersih seluruh pendaftaran data SmartTipWidget di dalam SharedPreferences guna mengembalikan seluruh panduan aplikasi ke kondisi awal."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Secure Local Namespacing",
+                    "type": "Data Persistence",
+                    "default": "",
+                    "desc": "Secara otomatis membungkus ID parameter ke dalam format prefix internal '_respo_internal_smart_tip_secure_ns_:$id' untuk mengamankan data lokal dari risiko tumpang tindih atau manipulasi key luar."
+                },
+                {
+                    "name": "2-Step Intelligent Disappearance",
+                    "type": "UI Layout / Animation",
+                    "default": "",
+                    "desc": "Saat tombol diklik, widget memainkan outEffect terlebih dahulu, disusul eksekusi AnimatedSize selama 300ms dengan kurva easeInOutCubic untuk meruntuhkan sisa ruang kosong kontainer secara lembut tanpa menyentak elemen UI sekitar."
+                },
+                {
+                    "name": "Asynchronous Anti-Flicker State",
+                    "type": "State Management",
+                    "default": "",
+                    "desc": "Membaca kondisi SharedPreferences di fase awal initState. Selama status pemuatan asinkronus berjalan, widget menahan diri untuk tidak merender visual (mengembalikan ukuran kosong) guna mengeliminasi efek kedipan layar (flicker)."
+                }
+            ],
+            "specialNotes": [
+                "Best Practice: Selalu berikan ID penamaan yang sangat spesifik dan deskriptif (contoh: 'form_password_edit_v1') guna mempermudah pelacakan state dan menghindari duplikasi data tak sengaja.",
+                "Design Note: Parameter inEffect sengaja diatur default null untuk menjaga stabilitas frame-rate halaman saat pertama kali dimuat. Namun, disarankan memberikan outEffect yang lembut (seperti AnimationEffect.fadeOut()) untuk menambah kesan premium saat interaksi klik terjadi.",
+                "QA Support: Sangat disarankan untuk menyematkan method SmartTipWidget.resetAllTips() pada menu pengaturan pengembang (Developer Options/Debug Menu) di dalam aplikasi untuk mempermudah proses pengujian ulang alur onboarding oleh tim QA."
+            ],
+            "code": "Column(\n  children: [\n    // 1. Penggunaan standar dengan teks pesan\n    SmartTipWidget(\n      id: 'form_profile_hint_tip',\n      message: 'Biarkan form ini kosong jika Anda tidak melakukan perubahan data.',\n      themeColor: Colors.amber.shade700,\n      icon: Icons.info_outline_rounded,\n      outEffect: AnimationEffect.fadeOut(),\n    ),\n\n    // 2. Menyembunyikan tombol dismissal (hanya informasi statis)\n    SmartTipWidget(\n      id: 'permanent_info_banner',\n      message: 'Server akan maintenance pada pukul 23.00 WIB.',\n      showDismissButton: false,\n    ),\n\n    // 3. Menggunakan kustom konten widget (Child)\n    SmartTipWidget(\n      id: 'rich_onboarding_tip',\n      child: Row(\n        children: [\n          Text('Fitur baru telah tersedia! '),\n          TextButton(onPressed: () {}, child: Text('Pelajari Selengkapnya')),\n        ],\n      ),\n    ),\n  ],\n)"
+        },
+        {
             "id": "PillWidget",
             "group": "Widget",
             "name": "Pill Badge Widget",
@@ -2571,19 +2679,13 @@
                     "name": "headerActions",
                     "type": "List<Widget>?",
                     "default": "null",
-                    "desc": "Kumpulan aksi/ikon tambahan yang diletakkan pada Header, berada persis sebelum tombol Close. Ideal untuk menaruh IconButton atau PopupMenuButton."
+                    "desc": "Kumpulan aksi/ikon tambahan yang diletakkan pada Header, dirender berjejer di sisi kanan. Ideal untuk menaruh IconButton atau PopupMenuButton."
                 },
                 {
                     "name": "footerActions",
                     "type": "List<Widget>?",
                     "default": "null",
                     "desc": "Kumpulan komponen tombol atau elemen custom yang akan dirender di area Footer menggunakan Wrap untuk mencegah overflow. Alignment otomatis terfokus ke kanan."
-                },
-                {
-                    "name": "onClose",
-                    "type": "VoidCallback?",
-                    "default": "null",
-                    "desc": "Callback sinkron yang dipicu ketika ikon tombol Close (X) di area Header ditekan. Keberadaan parameter ini (tidak null) secara otomatis akan memunculkan tombol Close."
                 },
                 {
                     "name": "width",
@@ -2621,7 +2723,7 @@
                 "Best Practice: Gunakan CardWidget sebagai komponen kontainer terstruktur untuk form atau informasi detail pada layar yang luas.",
                 "Stateless Design: Komponen ini tidak memiliki internal loading state. Semua logika loading (misalnya pada tombol di footerActions) harus dikelola oleh parent widget melalui state management."
             ],
-            "code": "CardWidget(\n  title: 'Edit Detail',\n  onClose: () => print('Close pressed'),\n  child: const Text('Konten di sini'),\n  footerActions: [\n    TextButton(onPressed: () {}, child: const Text('Batal')),\n    FilledButton(onPressed: () {}, child: const Text('Simpan')),\n  ],\n)"
+            "code": "CardWidget(\n  title: 'Edit Detail',\n  child: const Text('Konten di sini'),\n  footerActions: [\n    TextButton(onPressed: () {}, child: const Text('Batal')),\n    FilledButton(onPressed: () {}, child: const Text('Simpan')),\n  ],\n)"
         },
         {
             "id": "socket-helper-chunk-ecosystem",
