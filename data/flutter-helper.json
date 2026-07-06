@@ -2559,43 +2559,43 @@
                     "name": "child",
                     "type": "Widget?",
                     "default": "null",
-                    "description": "Konten utama yang akan dirender di bagian tengah (body) Card. Konten ini dibungkus otomatis dengan padding 24.0 dan SingleChildScrollView agar terhindar dari isu overflow."
+                    "desc": "Konten utama yang akan dirender di bagian tengah (body) Card. Konten ini dibungkus otomatis dengan padding 24.0 dan SingleChildScrollView agar terhindar dari isu overflow."
                 },
                 {
                     "name": "title",
                     "type": "String?",
                     "default": "null",
-                    "description": "Teks yang akan ditampilkan pada sisi kiri atas Header Card dengan ketebalan teks semi-bold."
+                    "desc": "Teks yang akan ditampilkan pada sisi kiri atas Header Card dengan ketebalan teks semi-bold."
                 },
                 {
                     "name": "headerActions",
                     "type": "List<Widget>?",
                     "default": "null",
-                    "description": "Kumpulan aksi/ikon tambahan yang diletakkan pada Header, berada persis sebelum tombol Close. Ideal untuk menaruh IconButton atau PopupMenuButton."
+                    "desc": "Kumpulan aksi/ikon tambahan yang diletakkan pada Header, berada persis sebelum tombol Close. Ideal untuk menaruh IconButton atau PopupMenuButton."
                 },
                 {
                     "name": "footerActions",
                     "type": "List<Widget>?",
                     "default": "null",
-                    "description": "Kumpulan komponen tombol atau elemen custom yang akan dirender di area Footer. Jika diisi, footer akan otomatis tampil dengan pengaturan alignment ke arah kanan."
+                    "desc": "Kumpulan komponen tombol atau elemen custom yang akan dirender di area Footer menggunakan Wrap untuk mencegah overflow. Alignment otomatis terfokus ke kanan."
                 },
                 {
                     "name": "onClose",
                     "type": "VoidCallback?",
                     "default": "null",
-                    "description": "Callback sinkron yang dipicu ketika ikon tombol Close (X) di area Header ditekan."
+                    "desc": "Callback sinkron yang dipicu ketika ikon tombol Close (X) di area Header ditekan. Keberadaan parameter ini (tidak null) secara otomatis akan memunculkan tombol Close."
                 },
                 {
                     "name": "width",
                     "type": "double?",
                     "default": "null",
-                    "description": "Menentukan lebar absolut (fixed width) dari Card. Jika null, Card akan menyesuaikan lebar parent."
+                    "desc": "Menentukan lebar absolut (fixed width) dari Card. Jika null, Card akan menyesuaikan lebar parent."
                 },
                 {
                     "name": "height",
                     "type": "double?",
                     "default": "null",
-                    "description": "Menentukan tinggi absolut dari Card. Jika diisi, area body akan mengisi ruang kosong (flex fit tight) dan mendorong Footer ke posisi paling bawah."
+                    "desc": "Menentukan tinggi absolut dari Card. Jika diisi, area body akan mengisi ruang kosong (flex fit tight) dan mendorong Footer ke posisi paling bawah."
                 }
             ],
             "additionalInfo": {
@@ -2607,19 +2607,21 @@
                 {
                     "name": "Dynamic Layout Fitting",
                     "type": "Layout Strategy",
-                    "description": "Jika `height` bernilai null, Card membungkus kontennya (MainAxisSize.min). Jika `height` ditentukan, Card akan merentangkan diri (MainAxisSize.max) memastikan Footer selalu menempel di bawah."
+                    "default": "",
+                    "desc": "Jika height bernilai null, Card membungkus kontennya (MainAxisSize.min). Jika height ditentukan, Card akan merentangkan diri (MainAxisSize.max) memastikan Footer selalu menempel di bawah."
                 },
                 {
                     "name": "Smart Divider Rendering",
                     "type": "UI Filter",
-                    "description": "Garis pemisah (Divider) antara Header, Body, dan Footer hanya akan dirender secara pintar jika elemen yang bersangkutan memang tersedia/aktif."
+                    "default": "",
+                    "desc": "Garis pemisah (Divider) antara Header, Body, dan Footer hanya akan dirender secara pintar jika elemen data pembentuknya memang tersedia/aktif."
                 }
             ],
             "specialNotes": [
-                "Best Practice: Gunakan `CardWidget` sebagai komponen kontainer terstruktur untuk form atau informasi detail pada layar yang luas.",
-                "Stateless Design: Komponen ini tidak memiliki internal loading state. Semua logika loading (misalnya pada tombol di footerActions) harus dikelola oleh parent widget melalui state management atau setState."
+                "Best Practice: Gunakan CardWidget sebagai komponen kontainer terstruktur untuk form atau informasi detail pada layar yang luas.",
+                "Stateless Design: Komponen ini tidak memiliki internal loading state. Semua logika loading (misalnya pada tombol di footerActions) harus dikelola oleh parent widget melalui state management."
             ],
-            "code": "CardWidget(\n  title: 'Edit Detail',\n  showCloseButton: true,\n  onClose: () => print('Close'),\n  child: Text('Konten di sini'),\n  footerActions: [\n    TextButton(onPressed: () {}, child: Text('Batal')),\n    FilledButton(onPressed: () {}, child: Text('Simpan')),\n  ],\n);"
+            "code": "CardWidget(\n  title: 'Edit Detail',\n  onClose: () => print('Close pressed'),\n  child: const Text('Konten di sini'),\n  footerActions: [\n    TextButton(onPressed: () {}, child: const Text('Batal')),\n    FilledButton(onPressed: () {}, child: const Text('Simpan')),\n  ],\n)"
         },
         {
             "id": "socket-helper-chunk-ecosystem",
