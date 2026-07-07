@@ -749,6 +749,12 @@
                     "desc": "Ikon bawaan di sebelah kiri teks (atau di tengah jika isIconOnly true)."
                 },
                 {
+                    "name": "iconPosition",
+                    "type": "FormButtonIconPosition",
+                    "default": "FormButtonIconPosition.prefix",
+                    "desc": "Menentukan letak ikon terhadap teks pada tombol. Gunakan prefix untuk menampilkan ikon di sebelah kiri teks, atau suffix untuk di sebelah kanan teks."
+                },
+                {
                     "name": "theme",
                     "type": "FormButtonTheme",
                     "default": "FormButtonTheme.primary",
