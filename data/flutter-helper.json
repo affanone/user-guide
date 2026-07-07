@@ -1160,6 +1160,18 @@
             ],
             "optionalProps": [
                 {
+                    "name": "onPresented",
+                    "type": "VoidCallback?",
+                    "default": "null",
+                    "desc": "Callback yang dipicu tepat saat menu popup terbuka dan ditampilkan ke layar."
+                },
+                {
+                    "name": "onDismissed",
+                    "type": "VoidCallback?",
+                    "default": "null",
+                    "desc": "Callback yang dipicu saat menu popup dibatalkan atau ditutup tanpa ada item yang dipilih (misalnya saat pengguna mengetuk area kosong di luar menu)."
+                },
+                {
                     "name": "icon",
                     "type": "Widget?",
                     "default": "null",
