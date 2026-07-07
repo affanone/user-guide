@@ -260,6 +260,12 @@
                     "desc": "Value utama FormNode dalam bentuk String."
                 },
                 {
+                    "name": ".hasFocus",
+                    "type": "bool",
+                    "default": "",
+                    "desc": "Mengecek apakah widget/node tersebut sedang dalam posisi fokus atau tidak."
+                },
+                {
                     "name": ".controller",
                     "type": "TextEditingController",
                     "default": "",
@@ -380,6 +386,30 @@
                     "type": "void",
                     "default": "",
                     "desc": "Memicu animasi getar (shake animation) pada widget yang terhubung dengan node. Cocok digunakan untuk menandai error validasi, input salah, OTP gagal, atau feedback visual interaktif."
+                },
+                {
+                    "name": ".addListener(void Function(FormNode node) listener)",
+                    "type": "void",
+                    "default": "",
+                    "desc": "Suntikan cerdas untuk memantau event dari node (seperti perubahan fokus) dengan mengirimkan seluruh context instance FormNode ke dalam callback. Anda bisa mengakses node.hasFocus, node.text, dsb secara fleksibel."
+                },
+                {
+                    "name": ".removeListener(void Function(FormNode node) listener)",
+                    "type": "void",
+                    "default": "",
+                    "desc": "Menghapus event listener secara spesifik (opsional, karena formController.dispose() sudah menanganinya secara otomatis)."
+                },
+                {
+                    "name": ".addTextListener(void Function(String text) listener)",
+                    "type": "void",
+                    "default": "",
+                    "desc": "Suntikan cerdas untuk memantau perubahan teks secara realtime. Mendukung anonymous function dan secara otomatis dibersihkan dari memori saat controller di-dispose."
+                },
+                {
+                    "name": ".removeTextListener(void Function(String text) listener)",
+                    "type": "void",
+                    "default": "",
+                    "desc": "Menghapus listener teks secara spesifik (opsional)."
                 }
             ],
             "behaviors": [
@@ -398,11 +428,12 @@
                 "Seluruh widget FormHelperWidget direkomendasikan menggunakan node() dibanding membuat FormNode manual.",
                 "FormNode sudah memiliki TextEditingController, FocusNode, enabled state, dan visible state internal.",
                 "Perubahan value pada widget akan otomatis sinkron ke FormNode secara reaktif.",
+                "Method addListener menggunakan pola Context Passing (mempassing FormNode). Memudahkan pengecekan multi-kondisi seperti mencocokkan hasFocus dengan nilai teks field secara bersamaan.",
+                "Sistem dilengkapi Smart Event Registry: Event listener (addListener & addTextListener) akan otomatis di-garbage collect saat controller di-dispose. Anda bebas menggunakan anonymous function tanpa takut memory leak.",
                 "FormNode mendukung kontrol focus, hide/show, enable/disable, serialize, clear, dan shake animation.",
-                "Method shake() sangat cocok digunakan untuk memberikan feedback error visual tanpa harus mengubah state field.",
-                "shake() dapat dipanggil manual kapan saja untuk menghasilkan efek getar pada widget terkait."
+                "Method shake() sangat cocok digunakan untuk memberikan feedback error visual tanpa harus mengubah state field."
             ],
-            "code": "final form = FormHelperController();\n\nfinal emailNode = form.node(\n  'email',\n  initialValue: 'admin@gmail.com',\n);\n\nemailNode.text = 'baru@gmail.com';\nemailNode.disable();\nemailNode.hide();\n\n/// trigger shake animation\nemailNode.shake();\n\n/// focus field\nemailNode.focus();"
+            "code": "final form = FormHelperController();\n\n@override\nvoid initState() {\n  super.initState();\n  \n  final amountNode = form.node('amount', initialValue: '10000');\n\n  // Smart Event Listener: Memantau event dengan context passing\n  amountNode.addListener((node) {\n    if (node.hasFocus) {\n      print('Field fokus! Teks saat ini: ${node.text}');\n    } else {\n      // Contoh logic ketika kehilangan fokus\n      if (node.text.isEmpty) {\n        node.shake(); // getarkan jika kosong\n      }\n    }\n  });\n\n  // Smart Event Listener: Memantau perubahan teks realtime\n  amountNode.addTextListener((text) {\n    print('Nilai amount berubah menjadi: $text');\n  });\n\n  // Contoh penggunaan method lain\n  amountNode.disable();\n}\n\n@override\nvoid dispose() {\n  // Cukup panggil form.dispose(). Seluruh node, Controller, FocusNode,\n  // beserta anonymous function (listeners) di atas akan disapu bersih otomatis.\n  form.dispose();\n  super.dispose();\n}"
         },
         {
             "id": "controller",
