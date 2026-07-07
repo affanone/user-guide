@@ -291,6 +291,12 @@
                     "desc": "[Hanya pada method .modal()] Callback sinkron/api-fire-and-forget yang dipicu sesaat (immediately) setelah dialog benar-benar ditutup dan hilang dari tumpukan rute."
                 },
                 {
+                    "name": "afterShow",
+                    "type": "VoidCallback?",
+                    "default": "null",
+                    "desc": "Callback sinkron yang dipicu sesaat setelah dialog/modal selesai dianimasikan dan muncul sepenuhnya di layar. Sangat berguna untuk menginisialisasi data atau memicu sesuatu tanpa mengganggu kelancaran animasi masuk."
+                },
+                {
                     "name": "width",
                     "type": "double?",
                     "default": "null",
