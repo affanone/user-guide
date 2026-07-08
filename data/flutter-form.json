@@ -1023,6 +1023,144 @@
             "code": "FormHelperWidget.Text(\n  label: 'Nama Lengkap',\n  node: _formCtrl.node('nama'),\n  hintText: 'Contoh: Budi Santoso',\n  valueTransformer: (val) => val.toUpperCase(),\n  validator: (val) => val.isEmpty ? 'Nama wajib diisi!' : null,\n)"
         },
         {
+            "id": "search",
+            "group": "Input Teks & Angka",
+            "name": "Search",
+            "icon": "fa-solid fa-envelope",
+            "description": "Field input khusus search. Secara otomatis memblokir spasi dan memberikan ikon default.",
+            "mandatoryProps": [],
+            "optionalProps": [
+                {
+                    "name": "key",
+                    "type": "Key?",
+                    "default": "null",
+                    "desc": "Kunci unik widget."
+                },
+                {
+                    "name": "label",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Label input."
+                },
+                {
+                    "name": "value",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Nilai awal form."
+                },
+                {
+                    "name": "node",
+                    "type": "FormNode?",
+                    "default": "null",
+                    "desc": "Simpul reaktif (FormNode)."
+                },
+                {
+                    "name": "onChanged",
+                    "type": "ValueChanged<String>?",
+                    "default": "null",
+                    "desc": "Penyadap perubahan teks."
+                },
+                {
+                    "name": "validator",
+                    "type": "FormValidator<String>?",
+                    "default": "null",
+                    "desc": "Validasi aturan input search."
+                },
+                {
+                    "name": "valueTransformer",
+                    "type": "ValueTransformer<String>?",
+                    "default": "null",
+                    "desc": "Memodifikasi input data sebelum masuk state."
+                },
+                {
+                    "name": "onKeyEvent",
+                    "type": "KeyEventResult Function(FocusNode node, KeyEvent event)?",
+                    "default": "null",
+                    "desc": "Event keyboard: Menangkap aksi tombol keyboard seperti Enter, Escape, Tab, atau shortcut lainnya melalui FocusNode."
+                },
+                {
+                    "name": "prefix",
+                    "type": "dynamic",
+                    "default": "null",
+                    "desc": "Sisipan kiri."
+                },
+                {
+                    "name": "suffix",
+                    "type": "dynamic",
+                    "default": "null",
+                    "desc": "Sisipan kanan."
+                },
+                {
+                    "name": "theme",
+                    "type": "FormElementTheme?",
+                    "default": "null",
+                    "desc": "Tema elemen form."
+                },
+                {
+                    "name": "size",
+                    "type": "FormElementSize?",
+                    "default": "null",
+                    "desc": "Skala proporsional elemen form."
+                },
+                {
+                    "name": "enabled",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Status aktif."
+                },
+                {
+                    "name": "readOnly",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Hanya baca."
+                },
+                {
+                    "name": "hintText",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Teks placeholder."
+                },
+                {
+                    "name": "showIcon",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Tampilkan icon amplop default."
+                },
+                {
+                    "name": "noBackground",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Melenyapkan warna latar form menjadi transparan murni."
+                },
+                {
+                    "name": "noBorder",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Mematikan seluruh garis tepi form."
+                },
+                {
+                    "name": "noPadding",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Menghancurkan ruang bernapas di dalam form agar merapat sempurna."
+                },
+                {
+                    "name": "noBorderRadius",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Memaksa sudut form menjadi tajam (kotak bersudut 90 derajat)."
+                }
+            ],
+            "additionalInfo": {
+                "globalSizing": "Mendukung sistem ukuran (size) berbasis FormElementSize.",
+                "globalDecoration": "Semua widget memiliki style otomatis dari FormStyle dan FormHelperWidget.decoration."
+            },
+            "specialNotes": [
+                "Input spasi secara internal diblokir menggunakan FilteringTextInputFormatter.deny."
+            ],
+            "code": "FormHelperWidget.Search(\n  label: 'Cari Disini',\n  node: _formCtrl.node('search'),\n)"
+        },
+        {
             "id": "email",
             "group": "Input Teks & Angka",
             "name": "Email",
