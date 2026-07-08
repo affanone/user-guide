@@ -1606,6 +1606,89 @@
             "code": "AutoRetryImageWidget(\n  imageUrl: '[https://example.com/images/profile.jpg](https://www.google.com/search?q=https://example.com/images/profile.jpg)',\n  width: 120.0,\n  height: 120.0,\n  delayRetry: 5,\n  maxRetry: 3,\n  colorSpinner: Colors.blueAccent,\n  colorBackground: Colors.grey[200]!,\n  debugMode: false,\n)"
         },
         {
+            "id": "BadgeWidget",
+            "group": "Widget",
+            "name": "Smart Badge",
+            "icon": "fa-solid fa-bell",
+            "description": "Widget indikator angka (badge) tingkat lanjut yang dirancang untuk notifikasi atau status item. Dilengkapi sistem kecerdasan yang otomatis menyesuaikan warna teks berdasarkan tingkat kecerahan (luminance) background, fitur Auto-Morph untuk bertransformasi dinamis dari lingkaran menjadi kapsul pada angka besar, serta menggunakan sistem Zero-Clip Positioning agar badge dapat melayang presisi di sudut luar tanpa terpotong batas widget (overflow).",
+            "mandatoryProps": [
+                {
+                    "name": "child",
+                    "type": "Widget",
+                    "default": "",
+                    "desc": "Widget utama yang akan ditumpangi oleh badge (misalnya: Icon keranjang belanja, tombol notifikasi, atau Avatar foto profil)."
+                },
+                {
+                    "name": "value",
+                    "type": "int",
+                    "default": "",
+                    "desc": "Nilai angka yang ditampilkan di dalam badge. Angka akan diformat secara otomatis jika melampaui batas wajar tampilan."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "showBadge",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Sistem rendering kondisional. Berfungsi untuk menyembunyikan badge (misal: saat tidak ada notifikasi) tanpa harus merombak widget tree di level parent."
+                },
+                {
+                    "name": "color",
+                    "type": "Color",
+                    "default": "Colors.red",
+                    "desc": "Warna solid untuk latar belakang badge. Sistem Smart Contrast akan secara otomatis memantau warna ini untuk menentukan teks hitam atau putih."
+                },
+                {
+                    "name": "position",
+                    "type": "BadgeCorner",
+                    "default": "BadgeCorner.topRight",
+                    "desc": "Menentukan di sudut mana badge akan disematkan. Enum yang didukung: topLeft, topRight, bottomLeft, dan bottomRight."
+                },
+                {
+                    "name": "scale",
+                    "type": "double",
+                    "default": "1.0",
+                    "desc": "Multiplier ukuran badge. Memodifikasi secara proporsional ukuran font, ketebalan shadow, padding, dan jarak offset pelampung (floating distance) tanpa merusak rasio desain."
+                }
+            ],
+            "additionalInfo": {
+                "dependencies": "Berdiri secara independen. Hanya menggunakan foundation layout bawaan Flutter (Stack, Positioned, Container)."
+            },
+            "methods": [],
+            "behaviors": [
+                {
+                    "name": "Smart Contrast Logic",
+                    "type": "Render Calculation",
+                    "default": "",
+                    "desc": "Menghitung nilai color.computeLuminance() secara real-time. Jika kecerahan warna > 0.5 (warna terang seperti kuning/putih), warna teks otomatis menjadi hitam pekat. Sebaliknya menjadi putih. Ini menjamin rasio aksesibilitas (readability) maksimal."
+                },
+                {
+                    "name": "Auto-Morph Shape",
+                    "type": "UI Layout",
+                    "default": "",
+                    "desc": "Layout badge membaca kuantitas digit value. 1 digit akan mengunci rasio tinggi dan lebar minimum (aspect-ratio 1:1) menjadi lingkaran bulat sempurna. Lebih dari 1 digit akan memicu regangan horizontal menjadi bentuk pil/kapsul."
+                },
+                {
+                    "name": "Zero-Clip Positioning",
+                    "type": "Layout Logic",
+                    "default": "",
+                    "desc": "Menggunakan Stack dengan clipBehavior: Clip.none dan offset negatif (-). Ini menjamin shadow dan separuh badan badge yang melayang di luar area child tidak akan terpotong oleh sistem layout rendering Flutter."
+                },
+                {
+                    "name": "Zero-Cost Bypass",
+                    "type": "Performance Optimization",
+                    "default": "",
+                    "desc": "Jika `showBadge` di-set ke false atau `value` sama dengan 0, siklus build badge sepenuhnya dibatalkan. Widget hanya akan me-return `child` aslinya, sehingga tidak membebani performa aplikasi (Zero Cost) saat badge tidak dibutuhkan."
+                }
+            ],
+            "specialNotes": [
+                "Sistem dilengkapi pembatas karakter logika bawaan: Jika `value` lebih dari 99, maka akan otomatis dirender sebagai teks '99+' demi menjaga estetika desain UI agar tidak terlalu melar.",
+                "Properti `scale` sangat dianjurkan daripada mencoba membungkus BadgeWidget dengan widget Transform.scale() demi menghindari glitch resolusi font.",
+                "Pastikan parent kontainer terluar dari widget yang memakai BadgeWidget tidak memiliki properti yang menahan/memotong tumpahan render (seperti ClipRRect) jika ingin efek melayang sempurna."
+            ],
+            "code": "Row(\n  mainAxisAlignment: MainAxisAlignment.spaceAround,\n  children: [\n    // Contoh Standar\n    BadgeWidget(\n      value: 5,\n      child: const Icon(Icons.shopping_cart, size: 32),\n    ),\n    \n    // Contoh Auto-Morph (99+) & Smart Contrast (Kuning -> Teks Hitam)\n    BadgeWidget(\n      value: 125, \n      color: Colors.yellowAccent,\n      scale: 1.2,\n      child: const Icon(Icons.notifications, size: 32),\n    ),\n    \n    // Contoh Posisi Custom & Disembunyikan (Zero Cost)\n    BadgeWidget(\n      value: 0,\n      showBadge: false,\n      position: BadgeCorner.bottomRight,\n      child: const CircleAvatar(\n        backgroundImage: NetworkImage('https://...'),\n      ),\n    ),\n  ],\n)"
+        },
+        {
             "id": "KeyHandler",
             "group": "Helper",
             "name": "Smart Key Handler",
@@ -2481,6 +2564,12 @@
             ],
             "optionalProps": [
                 {
+                    "name": "padding",
+                    "type": "EdgeInsetsGeometry?",
+                    "default": "null",
+                    "desc": "Menambahkan ruang kosong (scrollable padding) di dalam area scroll. Sangat berguna untuk mencegah konten paling akhir tertutup oleh elemen UI yang melayang (seperti Floating Action Button). Catatan: Hanya bekerja otomatis pada layout statis (Row/Column). Jika membungkus ListView/GridView, gunakan parameter padding bawaan dari list tersebut."
+                },
+                {
                     "name": "justify",
                     "type": "GridJustify",
                     "default": "GridJustify.start",
@@ -2503,6 +2592,12 @@
                     "type": "double",
                     "default": "12.0",
                     "desc": "Jarak renggang (spacing) vertikal antar baris apabila kolom mengalami pembungkusan (wrapping) ke bawah."
+                },
+                {
+                    "name": "matchHeight",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika diaktifkan, sistem akan memecah grid menjadi barisan Row yang dibungkus IntrinsicHeight secara dinamis. Ini memaksa seluruh kolom dalam satu baris untuk sejajar mengikuti tinggi item tertinggi, menyelesaikan masalah grid berantakan pada layout unconstrained."
                 }
             ],
             "additionalInfo": {
@@ -2576,34 +2671,41 @@
                     "name": "responsive",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Fungsi static pembantu yang mereturn nilai boolean berdasarkan evaluasi breakpoint layar saat ini. Dengan parameter 'initialValue' (default: true), Anda bisa menentukan nilai dasar awal sebelum sistem menerapkan pewarisan (cascading) nilai ke ukuran layar yang lebih besar. Contoh: Jika diset (initialValue: false, lg: true), maka fungsi akan mereturn false dari layar mobile hingga md, dan mereturn true mulai dari layar lg hingga xxxl."
+                    "desc": "Fungsi static pembantu yang mereturn nilai boolean berdasarkan evaluasi breakpoint layar saat ini. Dengan parameter 'initialValue' (default: true), menentukan nilai dasar awal sebelum sistem menerapkan pewarisan (cascading). Contoh: (initialValue: false, lg: true) mereturn false di mobile hingga md, dan true dari lg hingga xxxl."
                 }
             ],
             "behaviors": [
                 {
+                    "name": "Dual Engine Layout",
+                    "type": "Render Logic",
+                    "default": "",
+                    "desc": "Memiliki dua mode rendering. Saat matchHeight=false, menggunakan Wrap untuk performa komputasi maksimal. Saat matchHeight=true, beralih ke mode Dynamic Chunking dengan merakit baris ke dalam Row + IntrinsicHeight."
+                },
+                {
                     "name": "Responsive Cascading",
                     "type": "UI Layout",
                     "default": "",
-                    "desc": "Sistem GridColWidget dan fungsi responsive() mewarisi (cascade) nilai dari breakpoint terkecil hingga terbesar secara linear (Mobile-First). Jika Anda hanya mengatur nilai xs=12 dan md=6, maka pada layar lg, xl, hingga xxxl sistem akan menggunakan nilai md=6 secara otomatis sebagai fallback (acuan terdekat)."
+                    "desc": "Sistem mewarisi (cascade) nilai dari breakpoint terkecil hingga terbesar secara linear (Mobile-First). Jika hanya mengatur xs=12 dan md=6, maka pada layar lg hingga xxxl sistem menggunakan md=6 secara otomatis."
                 },
                 {
                     "name": "Zero Width Omission",
                     "type": "Performance",
                     "default": "",
-                    "desc": "Jika sebuah GridColWidget menghasilkan rentang kolom (colSpan) sebesar 0 pada suatu breakpoint, widget tersebut akan otomatis digantikan dengan SizedBox.shrink(). Ini membuang elemen dari tata letak visual dan menghemat kalkulasi memori rendering (mirip dengan implementasi 'display: none' di CSS)."
+                    "desc": "Jika sebuah GridColWidget menghasilkan rentang kolom (colSpan) sebesar 0, widget otomatis digantikan dengan SizedBox.shrink(). Membuang elemen dari tata letak visual dan menghemat kalkulasi memori rendering."
                 },
                 {
                     "name": "Clamp Overflow Protection",
                     "type": "UI Layout",
                     "default": "",
-                    "desc": "Perhitungan alokasi lebar absolut per kolom dikunci (clamp) secara aman di antara nilai 0.0 hingga maksimal lebar parent (maxWidth). Hal ini secara total menetralkan cacat desimal floating-point saat layar dirender ulang yang berpotensi mementalkan kolom ke baris baru tanpa alasan logis."
+                    "desc": "Perhitungan alokasi lebar absolut per kolom dikunci (clamp) secara aman di antara 0.0 hingga maksimal lebar parent (maxWidth). Sepenuhnya menetralkan cacat desimal floating-point yang berpotensi memicu line-break prematur."
                 }
             ],
             "specialNotes": [
-                "GridRowWidget secara internal menggunakan LayoutBuilder. Hal ini memungkinkan komponen grid bereaksi dinamis terhadap lebar kontainer parent terdekatnya, bukan hanya terhadap lebar absolut dari MediaQuery. Ini merupakan keuntungan masif untuk arsitektur nested-grid (grid bersarang).",
-                "Fitur GridAlign.stretch hanya akan bekerja secara sempurna apabila constraint vertikal dari kontainer pembungkus tidak diatur sebagai tak terbatas (infinite). Harus memiliki batasan alokasi tinggi yang jelas."
+                "GridRowWidget secara internal menggunakan LayoutBuilder. Ini memungkinkan komponen bereaksi dinamis terhadap lebar kontainer parent terdekat, bukan hanya terhadap lebar absolut MediaQuery (krusial untuk nested-grid).",
+                "STRETCH CONSTRAINT: Jika matchHeight=false, fitur GridAlign.stretch hanya bekerja apabila constraint vertikal dari parent tidak tak-terbatas (infinite).",
+                "MATCH HEIGHT: Gunakan matchHeight=true secara bijak. Meskipun menyelesaikan masalah tinggi kolom dalam ScrollView (infinite height), penggunaan IntrinsicHeight membawa sedikit penalti komputasi tambahan."
             ],
-            "code": "GridRowWidget(\n  justify: GridJustify.spaceBetween,\n  rowGap: 16.0,\n  columnGap: 16.0,\n  children: [\n    GridColWidget(\n      xs: 12,   // Penuh di Mobile\n      md: 6,    // 50% di Tablet\n      lg: 4,    // 33.3% di Desktop\n      child: Container(color: Colors.red, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      lg: 4,\n      child: Container(color: Colors.green, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 12,   // Penuh di Tablet (baris ke-2)\n      lg: 4,    // Sejajar dengan yang lain di Desktop\n      child: Container(color: Colors.blue, height: 100),\n    ),\n    // Contoh Kondisional menggunakan method responsive()\n    if (GridColWidget.responsive(context, xs: false, md: true))\n      GridColWidget(\n        xs: 12,\n        child: Text('Teks ini hanya muncul di layar md (Tablet) ke atas!'),\n      ),\n  ],\n)"
+            "code": "// SKENARIO 1: GRID REGULER (Performa Maksimal)\nGridRowWidget(\n  justify: GridJustify.spaceBetween,\n  rowGap: 16.0,\n  columnGap: 16.0,\n  children: [\n    GridColWidget(\n      xs: 12,   // Penuh di Mobile\n      md: 6,    // 50% di Tablet\n      lg: 4,    // 33.3% di Desktop\n      child: Container(color: Colors.red, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      lg: 4,\n      child: Container(color: Colors.green, height: 100),\n    ),\n  ],\n)\n\n// SKENARIO 2: GRID DENGAN MATCH HEIGHT\nGridRowWidget(\n  matchHeight: true, // Kolom pendek akan ditarik sejajar dengan kolom tertinggi di barisnya\n  children: [\n    GridColWidget(\n      xs: 6,\n      child: Container(color: Colors.blue, child: Text('Teks Singkat')),\n    ),\n    GridColWidget(\n      xs: 6,\n      child: Container(color: Colors.orange, child: Text('Teks yang sangat panjang... menempati banyak ruang vertikal dan mendorong tinggi kolom ke bawah secara dinamis.')),\n    ),\n  ],\n)"
         },
         {
             "id": "ListViewWidget",
