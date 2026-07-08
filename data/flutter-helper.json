@@ -2516,10 +2516,16 @@
                 ],
                 "grid_col_optional_props": [
                     {
-                        "name": "xs",
+                        "name": "xxs",
                         "type": "int",
                         "default": "12",
-                        "desc": "Lebar kolom (1-12) pada layar ekstra kecil (< 576px). Nilai 0 akan menyembunyikan kolom (display: none)."
+                        "desc": "Lebar kolom (1-12) pada layar sangat kecil (< 360px). Nilai 0 akan menyembunyikan kolom (display: none)."
+                    },
+                    {
+                        "name": "xs",
+                        "type": "int?",
+                        "default": "null",
+                        "desc": "Lebar kolom (1-12) pada layar ekstra kecil (≥ 360px)."
                     },
                     {
                         "name": "sm",
@@ -2549,13 +2555,13 @@
                         "name": "xxl",
                         "type": "int?",
                         "default": "null",
-                        "desc": "Lebar kolom (1-12) pada layar 2X besar (≥ 1400px)."
+                        "desc": "Lebar kolom (1-12) pada layar 2× besar (≥ 1400px)."
                     },
                     {
                         "name": "xxxl",
                         "type": "int?",
                         "default": "null",
-                        "desc": "Lebar kolom (1-12) pada layar 3X besar (≥ 1600px)."
+                        "desc": "Lebar kolom (1-12) pada layar 3× besar (≥ 1600px)."
                     }
                 ]
             },
