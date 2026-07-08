@@ -2700,6 +2700,112 @@
             "code": "// Di dalam State class Parent Widget:\n// final ScrollController _listController = ScrollController();\n//\n// Aksi Tombol:\n// ElevatedButton(\n//   onPressed: () => _listController.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut),\n//   child: const Text('Kembali ke Atas'),\n// )\n\nListViewWidget(\n  controller: _listController,\n  separator: const SizedBox(height: 12),\n  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),\n  children: const [\n    ItemWidget(title: 'Data 1'),\n    ItemWidget(title: 'Data 2'),\n    ItemWidget(title: 'Data 3'),\n  ],\n)"
         },
         {
+            "id": "ScrollbarWidget",
+            "group": "Layout",
+            "name": "Responsive Scrollbar",
+            "icon": "fa-solid fa-arrows-up-down-left-right",
+            "description": "Widget wrapper super cerdas yang menangani segala skenario scrolling antar platform secara otomatis. Menyuntikkan kemampuan mouse-drag (geser dengan klik) untuk Desktop/Web tanpa membebani memori di Mobile. Memiliki sistem Auto-Detect untuk membungkus layout statis (Row/Column) menjadi scrollable, sekaligus cerdas mendeteksi ListView/GridView agar fitur lazy-loading (performa memori) tidak rusak.",
+            "mandatoryProps": [
+                {
+                    "name": "child",
+                    "type": "Widget",
+                    "default": "",
+                    "desc": "Konten yang ingin di-scroll. Bisa berupa layout statis (Row, Column, Wrap) atau widget yang sudah scrollable (ListView, GridView, SingleChildScrollView)."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "draggable",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Jika aktif, mengizinkan user desktop/web untuk menggeser layar menggunakan klik-tahan mouse. Jika dimatikan, mouse drag dinonaktifkan."
+                },
+                {
+                    "name": "direction",
+                    "type": "ScrollDragDir",
+                    "default": "ScrollDragDir.vertical",
+                    "desc": "Menentukan orientasi scroll (vertical, horizontal, atau both)."
+                },
+                {
+                    "name": "controller",
+                    "type": "ScrollController?",
+                    "default": "null",
+                    "desc": "Controller eksternal untuk memantau atau mengendalikan posisi scroll secara programatis."
+                },
+                {
+                    "name": "autoWrapScrollView",
+                    "type": "bool?",
+                    "default": "null",
+                    "desc": "Override manual sistem deteksi. Set ke false JIKA menggunakan custom widget yang me-return ListView agar tidak terjadi double-wrapping."
+                },
+                {
+                    "name": "thumbVisibility",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Mengatur visibilitas batang scrollbar. Jika false, scrollbar hanya muncul saat terjadi aktivitas scroll. Jika true, scrollbar akan selalu terlihat."
+                },
+                {
+                    "name": "trackVisibility",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Mengatur visibilitas jalur (track) scrollbar. Jika false, track tidak muncul saat kursor mendekat (hover), memberikan tampilan UI yang lebih bersih."
+                },
+                {
+                    "name": "alignment",
+                    "type": "AlignmentGeometry?",
+                    "default": "null",
+                    "desc": "Jika diisi (contoh: Alignment.center), konten yang lebih kecil dari ukuran layar akan otomatis diselaraskan mengikuti alignment tersebut. Jika null, sistem langsung mengeksekusi scroll reguler tanpa merender LayoutBuilder."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "Programmatic Scrolling",
+                    "type": "ScrollAction",
+                    "default": "",
+                    "desc": "Injeksi ScrollController dari parent, lalu gunakan controller.animateTo(offset, duration, curve) untuk menggulir layar secara mulus melalui tombol eksternal."
+                },
+                {
+                    "name": "Scroll Position Listener",
+                    "type": "Event Listener",
+                    "default": "",
+                    "desc": "Tambahkan listener pada controller untuk memicu aksi saat user mencapai ujung scroll."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Zero-Cost Mobile Optimization",
+                    "type": "Performance Target",
+                    "default": "",
+                    "desc": "Sistem mendeteksi platform (Android/iOS). Di mobile, logic mouse-drag di-bypass, beban kinerja tambahan adalah 0%."
+                },
+                {
+                    "name": "Smart Type Checking",
+                    "type": "Render Logic",
+                    "default": "",
+                    "desc": "Mendeteksi apakah child adalah ScrollView. Jika ya, lazy-loading tetap jalan. Jika Row/Column, widget dibungkus SingleChildScrollView otomatis."
+                },
+                {
+                    "name": "Dynamic Spatial Alignment",
+                    "type": "Layout Strategy",
+                    "default": "",
+                    "desc": "Sistem memanfaatkan LayoutBuilder untuk membaca batasan constraint. Jika ukuran item lebih kecil dari viewport, Align mengambil alih kontrol posisi secara spasial. Mem-bypass LayoutBuilder sepenuhnya jika parameter alignment null untuk penghematan tree depth."
+                },
+                {
+                    "name": "Clean UI Control",
+                    "type": "UI Strategy",
+                    "default": "",
+                    "desc": "Dengan default thumbVisibility & trackVisibility = false, scrollbar tidak akan mengganggu tampilan (hover-free), namun tetap berfungsi saat scroll atau drag terjadi."
+                }
+            ],
+            "specialNotes": [
+                "PERINGATAN TIPE CUSTOM: Fitur pendeteksi ListView hanya mendeteksi widget asli turunan ScrollView. Jika menggunakan widget kustom, gunakan 'autoWrapScrollView: false'.",
+                "PENGGUNAAN ALIGNMENT: Gunakan alignment: Alignment.center pada widget independen (seperti BottomNavBar) agar tata letak tidak rusak dan menempel ke kiri pada layar tablet/desktop.",
+                "CONTROLLER PADA 'BOTH': Jika arah 'both', external controller hanya terikat pada axis utama (Vertical)."
+            ],
+            "code": "// SKENARIO 1: CLEAN UI\nScrollbarWidget(\n  child: ListView.builder(\n    itemCount: 50,\n    itemBuilder: (context, index) => ListTile(title: Text('Item $index')),\n  ),\n)\n\n// SKENARIO 2: ALIGNMENT FLEKSIBEL (Otomatis menyesuaikan viewport besar)\nScrollbarWidget(\n  direction: ScrollDragDir.horizontal,\n  alignment: Alignment.centerRight, // Konten diam di kanan jika layar lebar\n  child: Row(\n    children: [ /* ... item list ... */ ],\n  ),\n)\n\n// SKENARIO 3: SCROLL DUA ARAH DENGAN CONTROLLER\nfinal ScrollController _scrollController = ScrollController();\n\nScrollbarWidget(\n  controller: _scrollController,\n  direction: ScrollDragDir.both,\n  child: Container(\n    width: 2000,\n    height: 2000,\n    color: Colors.white,\n    child: Text('Canvas Besar'),\n  ),\n)"
+        },
+        {
             "id": "CardWidget",
             "group": "Widget",
             "name": "Card Premium",
