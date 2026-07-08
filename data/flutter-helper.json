@@ -2576,7 +2576,7 @@
                     "name": "responsive",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Fungsi static pembantu yang mereturn nilai boolean berdasarkan evaluasi breakpoint layar saat ini. Sistem secara otomatis menerapkan pewarisan nilai (cascading) dari ukuran layar terkecil menuju ukuran layar yang sedang aktif. Sangat ideal untuk conditional rendering."
+                    "desc": "Fungsi static pembantu yang mereturn nilai boolean berdasarkan evaluasi breakpoint layar saat ini. Dengan parameter 'initialValue' (default: true), Anda bisa menentukan nilai dasar awal sebelum sistem menerapkan pewarisan (cascading) nilai ke ukuran layar yang lebih besar. Contoh: Jika diset (initialValue: false, lg: true), maka fungsi akan mereturn false dari layar mobile hingga md, dan mereturn true mulai dari layar lg hingga xxxl."
                 }
             ],
             "behaviors": [
