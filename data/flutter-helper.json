@@ -2470,7 +2470,7 @@
             "group": "Layout",
             "name": "Grid System",
             "icon": "fa-solid fa-table-columns",
-            "description": "Sistem layout grid responsif berbasis 12-kolom yang terinspirasi dari Bootstrap. Komponen ini terdiri dari GridRowWidget sebagai kontainer utama dan GridColWidget sebagai penentu lebar kolom pada berbagai titik henti (breakpoint). Memungkinkan pembuatan desain antarmuka yang fleksibel dan dapat beradaptasi secara otomatis dari layar mobile kecil hingga layar desktop super lebar.",
+            "description": "Sistem layout grid responsif berbasis 12-kolom yang terinspirasi dari Bootstrap. Komponen ini terdiri dari GridRowWidget sebagai kontainer utama dan GridColWidget sebagai penentu lebar kolom pada berbagai titik henti (breakpoint). Memungkinkan pembuatan desain antarmuka yang fleksibel, otomatis beradaptasi dari layar mobile kecil hingga layar desktop super lebar, serta dilengkapi utilitas fungsi responsif independen.",
             "mandatoryProps": [
                 {
                     "name": "children",
@@ -2570,7 +2570,13 @@
                     "name": "breakpoint",
                     "type": "Breakpoint",
                     "default": "",
-                    "desc": "Fungsi helper independen untuk mendeteksi breakpoint aktif saat ini berdasarkan lebar layar (width). Menerima parameter opsional context atau width secara langsung."
+                    "desc": "Fungsi static pembantu untuk mendeteksi breakpoint aktif saat ini berdasarkan lebar layar (width). Menerima parameter opsional context atau width secara langsung."
+                },
+                {
+                    "name": "responsive",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Fungsi static pembantu yang mereturn nilai boolean berdasarkan evaluasi breakpoint layar saat ini. Sistem secara otomatis menerapkan pewarisan nilai (cascading) dari ukuran layar terkecil menuju ukuran layar yang sedang aktif. Sangat ideal untuk conditional rendering."
                 }
             ],
             "behaviors": [
@@ -2578,26 +2584,26 @@
                     "name": "Responsive Cascading",
                     "type": "UI Layout",
                     "default": "",
-                    "desc": "Sistem GridColWidget mewarisi (cascade) nilai breakpoint dari yang terkecil hingga terbesar. Jika Anda hanya mengatur nilai xs=12 dan md=6, maka pada layar lg, xl, xxl sistem akan menggunakan nilai md=6 secara otomatis karena nilai yang lebih besar akan mengambil fallback (nilai acuan) dari breakpoint valid tepat di bawahnya."
+                    "desc": "Sistem GridColWidget dan fungsi responsive() mewarisi (cascade) nilai dari breakpoint terkecil hingga terbesar secara linear (Mobile-First). Jika Anda hanya mengatur nilai xs=12 dan md=6, maka pada layar lg, xl, hingga xxxl sistem akan menggunakan nilai md=6 secara otomatis sebagai fallback (acuan terdekat)."
                 },
                 {
                     "name": "Zero Width Omission",
                     "type": "Performance",
                     "default": "",
-                    "desc": "Jika sebuah GridColWidget menghasilkan porsi rentang kolom (colSpan) sebesar 0 pada suatu breakpoint, widget akan otomatis dirender sebagai SizedBox.shrink(). Ini akan membuang elemen tersebut dari layout dan menghemat memori rendering (mirip dengan d-none di CSS)."
+                    "desc": "Jika sebuah GridColWidget menghasilkan rentang kolom (colSpan) sebesar 0 pada suatu breakpoint, widget tersebut akan otomatis digantikan dengan SizedBox.shrink(). Ini membuang elemen dari tata letak visual dan menghemat kalkulasi memori rendering (mirip dengan implementasi 'display: none' di CSS)."
                 },
                 {
                     "name": "Clamp Overflow Protection",
                     "type": "UI Layout",
                     "default": "",
-                    "desc": "Perhitungan lebar absolut per kolom dibungkus menggunakan .clamp(0.0, maxWidth). Hal ini menetralkan risiko cacat desimal floating-point saat layar digeser (resize) yang umumnya menyebabkan komponen terlempar ke baris berikutnya tanpa alasan yang jelas."
+                    "desc": "Perhitungan alokasi lebar absolut per kolom dikunci (clamp) secara aman di antara nilai 0.0 hingga maksimal lebar parent (maxWidth). Hal ini secara total menetralkan cacat desimal floating-point saat layar dirender ulang yang berpotensi mementalkan kolom ke baris baru tanpa alasan logis."
                 }
             ],
             "specialNotes": [
-                "GridRowWidget secara internal menggunakan LayoutBuilder. Hal ini membuat grid dapat bereaksi terhadap lebar parent terdekatnya, bukan hanya mendeteksi resolusi absolut dari MediaQuery. Sangat berguna untuk nested-grid.",
-                "Fitur GridAlign.stretch hanya akan berfungsi sempurna jika constraint vertikal pembungkus parent tidak diatur ke infinite (harus memiliki batasan tinggi yang jelas)."
+                "GridRowWidget secara internal menggunakan LayoutBuilder. Hal ini memungkinkan komponen grid bereaksi dinamis terhadap lebar kontainer parent terdekatnya, bukan hanya terhadap lebar absolut dari MediaQuery. Ini merupakan keuntungan masif untuk arsitektur nested-grid (grid bersarang).",
+                "Fitur GridAlign.stretch hanya akan bekerja secara sempurna apabila constraint vertikal dari kontainer pembungkus tidak diatur sebagai tak terbatas (infinite). Harus memiliki batasan alokasi tinggi yang jelas."
             ],
-            "code": "GridRowWidget(\n  justify: GridJustify.spaceBetween,\n  rowGap: 16.0,\n  columnGap: 16.0,\n  children: [\n    GridColWidget(\n      xs: 12,   // Penuh di Mobile\n      md: 6,    // 50% di Tablet\n      lg: 4,    // 33.3% di Desktop\n      child: Container(color: Colors.red, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      lg: 4,\n      child: Container(color: Colors.green, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 12,   // Penuh di Tablet (baris ke-2)\n      lg: 4,    // Sejajar dengan yang lain di Desktop\n      child: Container(color: Colors.blue, height: 100),\n    ),\n  ],\n)"
+            "code": "GridRowWidget(\n  justify: GridJustify.spaceBetween,\n  rowGap: 16.0,\n  columnGap: 16.0,\n  children: [\n    GridColWidget(\n      xs: 12,   // Penuh di Mobile\n      md: 6,    // 50% di Tablet\n      lg: 4,    // 33.3% di Desktop\n      child: Container(color: Colors.red, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      lg: 4,\n      child: Container(color: Colors.green, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 12,   // Penuh di Tablet (baris ke-2)\n      lg: 4,    // Sejajar dengan yang lain di Desktop\n      child: Container(color: Colors.blue, height: 100),\n    ),\n    // Contoh Kondisional menggunakan method responsive()\n    if (GridColWidget.responsive(context, xs: false, md: true))\n      GridColWidget(\n        xs: 12,\n        child: Text('Teks ini hanya muncul di layar md (Tablet) ke atas!'),\n      ),\n  ],\n)"
         },
         {
             "id": "ListViewWidget",
