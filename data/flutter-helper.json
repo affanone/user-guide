@@ -1160,6 +1160,12 @@
             ],
             "optionalProps": [
                 {
+                    "name": "enabled",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Mengontrol status interaktif menu. Jika false, widget otomatis meredup (opacity 0.5) dan mengabaikan seluruh pemanggilan fungsi next() maupun sentuhan pada icon."
+                },
+                {
                     "name": "onPresented",
                     "type": "VoidCallback?",
                     "default": "null",
@@ -1181,7 +1187,7 @@
                     "name": "child",
                     "type": "Widget Function(VoidCallback next)?",
                     "default": "null",
-                    "desc": "Fungsi builder yang mengembalikan widget pemicu kustom. Menyediakan callback 'next' yang digunakan untuk membuka popup menu secara programatik saat aksi (seperti onTap/onPressed) dieksekusi."
+                    "desc": "Fungsi builder yang mengembalikan widget pemicu kustom. Menyediakan callback 'next' yang digunakan untuk membuka popup menu secara programatik saat aksi dieksekusi."
                 },
                 {
                     "name": "shape",
@@ -1206,6 +1212,12 @@
             "methods": [],
             "behaviors": [
                 {
+                    "name": "Isolated Gesture Target",
+                    "type": "UI Architecture",
+                    "default": "",
+                    "desc": "Sistem memisahkan deteksi sentuhan internal PopupMenuButton dengan sentuhan pada custom child menggunakan arsitektur Stack dan IgnorePointer, mencegah trigger liar di luar area yang diinginkan."
+                },
+                {
                     "name": "Dynamic Row Assembly",
                     "type": "Render Logic",
                     "default": "",
@@ -1222,7 +1234,7 @@
                 "Hanya gunakan SATU antara parameter 'icon' atau 'child'. Jika menggunakan 'icon', Material design akan otomatis memberikan padding sirkular standar IconButton.",
                 "Komponen ini berjalan menggunakan GlobalKey secara internal agar pembukaan menu melalui parameter 'child' (programatik) berjalan aman tanpa pelemparan context tambahan."
             ],
-            "code": "PopupMenuWidget<String>(\n  onSelected: (value) {\n    print(value);\n  },\n  child: (next) => ElevatedButton(\n    onPressed: next,\n    child: const Text('Buka Menu'),\n  ),\n  items: const [\n    PopupMenuDataWidget(\n      value: 'profile',\n      label: 'Profile',\n      icon: Icons.person,\n    ),\n    PopupMenuDataWidget(\n      value: 'setting',\n      label: 'Setting',\n      icon: Icons.settings,\n    ),\n    PopupMenuDataWidget(\n      value: 'delete',\n      label: 'Hapus Akun',\n      icon: Icons.delete,\n      color: Colors.red,\n    ),\n  ],\n)"
+            "code": "PopupMenuWidget<String>(\n  enabled: true,\n  onSelected: (value) {\n  },\n  child: (next) => ElevatedButton(\n    onPressed: next,\n    child: const Text('Buka Menu'),\n  ),\n  items: const [\n    PopupMenuDataWidget(\n      value: 'profile',\n      label: 'Profile',\n      icon: Icons.person,\n    ),\n    PopupMenuDataWidget(\n      value: 'setting',\n      label: 'Setting',\n      icon: Icons.settings,\n    ),\n    PopupMenuDataWidget(\n      value: 'delete',\n      label: 'Hapus Akun',\n      icon: Icons.delete,\n      color: Colors.red,\n    ),\n  ],\n)"
         },
         {
             "id": "ToastWidget",
