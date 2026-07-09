@@ -1179,9 +1179,9 @@
                 },
                 {
                     "name": "child",
-                    "type": "Widget?",
+                    "type": "Widget Function(VoidCallback next)?",
                     "default": "null",
-                    "desc": "Widget kustom pemicu popup jika tidak ingin menggunakan ikon standar. Berguna jika pemicunya adalah tombol teks atau gambar."
+                    "desc": "Fungsi builder yang mengembalikan widget pemicu kustom. Menyediakan callback 'next' yang digunakan untuk membuka popup menu secara programatik saat aksi (seperti onTap/onPressed) dieksekusi."
                 },
                 {
                     "name": "shape",
@@ -1219,9 +1219,10 @@
                 }
             ],
             "specialNotes": [
-                "Hanya gunakan SATU antara parameter 'icon' atau 'child'. Jika menggunakan 'icon', Material design akan otomatis memberikan padding sirkular standar IconButton."
+                "Hanya gunakan SATU antara parameter 'icon' atau 'child'. Jika menggunakan 'icon', Material design akan otomatis memberikan padding sirkular standar IconButton.",
+                "Komponen ini berjalan menggunakan GlobalKey secara internal agar pembukaan menu melalui parameter 'child' (programatik) berjalan aman tanpa pelemparan context tambahan."
             ],
-            "code": "PopupMenuWidget<String>(\n  icon: const Icon(Icons.more_vert),\n  onSelected: (value) {\n    print('Menu yang dipilih: $value');\n  },\n  items: const [\n    PopupMenuDataWidget(\n      value: 'profile',\n      label: 'Profile',\n      icon: Icons.person,\n    ),\n    PopupMenuDataWidget(\n      value: 'setting',\n      label: 'Setting',\n      icon: Icons.settings,\n    ),\n    PopupMenuDataWidget(\n      value: 'delete',\n      label: 'Hapus Akun',\n      icon: Icons.delete,\n      color: Colors.red,\n    ),\n  ],\n)"
+            "code": "PopupMenuWidget<String>(\n  onSelected: (value) {\n    print(value);\n  },\n  child: (next) => ElevatedButton(\n    onPressed: next,\n    child: const Text('Buka Menu'),\n  ),\n  items: const [\n    PopupMenuDataWidget(\n      value: 'profile',\n      label: 'Profile',\n      icon: Icons.person,\n    ),\n    PopupMenuDataWidget(\n      value: 'setting',\n      label: 'Setting',\n      icon: Icons.settings,\n    ),\n    PopupMenuDataWidget(\n      value: 'delete',\n      label: 'Hapus Akun',\n      icon: Icons.delete,\n      color: Colors.red,\n    ),\n  ],\n)"
         },
         {
             "id": "ToastWidget",
