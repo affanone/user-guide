@@ -1793,7 +1793,7 @@
                     "name": "initialValue (khusus value<T>)",
                     "type": "T (Generic)",
                     "default": "",
-                    "desc": "Nilai dasar yang wajib diisi. Berlaku sebagai fallback mutlak dari tipe data yang Anda tentukan jika dimensi layar saat ini tidak memenuhi syarat breakpoint lain yang lebih besar."
+                    "desc": "Nilai dasar yang wajib diisi. Berlaku sebagai fallback mutlak dari tipe data yang Anda tentukan jika dimensi layar saat ini tidak memenuhi syarat breakpoint lain yang lebih besar, atau jika seluruh parameter breakpoint dikosongkan."
                 }
             ],
             "optionalProps": [
@@ -1850,7 +1850,7 @@
                 {
                     "name": "Mobile-First Override Approach",
                     "type": "Logic",
-                    "desc": "Mengevaluasi nilai dari breakpoint terkecil (xxs) hingga ukuran layar saat ini, mengamankan flow perubahan nilai secara proporsional dan konsisten."
+                    "desc": "Mengevaluasi nilai dari breakpoint terkecil (xxs) hingga ukuran layar saat ini, mengamankan flow perubahan nilai secara proporsional dan konsisten. Jika tidak ada yang sesuai, kembali ke `initialValue`."
                 }
             ],
             "specialNotes": [
@@ -2696,9 +2696,9 @@
                 "grid_col_optional_props": [
                     {
                         "name": "xxs",
-                        "type": "int",
-                        "default": "12",
-                        "desc": "Lebar kolom (1-12) pada layar sangat kecil (< 360px). Nilai 0 akan menyembunyikan kolom (display: none)."
+                        "type": "int?",
+                        "default": "null",
+                        "desc": "Lebar kolom (1-12) pada layar sangat kecil (< 360px). Jika dibiarkan kosong (null), nilai otomatis jatuh (fallback) ke default mutlak sistem yaitu 12. Nilai 0 akan menyembunyikan kolom (display: none)."
                     },
                     {
                         "name": "xs",
@@ -2769,7 +2769,7 @@
                     "name": "Responsive Cascading",
                     "type": "UI Layout",
                     "default": "",
-                    "desc": "Sistem mewarisi (cascade) nilai dari breakpoint terkecil hingga terbesar secara linear (Mobile-First). Jika hanya mengatur xs=12 dan md=6, maka pada layar lg hingga xxxl sistem menggunakan md=6 secara otomatis."
+                    "desc": "Sistem mewarisi (cascade) nilai dari breakpoint terkecil hingga terbesar secara linear (Mobile-First). Jika hanya mengatur xs=12 dan md=6, maka pada layar lg hingga xxxl sistem menggunakan md=6 secara otomatis. Jika tidak ada satupun yang diisi, kolom akan menempati lebar penuh (12)."
                 },
                 {
                     "name": "Zero Width Omission",
