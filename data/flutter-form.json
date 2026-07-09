@@ -1026,7 +1026,7 @@
             "id": "search",
             "group": "Input Teks & Angka",
             "name": "Search",
-            "icon": "fa-solid fa-envelope",
+            "icon": "fa-solid fa-search",
             "description": "Field input khusus search. Secara otomatis memblokir spasi dan memberikan ikon default.",
             "mandatoryProps": [],
             "optionalProps": [
@@ -4875,7 +4875,7 @@
         {
             "id": "lookup",
             "group": "Selection & Dropdown",
-            "name": "Lookup (Search/Picker)",
+            "name": "Lookup",
             "icon": "fa-solid fa-magnifying-glass-plus",
             "description": "Widget pencarian tingkat lanjut untuk memilih data dari modal atau halaman lain. Cocok untuk memilih 'Pelanggan', 'Produk', atau Data Referensi dari database master. Memiliki pemisahan mutlak: FormNode menyimpan value generik T, sedangkan displayBuilder mengatur tampilan UI tanpa mengubah data asli.",
             "mandatoryProps": [
