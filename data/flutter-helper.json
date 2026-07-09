@@ -2695,10 +2695,16 @@
                 ],
                 "grid_col_optional_props": [
                     {
+                        "name": "defaultCol",
+                        "type": "int",
+                        "default": "12",
+                        "desc": "Lebar bawaan kolom (1-12) yang digunakan jika tidak ada nilai breakpoint spesifik yang diatur. Menjadi fallback paling akhir."
+                    },
+                    {
                         "name": "xxs",
                         "type": "int?",
                         "default": "null",
-                        "desc": "Lebar kolom (1-12) pada layar sangat kecil (< 360px). Jika dibiarkan kosong (null), nilai otomatis jatuh (fallback) ke default mutlak sistem yaitu 12. Nilai 0 akan menyembunyikan kolom (display: none)."
+                        "desc": "Lebar kolom (1-12) pada layar sangat kecil (< 360px). Jika dibiarkan kosong (null), nilai otomatis jatuh (fallback) ke defaultCol. Nilai 0 akan menyembunyikan kolom (display: none)."
                     },
                     {
                         "name": "xs",
@@ -2789,7 +2795,7 @@
                 "STRETCH CONSTRAINT: Jika matchHeight=false, fitur GridAlign.stretch hanya bekerja apabila constraint vertikal dari parent tidak tak-terbatas (infinite).",
                 "MATCH HEIGHT: Gunakan matchHeight=true secara bijak. Meskipun menyelesaikan masalah tinggi kolom dalam ScrollView (infinite height), penggunaan IntrinsicHeight membawa sedikit penalti komputasi tambahan."
             ],
-            "code": "// SKENARIO 1: GRID REGULER (Performa Maksimal)\nGridRowWidget(\n  justify: GridJustify.spaceBetween,\n  rowGap: 16.0,\n  columnGap: 16.0,\n  children: [\n    GridColWidget(\n      xs: 12,   // Penuh di Mobile\n      md: 6,    // 50% di Tablet\n      lg: 4,    // 33.3% di Desktop\n      child: Container(color: Colors.red, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      lg: 4,\n      child: Container(color: Colors.green, height: 100),\n    ),\n  ],\n)\n\n// SKENARIO 2: GRID DENGAN MATCH HEIGHT\nGridRowWidget(\n  matchHeight: true, // Kolom pendek akan ditarik sejajar dengan kolom tertinggi di barisnya\n  children: [\n    GridColWidget(\n      xs: 6,\n      child: Container(color: Colors.blue, child: Text('Teks Singkat')),\n    ),\n    GridColWidget(\n      xs: 6,\n      child: Container(color: Colors.orange, child: Text('Teks yang sangat panjang... menempati banyak ruang vertikal dan mendorong tinggi kolom ke bawah secara dinamis.')),\n    ),\n  ],\n)"
+            "code": "GridRowWidget(\n  justify: GridJustify.spaceBetween,\n  rowGap: 16.0,\n  columnGap: 16.0,\n  children: [\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      lg: 4,\n      child: Container(color: Colors.red, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      lg: 4,\n      child: Container(color: Colors.green, height: 100),\n    ),\n  ],\n)\n\nGridRowWidget(\n  matchHeight: true,\n  children: [\n    GridColWidget(\n      xs: 6,\n      child: Container(color: Colors.blue, child: Text('Teks Singkat')),\n    ),\n    GridColWidget(\n      xs: 6,\n      child: Container(color: Colors.orange, child: Text('Teks yang sangat panjang... menempati banyak ruang vertikal dan mendorong tinggi kolom ke bawah secara dinamis.')),\n    ),\n  ],\n)"
         },
         {
             "id": "ListViewWidget",
@@ -2911,6 +2917,12 @@
                     "type": "ScrollDragDir",
                     "default": "ScrollDragDir.vertical",
                     "desc": "Menentukan orientasi scroll (vertical, horizontal, atau both)."
+                },
+                {
+                    "name": "thickness",
+                    "type": "double?",
+                    "default": "null",
+                    "desc": "Menentukan ukuran ketebalan visual dari garis scrollbar. Jika tidak diisi, akan mengikuti tema bawaan Flutter."
                 },
                 {
                     "name": "controller",
