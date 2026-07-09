@@ -1777,6 +1777,90 @@
             "code": "Focus(\n  onKeyEvent: (node, event) {\n    // Skenario 1: Helper Spesifik (Lebih cepat dieksekusi)\n    if (KeyHandler.isEnter(event)) {\n      print('Menyimpan form...');\n      return KeyEventResult.handled;\n    }\n\n    // Skenario 2: Kombinasi Custom (Shortcut)\n    if (KeyHandler.isMatch(event, 'CTRL+SHIFT+S')) {\n      _saveDataAs();\n      return KeyEventResult.handled;\n    }\n\n    // Skenario 3: Merespon saat tombol dilepas (Up Event)\n    if (KeyHandler.isEscape(event, action: KeyAction.up)) {\n      closeModal();\n      return KeyEventResult.handled;\n    }\n\n    // Fallback wajib: Abaikan event jika tidak ada yang cocok di atas\n    return KeyEventResult.ignored;\n  },\n  child: YourFormWidget(),\n)"
         },
         {
+            "id": "Responsive",
+            "group": "Helper",
+            "name": "Smart Responsive",
+            "icon": "fa-solid fa-display",
+            "description": "Kelas utilitas statis untuk mengelola breakpoint dan responsivitas UI secara efisien. Menggunakan `MediaQuery.sizeOf` untuk meminimalisir rebuild rendering tree. Dilengkapi dengan fungsi generik `value<T>` berskala waktu eksekusi O(1) untuk merender tipe data apapun (seperti Widget, double, int, bool) tanpa overhead pembuatan Map atau Looping, memastikan performa aplikasi tetap optimal dan hemat memori pada skala besar.",
+            "mandatoryProps": [
+                {
+                    "name": "context",
+                    "type": "BuildContext",
+                    "default": "",
+                    "desc": "Konteks aplikasi saat ini. Wajib disuplai untuk membaca dimensi layar secara real-time melalui MediaQuery."
+                },
+                {
+                    "name": "initialValue (khusus value<T>)",
+                    "type": "T (Generic)",
+                    "default": "",
+                    "desc": "Nilai dasar yang wajib diisi. Berlaku sebagai fallback mutlak dari tipe data yang Anda tentukan jika dimensi layar saat ini tidak memenuhi syarat breakpoint lain yang lebih besar."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "width",
+                    "type": "double",
+                    "default": "null",
+                    "desc": "Digunakan khusus pada method `breakpoint`. Jika diisi, akan mengabaikan dimensi dari `context` dan menggunakan nilai statis ini untuk kalkulasi."
+                },
+                {
+                    "name": "xxs, xs, sm, md, lg, xl, xxl, xxxl",
+                    "type": "T? / bool?",
+                    "default": "null",
+                    "desc": "Parameter opsional untuk menetapkan spesifik nilai atau state pada titik henti (breakpoint) layar tertentu."
+                }
+            ],
+            "additionalInfo": {
+                "dependencies": "flutter/material.dart",
+                "architecture_layer": "Static Helper Class, Generic Type (<T>), O(1) Execution Time"
+            },
+            "methods": [
+                {
+                    "name": "breakpoint(context, {width})",
+                    "returnType": "Breakpoint",
+                    "desc": "Mendapatkan nilai enum `Breakpoint` aktif secara instan berdasarkan ukuran layar saat ini."
+                },
+                {
+                    "name": "value<T>(context, {required initialValue, xxs...xxxl})",
+                    "returnType": "T",
+                    "desc": "Method utama yang bersifat polimorfik. Dapat menerima dan mengembalikan tipe data apapun (Widget, String, double, int) secara dinamis sesuai pergerakan resolusi layar."
+                },
+                {
+                    "name": "isResponsive(context, {initialValue, xxs...xxxl})",
+                    "returnType": "bool",
+                    "desc": "Fungsi spesifik yang dipertahankan untuk kompatibilitas. Merupakan wrapper yang mengeksekusi `value<bool>` guna mengembalikan state kebenaran (true/false) saja."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Rebuild Optimization",
+                    "type": "Performance",
+                    "desc": "Secara internal memakai `MediaQuery.sizeOf(context)` alih-alih `MediaQuery.of(context).size`. Ini mencegah widget tree merender ulang seluruh komponen ketika ada perubahan non-dimensi (seperti kemunculan keyboard)."
+                },
+                {
+                    "name": "O(1) Memory Efficiency",
+                    "type": "Architecture",
+                    "desc": "Evaluasi linier kaskade berkinerja tinggi. Otomatis menghindari instansiasi objek Map baru dan menghilangkan proses iterasi loop pada setiap frame UI."
+                },
+                {
+                    "name": "Generic Polymorphism",
+                    "type": "Scalability",
+                    "desc": "Ekspansi fungsi tanpa batas menggunakan parameter `T`. Satu fungsi bisa menangani manajemen ukuran font, hitungan grid, hingga pergantian layout widget utuh."
+                },
+                {
+                    "name": "Mobile-First Override Approach",
+                    "type": "Logic",
+                    "desc": "Mengevaluasi nilai dari breakpoint terkecil (xxs) hingga ukuran layar saat ini, mengamankan flow perubahan nilai secara proporsional dan konsisten."
+                }
+            ],
+            "specialNotes": [
+                "Pastikan selalu mendefinisikan tipe data eksplisit pada `<T>` seperti `Responsive.value<double>(...)` untuk menghindari kesalahan kompilasi atau inferensi tipe dari Dart.",
+                "Selalu letakkan pemanggilan fungsi ini langsung di dalam method `build` agar widget dapat bereaksi instan saat resolusi perangkat berubah.",
+                "Tidak perlu menyuplai setiap breakpoint. Cukup suplai `initialValue` dan titik di mana perubahan tata letak diperlukan (misalnya hanya di `md` dan `lg`)."
+            ],
+            "code": "Widget build(BuildContext context) {\n  final crossAxisCount = Responsive.value<int>(\n    context,\n    initialValue: 2,\n    md: 3,\n    lg: 4,\n    xxl: 6,\n  );\n\n  final padding = Responsive.value<double>(\n    context,\n    initialValue: 16.0,\n    md: 24.0,\n    xl: 32.0,\n  );\n\n  final showSidebar = Responsive.isResponsive(\n    context,\n    initialValue: false,\n    lg: true,\n  );\n\n  return Scaffold(\n    body: GridView.count(\n      padding: EdgeInsets.all(padding),\n      crossAxisCount: crossAxisCount,\n      children: [ /* Komponen Grid */ ],\n    ),\n  );\n}"
+        },
+        {
             "id": "CropWidget",
             "group": "Helper",
             "name": "Crop",
