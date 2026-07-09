@@ -606,7 +606,7 @@
         {
             "id": "NavigatorPageWidget",
             "group": "Widget",
-            "name": "Responsive Navigator Page",
+            "name": "Navigator Page",
             "icon": "fa-solid fa-route",
             "description": "Widget utilitas navigasi responsif yang secara cerdas merender komponen berdasarkan lebar layar (breakpoint). Pada layar desktop, konten dirender sebagai dialog/modal melayang bergaya premium dengan efek frosted glass. Sementara pada layar mobile, konten dirender sebagai halaman penuh (full-page) menggunakan MaterialPageRoute konvensional.",
             "mandatoryProps": [
