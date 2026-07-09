@@ -2650,7 +2650,7 @@
             "group": "Layout",
             "name": "Grid System",
             "icon": "fa-solid fa-table-columns",
-            "description": "Sistem layout grid responsif berbasis 12-kolom yang terinspirasi dari Bootstrap. Komponen ini terdiri dari GridRowWidget sebagai kontainer utama dan GridColWidget sebagai penentu lebar kolom pada berbagai titik henti (breakpoint). Memungkinkan pembuatan desain antarmuka yang fleksibel, otomatis beradaptasi dari layar mobile kecil hingga layar desktop super lebar, serta dilengkapi utilitas fungsi responsif independen.",
+            "description": "Sistem layout grid responsif berbasis 12-kolom yang terinspirasi dari Bootstrap. Komponen ini terdiri dari GridRowWidget sebagai kontainer utama dan GridColWidget sebagai penentu lebar kolom pada berbagai titik henti (breakpoint). Memungkinkan pembuatan desain antarmuka yang fleksibel, otomatis beradaptasi dari layar mobile kecil hingga layar desktop super lebar. Kini dilengkapi mesin spesifisitas cerdas (Intelligent Specificity Engine) untuk penanganan rentang piksel kustom secara premium.",
             "mandatoryProps": [
                 {
                     "name": "children",
@@ -2712,6 +2712,12 @@
                         "type": "int",
                         "default": "12",
                         "desc": "Lebar bawaan kolom (1-12) yang digunakan jika tidak ada nilai breakpoint spesifik yang diatur. Menjadi fallback paling akhir."
+                    },
+                    {
+                        "name": "customRanges",
+                        "type": "List<GridCustomRange>?",
+                        "default": "null",
+                        "desc": "Mendefinisikan pengaturan lebar kolom adaptif berbasis rentang piksel absolut (minWidth & maxWidth). Memiliki prioritas evaluasi di atas breakpoint bawaan. Jika minWidth kosong otomatis dianggap 0.0, jika maxWidth kosong otomatis dianggap tak terbatas. Jika keduanya kosong, indeks rentang tersebut akan diabaikan secara aman."
                     },
                     {
                         "name": "xxs",
@@ -2779,6 +2785,12 @@
             ],
             "behaviors": [
                 {
+                    "name": "Intelligent Range Specificity (Smart Ranking)",
+                    "type": "Render Logic",
+                    "default": "",
+                    "desc": "Jika terjadi tumpang tindih (overlap) nilai pada parameter customRanges, mesin cerdas premium akan mengadu kecocokan berdasarkan hukum spesifisitas tertinggi (bukan urutan penulisan array). Prioritas pemenang ditentukan bertahap: (1) Rentang cakupan piksel paling sempit/spesifik, (2) Nilai minWidth tertinggi yang paling mendekati lebar layar aktif, (3) Nilai maxWidth terendah."
+                },
+                {
                     "name": "Dual Engine Layout",
                     "type": "Render Logic",
                     "default": "",
@@ -2806,9 +2818,10 @@
             "specialNotes": [
                 "GridRowWidget secara internal menggunakan LayoutBuilder. Ini memungkinkan komponen bereaksi dinamis terhadap lebar kontainer parent terdekat, bukan hanya terhadap lebar absolut MediaQuery (krusial untuk nested-grid).",
                 "STRETCH CONSTRAINT: Jika matchHeight=false, fitur GridAlign.stretch hanya bekerja apabila constraint vertikal dari parent tidak tak-terbatas (infinite).",
-                "MATCH HEIGHT: Gunakan matchHeight=true secara bijak. Meskipun menyelesaikan masalah tinggi kolom dalam ScrollView (infinite height), penggunaan IntrinsicHeight membawa sedikit penalti komputasi tambahan."
+                "MATCH HEIGHT: Gunakan matchHeight=true secara bijak. Meskipun menyelesaikan masalah tinggi kolom dalam ScrollView (infinite height), penggunaan IntrinsicHeight membawa sedikit penalti komputasi tambahan.",
+                "AUTOMATIC OVERLAP RESOLUTION: Karena adanya Smart Ranking Engine, penulisan customRanges yang tumpang tindih tanpa batas maxWidth tetap aman digunakan dan akan diurai secara logis berdasarkan kedekatan angka piksel layar aktif."
             ],
-            "code": "GridRowWidget(\n  justify: GridJustify.spaceBetween,\n  rowGap: 16.0,\n  columnGap: 16.0,\n  children: [\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      lg: 4,\n      child: Container(color: Colors.red, height: 100),\n    ),\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      lg: 4,\n      child: Container(color: Colors.green, height: 100),\n    ),\n  ],\n)\n\nGridRowWidget(\n  matchHeight: true,\n  children: [\n    GridColWidget(\n      xs: 6,\n      child: Container(color: Colors.blue, child: Text('Teks Singkat')),\n    ),\n    GridColWidget(\n      xs: 6,\n      child: Container(color: Colors.orange, child: Text('Teks yang sangat panjang... menempati banyak ruang vertikal dan mendorong tinggi kolom ke bawah secara dinamis.')),\n    ),\n  ],\n)"
+            "code": "GridRowWidget(\n  justify: GridJustify.spaceBetween,\n  rowGap: 16.0,\n  columnGap: 16.0,\n  children: [\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      lg: 4,\n      child: Container(color: Colors.red, height: 100),\n    ),\n  ],\n)\n\n// Contoh Kasus Overlap Cerdas (Premium Specificity)\nGridRowWidget(\n  children: [\n    GridColWidget(\n      xs: 12,\n      md: 6,\n      customRanges: [\n        // Layar >= 200px s/d 299px akan menggunakan colSpan: 5\n        GridCustomRange(minWidth: 200, colSpan: 5),\n        // Saat layar mencapai >= 300px, aturan ini otomatis menang karena lebih spesifik mendekati ukuran layar aktif\n        GridCustomRange(minWidth: 300, colSpan: 12),\n      ],\n      child: Container(color: Colors.purple, height: 100),\n    ),\n  ],\n)\n\n// Contoh Penggunaan matchHeight Dinamis\nGridRowWidget(\n  matchHeight: true,\n  children: [\n    GridColWidget(\n      xs: 6,\n      child: Container(color: Colors.blue, child: Text('Teks Singkat')),\n    ),\n    GridColWidget(\n      xs: 6,\n      child: Container(color: Colors.orange, child: Text('Teks yang sangat panjang... menempati banyak ruang vertikal secara dinamis.')),\n    ),\n  ],\n)"
         },
         {
             "id": "ListViewWidget",
