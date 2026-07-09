@@ -608,7 +608,7 @@
             "group": "Widget",
             "name": "Responsive Navigator Page",
             "icon": "fa-solid fa-route",
-            "description": "Widget utilitas navigasi responsif yang secara cerdas merender komponen berdasarkan lebar layar (breakpoint). Pada layar desktop (lebar ≥ 1024px), konten dirender sebagai dialog/modal melayang bergaya premium dengan efek frosted glass. Sementara pada layar mobile (< 1024px), konten dirender sebagai halaman penuh (full-page) menggunakan MaterialPageRoute konvensional.",
+            "description": "Widget utilitas navigasi responsif yang secara cerdas merender komponen berdasarkan lebar layar (breakpoint). Pada layar desktop, konten dirender sebagai dialog/modal melayang bergaya premium dengan efek frosted glass. Sementara pada layar mobile, konten dirender sebagai halaman penuh (full-page) menggunakan MaterialPageRoute konvensional.",
             "mandatoryProps": [
                 {
                     "name": "context",
@@ -620,7 +620,7 @@
                     "name": "child",
                     "type": "Widget",
                     "default": "",
-                    "desc": "Konten widget utama (misal: halaman form, detail, atau komponen utuh) yang akan dirender di dalam layar modal desktop maupun rute layar penuh mobile."
+                    "desc": "Konten widget utama (misal: halaman form, detail) yang akan dirender di dalam layar modal desktop maupun rute layar penuh mobile."
                 }
             ],
             "optionalProps": [
@@ -628,19 +628,19 @@
                     "name": "inEffect",
                     "type": "AnimationEffect?",
                     "default": "null",
-                    "desc": "Konfigurasi transisi saat komponen masuk ke layar (fase IN). Sistem akan otomatis menjalankan animasi secara maju (forward) dari nilai status 0.0 menuju 1.0 menggunakan kurva yang ditentukan."
+                    "desc": "Konfigurasi transisi saat komponen masuk ke layar (fase IN). Sistem otomatis menjalankan animasi secara maju (forward) dari nilai status 0.0 menuju 1.0."
                 },
                 {
                     "name": "outEffect",
                     "type": "AnimationEffect?",
                     "default": "null",
-                    "desc": "Konfigurasi transisi saat komponen keluar dari layar (fase OUT). Sistem akan mendeteksi perubahan fase dan membalikkan arah animasi (reverse) secara otomatis, sambil menyuntikkan flag isOut agar widget tahu arah gerak keluarnya."
+                    "desc": "Konfigurasi transisi saat komponen keluar dari layar (fase OUT). Sistem mendeteksi perubahan fase dan membalikkan arah animasi (reverse) secara otomatis."
                 },
                 {
-                    "name": "forceFullScreen",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Jika bernilai true, memaksa tampilan untuk selalu menjadi halaman penuh (full screen) dan mengabaikan bentuk modal terlepas dari seberapa besar ukuran lebar layar pengguna."
+                    "name": "breakpoint",
+                    "type": "Breakpoint",
+                    "default": "Breakpoint.md",
+                    "desc": "Batas ukuran lebar view port penentu transisi UI. Jika view port >= nilai breakpoint, beralih ke mode Desktop (modal). Jika kurang, beralih ke mode Mobile."
                 },
                 {
                     "name": "modalMaxWidth",
@@ -652,7 +652,7 @@
                     "name": "modalMaxHeight",
                     "type": "double?",
                     "default": "null",
-                    "desc": "Batasan tinggi maksimum jendela modal pada mode desktop. Jika null, akan otomatis diatur sebesar 90% dari total tinggi layar (view port)."
+                    "desc": "Batasan tinggi maksimum jendela modal pada mode desktop. Jika null, otomatis diatur sebesar 90% dari total tinggi layar (view port)."
                 },
                 {
                     "name": "isDismissible",
@@ -664,7 +664,7 @@
                     "name": "barrierColor",
                     "type": "Color?",
                     "default": "null",
-                    "desc": "Warna overlay penutup layar belakang modal pada mode desktop. Jika null, sistem akan mengotomatiskan warnanya berdasarkan tema (terang/gelap)."
+                    "desc": "Warna overlay penutup layar belakang modal pada mode desktop. Jika null, sistem mengotomatiskan warnanya berdasarkan tema (terang/gelap)."
                 },
                 {
                     "name": "routeName",
@@ -676,7 +676,7 @@
                     "name": "wrapWithScaffoldIfRoute",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Hanya berlaku pada mode mobile (navigator push). Jika true, secara otomatis membungkus konten widget child ke dalam Scaffold agar memiliki layout latar dan app bar dasar yang valid secara material."
+                    "desc": "Hanya berlaku pada mode mobile (navigator push). Jika true, secara otomatis membungkus konten widget child ke dalam Scaffold agar memiliki layout latar dasar."
                 },
                 {
                     "name": "backgroundColor",
@@ -686,7 +686,7 @@
                 }
             ],
             "additionalInfo": {
-                "dependencies": "flutter/material.dart, dart:ui",
+                "dependencies": "flutter/material.dart, dart:ui, respo/src/utilities/responsive_utility.dart, respo/src/widgets/animation_widget.dart",
                 "enums": "PopupMode (modal, navigator, inline)"
             },
             "methods": [
@@ -694,19 +694,19 @@
                     "name": "push<T>",
                     "type": "static Future<T?>",
                     "default": "",
-                    "desc": "Metode utama untuk berpindah antarmuka yang akan memutuskan secara kondisional apakah me-render tampilan sebagai GeneralDialog (Desktop) atau MaterialPageRoute (Mobile)."
+                    "desc": "Metode utama untuk berpindah antarmuka yang memutuskan secara kondisional apakah merender tampilan sebagai GeneralDialog (Desktop) atau MaterialPageRoute (Mobile)."
                 },
                 {
                     "name": "pushReplacementx<T, TO>",
                     "type": "static Future<T?>",
                     "default": "",
-                    "desc": "Pintasan (Syntactic Sugar) yang akan menutup (pop) entri navigasi saat ini kemudian menimpa (replace) dengan NavigatorPageWidget.push yang baru. Berguna untuk perpindahan halaman linier seperti Next Step Wizard tanpa menumpuk riwayat stack layer rute."
+                    "desc": "Pintasan yang menutup (pop) entri navigasi saat ini kemudian menimpa (replace) dengan rute baru. Berguna untuk perpindahan linear tanpa menumpuk history stack."
                 },
                 {
                     "name": "pushReturnMode",
                     "type": "static void",
                     "default": "",
-                    "desc": "Varian push lanjutan untuk kasus khusus di mana widget di dalam child sangat membutuhkan konteks terkait 'di mode apa' widget tersebut sedang berada, yang akan dilempar melalui Builder Callback yang me-return enum PopupMode (modal atau navigator)."
+                    "desc": "Varian push lanjutan untuk kasus di mana widget child membutuhkan konteks 'mode apa' yang sedang berjalan, dilempar melalui Builder Callback (return enum PopupMode)."
                 }
             ],
             "behaviors": [
@@ -714,26 +714,26 @@
                     "name": "Responsive Split Routing",
                     "type": "Architecture",
                     "default": "",
-                    "desc": "Ketika lebar view port layar mencapai lebih dari sama dengan (>=) 1024px, maka aliran kode (flow code) otomatis di-bypass (dialihkan) untuk mengeksekusi showGeneralDialog. Jika lebih rendah, sistem akan membangun MaterialPageRoute."
+                    "desc": "Ketika lebar view port layar mencapai batas nilai Breakpoint, aliran kode otomatis di-bypass untuk mengeksekusi showGeneralDialog. Jika lebih rendah, menggunakan MaterialPageRoute."
+                },
+                {
+                    "name": "Smart Transition Reversal",
+                    "type": "Animation",
+                    "default": "",
+                    "desc": "Otomatis mendeteksi status animasi (reverse) ketika rute ditutup, mengonversi arah nilai dari 1.0 -> 0.0 menjadi eksekusi forward 0.0 -> 1.0 agar outEffect berjalan sempurna."
                 },
                 {
                     "name": "Dark Mode Barrier Frosting",
                     "type": "UI Reaction",
                     "default": "",
-                    "desc": "Apabila di mode terang, overlay barrier modal berwarna hitam transparan (0.4 opacity). Apabila di mode gelap, efeknya ditransformasi menjadi pelindung putih tipis dengan transparansi 0.04 yang bersinergi dengan filter pemburaman layar (frosted blur)."
-                },
-                {
-                    "name": "Intrinsic Constraint Adaptation",
-                    "type": "UI Reaction",
-                    "default": "",
-                    "desc": "Ukuran box container modal di-skalakan secara statis sehingga apabila konten (child) lebih pendek, modal akan mengikuti tinggi minimum dengan aman. Tinggi batas maksimal dilimit oleh perhitungan MediaQuery 90% secara proporsional."
+                    "desc": "Di mode terang, overlay barrier berwarna hitam transparan (0.4). Di mode gelap, ditransformasi menjadi pelindung putih transparan (0.04) bersinergi dengan filter pemburaman layar (frosted blur), dan container modal diberikan border tipis."
                 }
             ],
             "specialNotes": [
-                "Peringatan Trik UI Desktop: Karena layer Modal Desktop dibungkus Material() dengan clipBehavior 'Clip.antiAlias' untuk melengkungkan sudut, menyisipkan widget turunan (child) berupa Scaffold secara utuh *di dalam* modal desktop bisa menyebabkan double backgroundColor (putih di atas putih) atau overflow margin (Scaffold mencoba memakan layar utuh). Sebaiknya rancang form/child secara fleksibel (tidak terikat Scaffold secara instan).",
-                "Warning: pushReturnMode hanya me-return void (fire and forget), sehingga ia tidak ditujukan jika Anda mengharapkan respons await result layaknya navigator."
+                "Peringatan Trik UI Desktop: Karena layer Modal Desktop dibungkus Material() dengan clipBehavior 'Clip.antiAlias' untuk melengkungkan sudut, menyisipkan widget turunan (child) berupa Scaffold secara utuh di dalam modal desktop bisa menyebabkan double backgroundColor atau overflow margin.",
+                "Warning: pushReturnMode hanya me-return void (fire and forget), tidak ditujukan jika mengharapkan respons await result layaknya navigator biasa."
             ],
-            "code": "final resultData = await NavigatorPageWidget.push<String>(\n  context,\n  modalMaxWidth: 700,\n  wrapWithScaffoldIfRoute: true,\n  routeName: '/user/detail',\n  child: FormDetailPengguna(),\n);\n\nif (resultData != null) {\n  print('Kembali dengan data: $resultData');\n}"
+            "code": "final resultData = await NavigatorPageWidget.push<String>(\n  context,\n  modalMaxWidth: 700,\n  breakpoint: Breakpoint.lg,\n  wrapWithScaffoldIfRoute: true,\n  routeName: '/user/detail',\n  child: FormDetailPengguna(),\n);\n\nif (resultData != null) {\n  print('Kembali dengan data: $resultData');\n}"
         },
         {
             "id": "NoteWidget",
