@@ -2661,6 +2661,12 @@
             ],
             "optionalProps": [
                 {
+                    "name": "useGlobalWidth",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika true, grid akan menghitung lebar berdasarkan lebar layar penuh (MediaQuery) dan mengabaikan batasan (constraints) dari widget parent."
+                },
+                {
                     "name": "padding",
                     "type": "EdgeInsetsGeometry?",
                     "default": "null",
