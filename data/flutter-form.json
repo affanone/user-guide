@@ -5831,6 +5831,12 @@
                     "desc": "Menampilkan ikon utama."
                 },
                 {
+                    "name": "wrapper",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pilihan (chips) akan dibungkus ke baris baru. Jika disetel ke false, pilihan akan memanjang rata kiri (horizontal) tanpa batasan scroll, dan lebar pembungkus akan mengecil menyesuaikan panjang isinya."
+                },
+                {
                     "name": "enabled",
                     "type": "bool",
                     "default": "true",
@@ -5966,6 +5972,12 @@
                     "type": "String",
                     "default": ",",
                     "desc": "Pemisah string controller."
+                },
+                {
+                    "name": "wrapper",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pilihan (chips) akan dibungkus ke baris baru. Jika disetel ke false, pilihan akan memanjang rata kiri (horizontal) tanpa batasan scroll, dan lebar pembungkus akan mengecil menyesuaikan panjang isinya."
                 },
                 {
                     "name": "enabled",
