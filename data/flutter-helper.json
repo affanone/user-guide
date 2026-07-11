@@ -518,7 +518,10 @@
                     "AnimationEffect.slideLeft() -> Transisi pergeseran horizontal berkesinambungan. Saat IN masuk dari kanan ke tengah, saat OUT keluar dari tengah melesat meneruskan ke kiri.",
                     "AnimationEffect.slideRight() -> Transisi pergeseran horizontal berkesinambungan. Saat IN masuk dari kiri ke tengah, saat OUT keluar dari tengah melesat meneruskan ke kanan.",
                     "AnimationEffect.shakeHorizontal() -> Transisi efek getaran horizontal secara bolak-balik. Saat IN bergetar cepat ke kiri dan kanan sambil memudar masuk ke tengah, saat OUT bergetar intens dari posisi tengah sebelum akhirnya memudar hilang keluar.",
-                    "AnimationEffect.shakeVertical() -> Transisi efek getaran vertikal secara bolak-balik. Saat IN bergetar cepat ke atas dan bawah sambil memudar masuk ke tengah, saat OUT bergetar intens dari posisi tengah sebelum akhirnya memudar hilang keluar."
+                    "AnimationEffect.shakeVertical() -> Transisi efek getaran vertikal secara bolak-balik. Saat IN bergetar cepat ke atas dan bawah sambil memudar masuk ke tengah, saat OUT bergetar intens dari posisi tengah sebelum akhirnya memudar hilang keluar.",
+                    "AnimationEffect.spin() -> Transisi efek putaran melingkar secara penuh. Saat IN berputar 360 derajat sambil memudar masuk ke posisi normal, saat OUT berputar 360 derajat ke arah sebaliknya dari posisi tengah sebelum akhirnya memudar hilang keluar.",
+                    "AnimationEffect.blur() -> Transisi efek perubahan fokus visual. Saat IN perlahan menjadi tajam dari kondisi sangat buram sambil memudar masuk ke tengah, saat OUT kehilangan fokus menjadi sangat buram dari posisi tengah sebelum akhirnya memudar hilang keluar.",
+                    "AnimationEffect.scaleRotate() -> Transisi efek kombinasi perputaran dan skala ukuran. Saat IN membesar dari titik hilang sambil berputar 90 derajat dan memudar masuk ke posisi normal, saat OUT mengecil dan berputar terbalik dari posisi normal sebelum akhirnya memudar hilang keluar."
                 ]
             },
             "methods": [
