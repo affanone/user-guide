@@ -11,42 +11,98 @@
             "group": "Alert",
             "name": "Alert",
             "icon": "fa-solid fa-circle-exclamation",
-            "description": "Utility class statis yang menyediakan antarmuka dialog umpan balik (feedback alert) secara instan. Menawarkan empat varian peringatan: info, success, warning, dan error dengan desain premium, ukuran responsif, opsi draggable, serta dukungan Dark Mode dan animasi transisi kustom otomatis.",
-            "mandatoryProps": [],
-            "optionalProps": [],
+            "description": "Utility class statis yang menyediakan antarmuka dialog umpan balik (feedback alert) secara instan. Menawarkan empat varian peringatan: info, success, warning, dan error dengan desain premium, ukuran responsif, opsi draggable, auto-close, kontrol dismissable, serta dukungan Dark Mode dan animasi transisi kustom otomatis.",
+            "mandatoryProps": [
+                {
+                    "name": "context",
+                    "type": "BuildContext",
+                    "default": "",
+                    "desc": "Konteks aplikasi saat ini yang diperlukan oleh showGeneralDialog untuk menampilkan UI di atas layar."
+                },
+                {
+                    "name": "message",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Teks pesan utama yang akan ditampilkan di dalam badan dialog."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "title",
+                    "type": "String",
+                    "default": "Bervariasi",
+                    "desc": "Judul dialog. Nilai default menyesuaikan metode (Info, Berhasil, Peringatan, Error)."
+                },
+                {
+                    "name": "draggable",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika diatur ke true, pengguna dapat menggeser posisi dialog secara bebas."
+                },
+                {
+                    "name": "dismissable",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Mengizinkan pengguna menutup dialog dengan mengetuk area latar belakang atau menekan tombol kembali (ESC)."
+                },
+                {
+                    "name": "autoCloseDuration",
+                    "type": "Duration?",
+                    "default": "null",
+                    "desc": "Jika diisi, dialog akan otomatis tertutup sendiri setelah durasi yang ditentukan berlalu."
+                },
+                {
+                    "name": "inEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Memberikan efek animasi masuk (in) kustom dari package respo."
+                },
+                {
+                    "name": "outEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Memberikan efek animasi keluar (out) kustom dari package respo saat dialog ditutup."
+                }
+            ],
             "additionalInfo": {},
             "methods": [
                 {
                     "name": "info",
                     "type": "static void",
                     "default": "",
-                    "desc": "Menampilkan dialog informasi dengan ikon biru. Digunakan untuk pesan informatif netral. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) default 'Info', draggable (bool) default false, inEffect (AnimationEffect?), outEffect (AnimationEffect?)."
+                    "desc": "Menampilkan dialog informasi dengan ikon biru. Digunakan untuk pesan informatif netral."
                 },
                 {
                     "name": "success",
                     "type": "static void",
                     "default": "",
-                    "desc": "Menampilkan dialog berhasil dengan ikon hijau terang. Digunakan setelah operasi sukses seperti simpan data. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) default 'Berhasil', draggable (bool) default false, inEffect (AnimationEffect?), outEffect (AnimationEffect?)."
+                    "desc": "Menampilkan dialog berhasil dengan ikon hijau terang. Digunakan setelah operasi sukses seperti simpan data."
                 },
                 {
                     "name": "warning",
                     "type": "static void",
                     "default": "",
-                    "desc": "Menampilkan dialog peringatan dengan ikon oranye. Digunakan untuk kondisi yang perlu diwaspadai pengguna. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) default 'Peringatan', draggable (bool) default false, inEffect (AnimationEffect?), outEffect (AnimationEffect?)."
+                    "desc": "Menampilkan dialog peringatan dengan ikon oranye. Digunakan untuk kondisi yang perlu diwaspadai pengguna."
                 },
                 {
                     "name": "error",
                     "type": "static void",
                     "default": "",
-                    "desc": "Menampilkan dialog error dengan ikon merah. Digunakan ketika terjadi kegagalan proses atau exception. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) default 'Error', draggable (bool) default false, inEffect (AnimationEffect?), outEffect (AnimationEffect?)."
+                    "desc": "Menampilkan dialog error dengan ikon merah. Digunakan ketika terjadi kegagalan proses atau exception."
                 }
             ],
             "behaviors": [
                 {
-                    "name": "Non-dismissible & Dynamic Barrier",
+                    "name": "Dismissible & Dynamic Barrier",
                     "type": "Interaction",
-                    "default": "",
-                    "desc": "Dialog tidak dapat ditutup dengan mengetuk area latar belakang (barrierDismissible: false). Jika draggable false, latar belakang memiliki efek blur (BackdropFilter) dan warna hitam transparan (black54). Jika draggable true, latar belakang transparan penuh tanpa blur, namun interaksi ke elemen di belakangnya tetap diblokir."
+                    "default": "true",
+                    "desc": "Dialog secara default dapat ditutup dengan mengetuk area latar belakang atau menekan ESC (tergantung parameter dismissable). Jika draggable false, latar belakang memiliki efek blur (BackdropFilter) dan warna hitam transparan (black54). Jika draggable true, latar belakang transparan penuh tanpa blur."
+                },
+                {
+                    "name": "Auto Close Timer",
+                    "type": "Automation",
+                    "default": "null",
+                    "desc": "Jika parameter autoCloseDuration diberikan, dialog akan secara otomatis tertutup setelah durasi yang ditentukan habis. Proses ini menggunakan Future.delayed dengan pengecekan context.mounted dan flag isClosed untuk mencegah error navigasi ganda."
                 },
                 {
                     "name": "Draggable Support",
@@ -80,7 +136,7 @@
                 "Limitation: Warna tombol konfirmasi di-hardcode menggunakan Colors.deepOrange dan tidak beradaptasi dengan warna primary dari tema aplikasi.",
                 "Best Practice: Panggil AlertWidget.error() di dalam blok catch ketika menangkap Exception dari pemanggilan API untuk memberikan umpan balik langsung kepada user."
             ],
-            "code": "try {\n  await apiService.submitData(data);\n  AlertWidget.success(\n    context, \n    'Data pengguna berhasil diperbarui dan disimpan ke dalam sistem.',\n    'Update Sukses',\n    true,\n    FadeInEffect(),\n    FadeOutEffect()\n  );\n} catch (e) {\n  AlertWidget.error(\n    context, \n    'Gagal menyimpan data. Silakan periksa koneksi internet Anda.',\n    'Error',\n    false,\n    ShakeEffect(),\n    FadeOutEffect()\n  );\n}"
+            "code": "try {\n  await apiService.submitData(data);\n  AlertWidget.success(\n    context, \n    'Data pengguna berhasil diperbarui dan disimpan ke dalam sistem.',\n    title: 'Update Sukses',\n    draggable: true,\n    autoCloseDuration: const Duration(seconds: 3),\n    inEffect: AnimationEffect.shakeVertical(),\n    outEffect: AnimationEffect.zoomOut(),\n  );\n} catch (e) {\n  AlertWidget.error(\n    context, \n    'Gagal menyimpan data. Silakan periksa koneksi internet Anda.',\n    title: 'Error',\n    dismissable: false,\n    inEffect: AnimationEffect.shakeHorizontal(),\n  );\n}"
         },
         {
             "id": "ConfirmWidget",
