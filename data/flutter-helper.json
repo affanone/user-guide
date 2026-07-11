@@ -11,7 +11,7 @@
             "group": "Alert",
             "name": "Alert",
             "icon": "fa-solid fa-circle-exclamation",
-            "description": "Utility class statis yang menyediakan antarmuka dialog umpan balik (feedback alert) secara instan. Menawarkan empat varian peringatan: info, success, warning, dan error dengan desain premium, ukuran responsif, serta dukungan Dark Mode otomatis.",
+            "description": "Utility class statis yang menyediakan antarmuka dialog umpan balik (feedback alert) secara instan. Menawarkan empat varian peringatan: info, success, warning, dan error dengan desain premium, ukuran responsif, opsi draggable, serta dukungan Dark Mode dan animasi transisi kustom otomatis.",
             "mandatoryProps": [],
             "optionalProps": [],
             "additionalInfo": {},
@@ -20,33 +20,45 @@
                     "name": "info",
                     "type": "static void",
                     "default": "",
-                    "desc": "Menampilkan dialog informasi dengan ikon biru. Digunakan untuk pesan informatif netral. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) dengan default 'Info'."
+                    "desc": "Menampilkan dialog informasi dengan ikon biru. Digunakan untuk pesan informatif netral. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) default 'Info', draggable (bool) default false, inEffect (AnimationEffect?), outEffect (AnimationEffect?)."
                 },
                 {
                     "name": "success",
                     "type": "static void",
                     "default": "",
-                    "desc": "Menampilkan dialog berhasil dengan ikon hijau terang. Digunakan setelah operasi sukses seperti simpan data. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) dengan default 'Berhasil'."
+                    "desc": "Menampilkan dialog berhasil dengan ikon hijau terang. Digunakan setelah operasi sukses seperti simpan data. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) default 'Berhasil', draggable (bool) default false, inEffect (AnimationEffect?), outEffect (AnimationEffect?)."
                 },
                 {
                     "name": "warning",
                     "type": "static void",
                     "default": "",
-                    "desc": "Menampilkan dialog peringatan dengan ikon oranye. Digunakan untuk kondisi yang perlu diwaspadai pengguna. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) dengan default 'Peringatan'."
+                    "desc": "Menampilkan dialog peringatan dengan ikon oranye. Digunakan untuk kondisi yang perlu diwaspadai pengguna. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) default 'Peringatan', draggable (bool) default false, inEffect (AnimationEffect?), outEffect (AnimationEffect?)."
                 },
                 {
                     "name": "error",
                     "type": "static void",
                     "default": "",
-                    "desc": "Menampilkan dialog error dengan ikon merah. Digunakan ketika terjadi kegagalan proses atau exception. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) dengan default 'Error'."
+                    "desc": "Menampilkan dialog error dengan ikon merah. Digunakan ketika terjadi kegagalan proses atau exception. Parameter wajib: context (BuildContext) dan message (String). Parameter opsional: title (String) default 'Error', draggable (bool) default false, inEffect (AnimationEffect?), outEffect (AnimationEffect?)."
                 }
             ],
             "behaviors": [
                 {
-                    "name": "Non-dismissible Barrier",
+                    "name": "Non-dismissible & Dynamic Barrier",
                     "type": "Interaction",
                     "default": "",
-                    "desc": "Dialog tidak dapat ditutup dengan mengetuk area latar belakang luar (barrierDismissible: false). Pengguna diwajibkan untuk menekan tombol 'Mengerti' agar sistem memastikan pesan telah dibaca."
+                    "desc": "Dialog tidak dapat ditutup dengan mengetuk area latar belakang (barrierDismissible: false). Jika draggable false, latar belakang memiliki efek blur (BackdropFilter) dan warna hitam transparan (black54). Jika draggable true, latar belakang transparan penuh tanpa blur, namun interaksi ke elemen di belakangnya tetap diblokir."
+                },
+                {
+                    "name": "Draggable Support",
+                    "type": "Interaction",
+                    "default": "false",
+                    "desc": "Jika parameter draggable bernilai true, dialog dibungkus custom widget yang memungkinkan pengguna menggeser posisi modal secara bebas menggunakan Transform.translate dan onPanUpdate."
+                },
+                {
+                    "name": "Custom Transitions",
+                    "type": "Animation",
+                    "default": "",
+                    "desc": "Mendukung kustomisasi efek animasi masuk dan keluar menggunakan inEffect dan outEffect. Jika tidak diberikan, secara default akan menggunakan kombinasi animasi FadeTransition dan ScaleTransition dengan kurva easeOutBack."
                 },
                 {
                     "name": "Automatic Theme Adaptation",
@@ -62,12 +74,13 @@
                 }
             ],
             "specialNotes": [
-                "Dependency: Kelas ini memiliki ketergantungan pada package eksternal 'google_fonts' untuk merender jenis huruf Poppins.",
+                "Dependency: Kelas ini memiliki ketergantungan pada package eksternal 'google_fonts' untuk merender jenis huruf Poppins, dan 'com.noobcode.respo' untuk AnimationEffect.",
+                "System: Menggunakan showGeneralDialog alih-alih showDialog untuk mendukung transitionBuilder kustom dan durasi animasi yang presisi.",
                 "Limitation: Tombol konfirmasi bersifat statis dengan teks 'Mengerti' dan aksi Navigator.pop(context). Tidak dapat disisipkan callback kustom untuk trigger event lain saat tombol ditekan.",
                 "Limitation: Warna tombol konfirmasi di-hardcode menggunakan Colors.deepOrange dan tidak beradaptasi dengan warna primary dari tema aplikasi.",
                 "Best Practice: Panggil AlertWidget.error() di dalam blok catch ketika menangkap Exception dari pemanggilan API untuk memberikan umpan balik langsung kepada user."
             ],
-            "code": "try {\n  await apiService.submitData(data);\n  AlertWidget.success(\n    context, \n    'Data pengguna berhasil diperbarui dan disimpan ke dalam sistem.',\n    'Update Sukses'\n  );\n} catch (e) {\n  AlertWidget.error(\n    context, \n    'Gagal menyimpan data. Silakan periksa koneksi internet Anda.',\n  );\n}"
+            "code": "try {\n  await apiService.submitData(data);\n  AlertWidget.success(\n    context, \n    'Data pengguna berhasil diperbarui dan disimpan ke dalam sistem.',\n    'Update Sukses',\n    true,\n    FadeInEffect(),\n    FadeOutEffect()\n  );\n} catch (e) {\n  AlertWidget.error(\n    context, \n    'Gagal menyimpan data. Silakan periksa koneksi internet Anda.',\n    'Error',\n    false,\n    ShakeEffect(),\n    FadeOutEffect()\n  );\n}"
         },
         {
             "id": "ConfirmWidget",
@@ -447,7 +460,9 @@
                     "AnimationEffect.slideUp() -> Transisi pergeseran vertikal berkesinambungan. Saat IN masuk dari bawah ke tengah, saat OUT keluar dari tengah melesat meneruskan ke atas.",
                     "AnimationEffect.slideDown() -> Transisi pergeseran vertikal berkesinambungan. Saat IN masuk dari atas ke tengah, saat OUT keluar dari tengah melesat meneruskan ke bawah.",
                     "AnimationEffect.slideLeft() -> Transisi pergeseran horizontal berkesinambungan. Saat IN masuk dari kanan ke tengah, saat OUT keluar dari tengah melesat meneruskan ke kiri.",
-                    "AnimationEffect.slideRight() -> Transisi pergeseran horizontal berkesinambungan. Saat IN masuk dari kiri ke tengah, saat OUT keluar dari tengah melesat meneruskan ke kanan."
+                    "AnimationEffect.slideRight() -> Transisi pergeseran horizontal berkesinambungan. Saat IN masuk dari kiri ke tengah, saat OUT keluar dari tengah melesat meneruskan ke kanan.",
+                    "AnimationEffect.shakeHorizontal() -> Transisi efek getaran horizontal secara bolak-balik. Saat IN bergetar cepat ke kiri dan kanan sambil memudar masuk ke tengah, saat OUT bergetar intens dari posisi tengah sebelum akhirnya memudar hilang keluar.",
+                    "AnimationEffect.shakeVertical() -> Transisi efek getaran vertikal secara bolak-balik. Saat IN bergetar cepat ke atas dan bawah sambil memudar masuk ke tengah, saat OUT bergetar intens dari posisi tengah sebelum akhirnya memudar hilang keluar."
                 ]
             },
             "methods": [
