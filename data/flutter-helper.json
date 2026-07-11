@@ -214,7 +214,7 @@
             "group": "Alert",
             "name": "Modal Premium",
             "icon": "fa-solid fa-window-maximize",
-            "description": "Widget pengelola dialog (modal) tingkat lanjut yang menawarkan tampilan desain ala enterprise dengan efek blur (frosted glass/backdrop filter), bayangan meluas, batas melengkung, serta animasi pemunculan zoom-out yang halus. Menyediakan API level rendah untuk kustomisasi total, serta API 'modal' level tinggi (High-level API) yang telah dibungkus rapi dengan Header, Scrollable Body, Actions (tombol eksekusi async/sync), dan Loading Spinner bawaan.",
+            "description": "Widget pengelola dialog (modal) tingkat lanjut. Menyediakan API level rendah untuk kustomisasi total, serta API 'modal' level tinggi yang telah dibungkus rapi dengan Header, Scrollable Body via Builder (terintegrasi dengan ModalController dan StateSetter), Actions, dan Loading Spinner. Mendukung mode Draggable tanpa blur untuk interaksi form yang fleksibel.",
             "mandatoryProps": [
                 {
                     "name": "context",
@@ -228,79 +228,91 @@
                     "name": "inEffect",
                     "type": "AnimationEffect?",
                     "default": "null",
-                    "desc": "Konfigurasi transisi saat komponen masuk ke layar (fase IN). Sistem akan otomatis menjalankan animasi secara maju (forward) dari nilai status 0.0 menuju 1.0 menggunakan kurva yang ditentukan."
+                    "desc": "Konfigurasi transisi saat komponen masuk ke layar (fase IN). Sistem otomatis menjalankan animasi maju (forward) dari 0.0 menuju 1.0."
                 },
                 {
                     "name": "outEffect",
                     "type": "AnimationEffect?",
                     "default": "null",
-                    "desc": "Konfigurasi transisi saat komponen keluar dari layar (fase OUT). Sistem akan mendeteksi perubahan fase dan membalikkan arah animasi (reverse) secara otomatis, sambil menyuntikkan flag isOut agar widget tahu arah gerak keluarnya."
+                    "desc": "Konfigurasi transisi saat komponen keluar layar (fase OUT). Sistem mendeteksi perubahan fase dan membalikkan arah animasi (reverse) secara otomatis."
                 },
                 {
                     "name": "child",
                     "type": "Widget?",
                     "default": "null",
-                    "desc": "Konten utama yang akan dirender di bagian tengah tubuh (body) dialog. Pada API level tinggi (modal), konten ini akan dibungkus otomatis dengan padding 24.0 dan SingleChildScrollView."
+                    "desc": "[Hanya pada method .show() dan .replace()] Konten utama statis yang akan dirender di bagian tengah body dialog."
+                },
+                {
+                    "name": "builder",
+                    "type": "Widget Function(BuildContext context, ModalController modal, StateSetter modalState)?",
+                    "default": "null",
+                    "desc": "[Hanya pada method .modal()] Pengganti child statis. Membawa instance ModalController untuk kontrol eksekusi, serta StateSetter (modalState) untuk memicu reaktivitas UI lokal (seperti toggle, checkbox, atau validasi real-time) di dalam modal tanpa perlu memanggil StatefulBuilder manual."
+                },
+                {
+                    "name": "isDraggable",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika true, modal dapat digeser (drag). Secara otomatis menonaktifkan efek blur (frosted glass), menghilangkan bayangan (shadow) kotak, dan merubah warna overlay menjadi transparan penuh."
                 },
                 {
                     "name": "title",
                     "type": "String?",
                     "default": "null",
-                    "desc": "[Hanya pada method .modal()] Teks yang akan ditampilkan pada sisi kiri atas Header modal dengan ketebalan teks semi-bold."
+                    "desc": "[Hanya pada method .modal()] Teks di sisi kiri atas Header modal dengan ketebalan semi-bold."
                 },
                 {
                     "name": "actions",
                     "type": "List<Widget>?",
                     "default": "null",
-                    "desc": "[Hanya pada method .modal()] Kumpulan aksi/ikon tambahan yang diletakkan pada Header, berada persis sebelum tombol Close. Sangat ideal untuk menaruh IconButton atau PopupMenuButton."
+                    "desc": "[Hanya pada method .modal()] Kumpulan aksi/ikon tambahan pada Header, berada persis sebelum tombol Close."
                 },
                 {
                     "name": "footerActions",
                     "type": "List<Widget>?",
                     "default": "null",
-                    "desc": "[Hanya pada method .modal()] Komponen tombol atau elemen custom yang akan merender ulang keseluruhan area Footer. Jika diisi, tombol OK dan Cancel otomatis tidak akan ditampilkan."
+                    "desc": "[Hanya pada method .modal()] Merender ulang keseluruhan area Footer dengan widget kustom. Jika diisi, tombol bawaan OK dan Cancel tidak ditampilkan."
                 },
                 {
                     "name": "onConfirm",
                     "type": "FutureOr<bool?> Function()?",
                     "default": "null",
-                    "desc": "[Hanya pada method .modal()] Callback reaktif yang dipicu ketika tombol konfirmasi (OK) diklik. Mendukung Async/Await. Tombol dan aksi penutupan dialog akan dikunci (disabled + loading spinner) sampai promise ini mengembalikan nilai boolean. Hanya return nilai 'true' yang dapat menutup dialog; nilai 'false' atau 'null' akan membiarkan dialog tetap terbuka."
+                    "desc": "[Hanya pada method .modal()] Callback reaktif tombol konfirmasi. Mendukung Async/Await. State modal akan dikunci (disabled + spinner) sampai return. Return 'true' menutup dialog; 'false' atau 'null' membiarkan dialog terbuka."
                 },
                 {
                     "name": "showCancelButton",
                     "type": "bool",
                     "default": "false",
-                    "desc": "[Hanya pada method .modal()] Menampilkan tombol sekunder dengan style outline yang digunakan untuk sekadar menutup modal tanpa aksi."
+                    "desc": "[Hanya pada method .modal()] Menampilkan tombol sekunder outline untuk menutup modal tanpa aksi."
                 },
                 {
                     "name": "confirmText",
                     "type": "String",
                     "default": "'OK'",
-                    "desc": "[Hanya pada method .modal()] Mengubah teks label (caption) default untuk tombol utama aksi konfirmasi (Primary Button)."
+                    "desc": "[Hanya pada method .modal()] Mengubah label caption default untuk tombol utama (Primary)."
                 },
                 {
                     "name": "cancelText",
                     "type": "String",
                     "default": "'Cancel'",
-                    "desc": "[Hanya pada method .modal()] Mengubah teks label (caption) default untuk tombol sekunder atau batal."
+                    "desc": "[Hanya pada method .modal()] Mengubah label caption default untuk tombol batal (Secondary)."
                 },
                 {
                     "name": "afterClose",
                     "type": "VoidCallback?",
                     "default": "null",
-                    "desc": "[Hanya pada method .modal()] Callback sinkron/api-fire-and-forget yang dipicu sesaat (immediately) setelah dialog benar-benar ditutup dan hilang dari tumpukan rute."
+                    "desc": "[Hanya pada method .modal()] Callback sinkron yang dipicu sesaat setelah dialog benar-benar ditutup dan hilang dari tumpukan rute."
                 },
                 {
                     "name": "afterShow",
                     "type": "VoidCallback?",
                     "default": "null",
-                    "desc": "Callback sinkron yang dipicu sesaat setelah dialog/modal selesai dianimasikan dan muncul sepenuhnya di layar. Sangat berguna untuk menginisialisasi data atau memicu sesuatu tanpa mengganggu kelancaran animasi masuk."
+                    "desc": "Callback sinkron yang dipicu sesaat setelah animasi masuk selesai sepenuhnya. Berguna untuk inisialisasi data (fetching API)."
                 },
                 {
                     "name": "width",
                     "type": "double?",
                     "default": "null",
-                    "desc": "Memaksa (force) agar modal memiliki batas minimal width yang konsisten. Berguna di layar desktop agar konten tidak collapse."
+                    "desc": "Memaksa (force) agar modal memiliki batas minimal width."
                 },
                 {
                     "name": "height",
@@ -312,19 +324,19 @@
                     "name": "modalMaxWidth",
                     "type": "double",
                     "default": "600",
-                    "desc": "Batas maksimum seberapa lebar dialog ini dapat merentang (stretch) saat diaplikasikan di peramban Web atau layar Ultra-wide. Layar di atas 600px akan menampilkan modal tepat di tengah."
+                    "desc": "Batas lebar maksimum. Layar ultra-wide atau peramban desktop akan menahan lebar dialog di angka ini dan memposisikannya di tengah."
                 },
                 {
                     "name": "modalMaxHeight",
                     "type": "double?",
                     "default": "null",
-                    "desc": "Batas ekstrem untuk mencegah agar modal tidak lebih tinggi dari ukuran tertentu. Jika null, batas tinggi ekstrem akan otomatis 90% dari ukuran Viewport vertikal (MediaQuery)."
+                    "desc": "Batas tinggi ekstrem. Jika null, otomatis mengambil 90% dari ukuran Viewport vertikal (MediaQuery)."
                 },
                 {
                     "name": "isDismissible",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Jika true, pengguna diperbolehkan menekan latar transparan (barrier blur) untuk langsung membuang atau menutup dialog dari layar."
+                    "desc": "Jika true, klik pada area luar (barrier) akan menutup dialog."
                 },
                 {
                     "name": "barrierColor",
@@ -334,27 +346,27 @@
                 }
             ],
             "additionalInfo": {
-                "styling": "Secara umum pewarnaan elemen dialog dan batas garis (border) akan otomatis merujuk dan bereaksi (reactive) terhadap Brightness parent, memicu tema cerah dengan border abu-abu pucat atau tema gelap 0xFF1E1E1E dengan border transparan putih.",
-                "animation": "Transisi masuk menggunakan penggabungan (stagger) antara Tween opacity FadeTransition dengan Zoom-out ScaleTransition memakai kurva easeOutBack agar terlihat lentur seperti karet."
+                "styling": "Pewarnaan elemen dan border bereaksi otomatis terhadap Brightness parent (tema terang/gelap).",
+                "animation": "Transisi masuk menggunakan penggabungan Tween opacity dengan Zoom-out ScaleTransition memakai kurva easeOutBack."
             },
             "methods": [
                 {
                     "name": "show<T>",
                     "type": "static Future<T?>",
                     "default": "",
-                    "desc": "Method fondasi (Low-Level API) untuk merender modal polos langsung ke layer showGeneralDialog. Hanya berisi body box putih dengan padding dan shadow premium tanpa atribut pelengkap seperti header, divider, atau action buttons. Menerima widget custom bebas bentuk."
+                    "desc": "Low-Level API. Merender modal polos ke layer showGeneralDialog. Menggunakan parameter child statis tanpa header/footer."
                 },
                 {
                     "name": "replace<T>",
                     "type": "static Future<T?>",
                     "default": "",
-                    "desc": "Pintasan (Syntactic Sugar) yang menutup dialog saat ini (via Navigator.pop) sesaat sebelum membuka dialog show() yang baru. Sangat berguna untuk flow wizard berantai (next step) agar rute modal tidak bertumpuk di memori."
+                    "desc": "Pintasan yang menutup dialog saat ini (Navigator.pop) sebelum membuka dialog baru. Ideal untuk flow wizard berantai."
                 },
                 {
                     "name": "modal<T>",
                     "type": "static Future<T?>",
                     "default": "",
-                    "desc": "Method komprehensif (High-Level API). Membangun dan mewarisi efek dari method show(), namun secara otomatis merajut tata letak internal dengan Header (Title & Close Button), Scrollable Body untuk mengamankan child dari constraint overflow, dan Footer dinamis (Auto-Loading Confirm/Cancel Action). Sangat disarankan untuk digunakan dalam eksekusi data form dan input."
+                    "desc": "High-Level API. Merajut tata letak otomatis dengan Header, Body dinamis via builder() yang terintegrasi dengan ModalController, serta Footer berisi tombol konfirmasi cerdas."
                 }
             ],
             "behaviors": [
@@ -362,26 +374,33 @@
                     "name": "Async State Blocking",
                     "type": "Lifecycle & State",
                     "default": "",
-                    "desc": "Apabila 'onConfirm' me-return promise atau delay, modal akan dibungkus oleh StatefulBuilder. Method ini otomatis merubah properti internal (isLoading = true), menonaktifkan PopScope (tombol back hardware tidak berlaku), menghitam-putihkan tombol cancel, dan merender spinner putar persis di dalam primary button. Modal aman sepenuhnya dari spam-click dan double submission."
+                    "desc": "Saat 'onConfirm' me-return promise, modal otomatis mengunci state (isLoading = true), memblokir PopScope, menonaktifkan tombol lain, dan merender spinner di primary button. Anti spam-click."
                 },
                 {
                     "name": "Adaptive Frosted Barrier",
                     "type": "UI Filter",
                     "default": "",
-                    "desc": "Lapisan penutup belakang dialog memanfaatkan ImageFilter.blur (sigma 6.0) untuk membuyarkan elemen di layar belakangnya. Warnanya akan otomatis menyesuaikan Brightness untuk mensimulasikan kaca buram iOS-style (gelap semi transparan di light mode, atau putih transparan tipis di dark mode)."
+                    "desc": "Lapisan barrier menggunakan ImageFilter.blur (sigma 6.0) untuk efek kaca buram iOS-style, warnanya menyesuaikan Brightness layar."
+                },
+                {
+                    "name": "Draggable By-pass",
+                    "type": "Interaction Constraint",
+                    "default": "",
+                    "desc": "Ketika isDraggable diaktifkan, layer akan membypass efek blur (BackdropFilter), menghapus elevasi bayangan (flat), dan mengubah background barrier menjadi Colors.transparent agar fokus pada konten."
                 },
                 {
                     "name": "Safe Resolution Bound",
                     "type": "Constraint",
                     "default": "",
-                    "desc": "Ketinggian badan konten akan senantiasa menyesuaikan ukuran (minAxisSize), namun tidak akan pernah menembus batas layar akibat constraint perlindungan maxHeight 90% view port."
+                    "desc": "Ketinggian konten dibatasi aman maksimal 90% dari view port agar tidak menabrak batas ekstrem layar."
                 }
             ],
             "specialNotes": [
-                "Best Practice: Selalu jadikan method `modal<T>` sebagai pintu utama untuk dialog konfirmasi karena ia sudah menyertakan penguncian status (popscope & disable action) ketika fungsi asynchronous berjalan.",
-                "Limitation: Modifikasi warna primary-button pada konfirmasi bawaan footer diset hardcoded sebagai 'Colors.deepOrange'. Warna ini tidak akan mengikuti ColorScheme global Flutter Theme jika Anda merubah palet secara sentral."
+                "Gunakan ModalController dari parameter `builder` untuk memicu aksi `onConfirm` via keyboard (seperti onFieldSubmitted) guna menghindari pembuatan ulang fungsi logika.",
+                "Gunakan parameter `modalState` untuk merubah UI lokal di dalam modal secara efisien tanpa perlu memanggil setState milik layar utama.",
+                "Warna primary-button footer bawaan di-set ke Colors.deepOrange (hardcoded). Jika butuh penyesuaian khusus, injeksi widget melalui footerActions."
             ],
-            "code": "final bool? isSuccess = await ModalWidget.modal<bool>(\n  context,\n  title: 'Edit Detail Akun',\n  showCancelButton: true,\n  confirmText: 'Simpan Perubahan',\n  child: Form(\n    key: _formKey,\n    child: Column(\n      children: [\n         TextFormField(decoration: const InputDecoration(labelText: 'Nama Lengkap')),\n         TextFormField(decoration: const InputDecoration(labelText: 'Email')),\n      ],\n    ),\n  ),\n  onConfirm: () async {\n    if (!_formKey.currentState!.validate()) return false;\n    \n    // Eksekusi ini otomatis me-render loading spinner di tombol\n    final result = await apiService.updateProfile();\n    \n    if (result.isError) {\n      showToast('Gagal merubah data');\n      return false; // Membiarkan modal tetap tampil untuk direvisi ulang\n    }\n    \n    return true; // Modal ditutup, isLoading selesai, nilai True dikembalikan ke layer pemanggil.\n  },\n  afterClose: () {\n    print('Proses edit selesai & Modal tertutup');\n  }\n);\n\nif (isSuccess == true) {\n  _refreshTable();\n}"
+            "code": "bool isAgreed = false;\n\nfinal bool? isSuccess = await ModalWidget.modal<bool>(\n  context,\n  title: 'Edit Detail Akun',\n  isDraggable: true,\n  showCancelButton: true,\n  confirmText: 'Simpan Perubahan',\n  builder: (context, modal, modalState) {\n    return Form(\n      key: _formKey,\n      child: Column(\n        children: [\n          TextFormField(\n            decoration: const InputDecoration(labelText: 'Nama Lengkap'),\n            onFieldSubmitted: (_) => modal.confirm(),\n          ),\n          CheckboxListTile(\n            title: const Text('Setuju dengan pembaruan'),\n            value: isAgreed,\n            onChanged: (val) {\n              // Mengubah UI hanya di dalam modal\n              modalState(() => isAgreed = val ?? false);\n            },\n          )\n        ],\n      ),\n    );\n  },\n  onConfirm: () async {\n    if (!_formKey.currentState!.validate() || !isAgreed) return false;\n    \n    final result = await apiService.updateProfile();\n    if (result.isError) return false;\n    \n    return true;\n  },\n);\n\nif (isSuccess == true) {\n  _refreshTable();\n}"
         },
         {
             "id": "AnimationWidget",
@@ -1239,7 +1258,7 @@
         {
             "id": "ToastWidget",
             "group": "Alert",
-            "name": "Premium Overlay Toast",
+            "name": "Toast Widget",
             "icon": "fa-solid fa-message",
             "description": "Widget utilitas tingkat tinggi untuk menampilkan notifikasi mengambang (toast) secara independen di atas seluruh UI menggunakan sistem Overlay. Sepenuhnya lepas dari batasan Scaffold/SnackBar bawaan, mendukung penempatan posisi bebas (9 arah), responsif terhadap ukuran layar, serta terintegrasi dengan AnimationWidget untuk transisi masuk dan keluar yang super mulus.",
             "mandatoryProps": [
