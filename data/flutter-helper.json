@@ -214,193 +214,163 @@
             "group": "Alert",
             "name": "Modal Premium",
             "icon": "fa-solid fa-window-maximize",
-            "description": "Widget pengelola dialog (modal) tingkat lanjut. Menyediakan API level rendah untuk kustomisasi total, serta API 'modal' level tinggi yang telah dibungkus rapi dengan Header, Scrollable Body via Builder (terintegrasi dengan ModalController dan StateSetter), Actions, dan Loading Spinner. Mendukung mode Draggable tanpa blur untuk interaksi form yang fleksibel.",
+            "description": "Widget pengelola dialog (modal) tingkat lanjut. Menyediakan API .modal() yang dibungkus rapi dengan Header, Scrollable Body via builder/statefulBuilder (terintegrasi dengan ModalControl dan StateSetter), Actions, dan Loading Spinner otomatis. Mendukung mode draggable kustom.",
             "mandatoryProps": [
                 {
                     "name": "context",
                     "type": "BuildContext",
                     "default": "",
-                    "desc": "Konteks saat ini yang terikat di dalam pohon widget (widget tree) dan memiliki akses ke instance Navigator untuk menampilkan dialog overlay."
+                    "desc": "Konteks saat ini yang terikat di dalam widget tree untuk eksekusi showGeneralDialog."
                 }
             ],
             "optionalProps": [
                 {
-                    "name": "inEffect",
-                    "type": "AnimationEffect?",
-                    "default": "null",
-                    "desc": "Konfigurasi transisi saat komponen masuk ke layar (fase IN). Sistem otomatis menjalankan animasi maju (forward) dari 0.0 menuju 1.0."
-                },
-                {
-                    "name": "outEffect",
-                    "type": "AnimationEffect?",
-                    "default": "null",
-                    "desc": "Konfigurasi transisi saat komponen keluar layar (fase OUT). Sistem mendeteksi perubahan fase dan membalikkan arah animasi (reverse) secara otomatis."
-                },
-                {
-                    "name": "child",
-                    "type": "Widget?",
-                    "default": "null",
-                    "desc": "[Hanya pada method .show() dan .replace()] Konten utama statis yang akan dirender di bagian tengah body dialog."
-                },
-                {
-                    "name": "builder",
-                    "type": "Widget Function(BuildContext context, ModalController modal, StateSetter modalState)?",
-                    "default": "null",
-                    "desc": "[Hanya pada method .modal()] Pengganti child statis. Membawa instance ModalController untuk kontrol eksekusi, serta StateSetter (modalState) untuk memicu reaktivitas UI lokal (seperti toggle, checkbox, atau validasi real-time) di dalam modal tanpa perlu memanggil StatefulBuilder manual."
-                },
-                {
-                    "name": "isDraggable",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Jika true, modal dapat digeser (drag). Secara otomatis menonaktifkan efek blur (frosted glass), menghilangkan bayangan (shadow) kotak, dan merubah warna overlay menjadi transparan penuh."
-                },
-                {
                     "name": "title",
                     "type": "String?",
                     "default": "null",
-                    "desc": "[Hanya pada method .modal()] Teks di sisi kiri atas Header modal dengan ketebalan semi-bold."
+                    "desc": "Teks di sisi kiri atas Header modal dengan font semi-bold. Jika null, area judul tidak dirender."
+                },
+                {
+                    "name": "builder",
+                    "type": "Widget Function(BuildContext ctx, ModalControl control, StateSetter stateModal)?",
+                    "default": "null",
+                    "desc": "Konten dinamis utama. Menyediakan akses ke ModalControl dan StateSetter untuk reaktivitas UI lokal."
                 },
                 {
                     "name": "actions",
                     "type": "List<Widget>?",
                     "default": "null",
-                    "desc": "[Hanya pada method .modal()] Kumpulan aksi/ikon tambahan pada Header, berada persis sebelum tombol Close."
+                    "desc": "Kumpulan aksi/ikon tambahan pada Header, berada persis sebelum tombol Close."
                 },
                 {
                     "name": "footerActions",
                     "type": "List<Widget>?",
                     "default": "null",
-                    "desc": "[Hanya pada method .modal()] Merender ulang keseluruhan area Footer dengan widget kustom. Jika diisi, tombol bawaan OK dan Cancel tidak ditampilkan."
+                    "desc": "Mengganti keseluruhan area Footer. Tombol bawaan OK dan Cancel akan disembunyikan jika list ini diisi."
                 },
                 {
-                    "name": "onConfirm",
-                    "type": "FutureOr<bool?> Function()?",
-                    "default": "null",
-                    "desc": "[Hanya pada method .modal()] Callback reaktif tombol konfirmasi. Mendukung Async/Await. State modal akan dikunci (disabled + spinner) sampai return. Return 'true' menutup dialog; 'false' atau 'null' membiarkan dialog terbuka."
-                },
-                {
-                    "name": "showCancelButton",
+                    "name": "showCloseButton",
                     "type": "bool",
-                    "default": "false",
-                    "desc": "[Hanya pada method .modal()] Menampilkan tombol sekunder outline untuk menutup modal tanpa aksi."
-                },
-                {
-                    "name": "confirmText",
-                    "type": "String",
-                    "default": "'OK'",
-                    "desc": "[Hanya pada method .modal()] Mengubah label caption default untuk tombol utama (Primary)."
-                },
-                {
-                    "name": "cancelText",
-                    "type": "String",
-                    "default": "'Cancel'",
-                    "desc": "[Hanya pada method .modal()] Mengubah label caption default untuk tombol batal (Secondary)."
-                },
-                {
-                    "name": "afterClose",
-                    "type": "VoidCallback?",
-                    "default": "null",
-                    "desc": "[Hanya pada method .modal()] Callback sinkron yang dipicu sesaat setelah dialog benar-benar ditutup dan hilang dari tumpukan rute."
-                },
-                {
-                    "name": "afterShow",
-                    "type": "VoidCallback?",
-                    "default": "null",
-                    "desc": "Callback sinkron yang dipicu sesaat setelah animasi masuk selesai sepenuhnya. Berguna untuk inisialisasi data (fetching API)."
-                },
-                {
-                    "name": "width",
-                    "type": "double?",
-                    "default": "null",
-                    "desc": "Memaksa (force) agar modal memiliki batas minimal width."
-                },
-                {
-                    "name": "height",
-                    "type": "double?",
-                    "default": "null",
-                    "desc": "Memaksa (force) tinggi minimal dari modal."
-                },
-                {
-                    "name": "modalMaxWidth",
-                    "type": "double",
-                    "default": "600",
-                    "desc": "Batas lebar maksimum. Layar ultra-wide atau peramban desktop akan menahan lebar dialog di angka ini dan memposisikannya di tengah."
-                },
-                {
-                    "name": "modalMaxHeight",
-                    "type": "double?",
-                    "default": "null",
-                    "desc": "Batas tinggi ekstrem. Jika null, otomatis mengambil 90% dari ukuran Viewport vertikal (MediaQuery)."
+                    "default": "true",
+                    "desc": "Menampilkan atau menyembunyikan ikon 'X' (close) di pojok kanan atas Header."
                 },
                 {
                     "name": "isDismissible",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Jika true, klik pada area luar (barrier) akan menutup dialog."
+                    "desc": "Jika true, ketukan di area luar (barrier) akan memicu Navigator.pop."
                 },
                 {
-                    "name": "barrierColor",
-                    "type": "Color?",
+                    "name": "draggable",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Mengaktifkan mode geser (drag). Mengubah warna barrier menjadi transparan, meniadakan blur/frosted glass, dan memperbesar radius bayangan modal."
+                },
+                {
+                    "name": "width",
+                    "type": "double?",
                     "default": "null",
-                    "desc": "Menimpa (override) warna latar belakang pelindung luar modal."
+                    "desc": "Menerapkan nilai minWidth dan maxWidth ekstrem jika diperlukan."
+                },
+                {
+                    "name": "height",
+                    "type": "double?",
+                    "default": "null",
+                    "desc": "Memaksa (force) agar modal memenuhi tinggi (maxHeight) spesifik. Jika diisi, modal menggunakan MainAxisSize.max."
+                },
+                {
+                    "name": "modalMaxWidth",
+                    "type": "double",
+                    "default": "600",
+                    "desc": "Batas lebar maksimum. Digunakan oleh ConstrainedBox untuk menahan lebar dialog di layar besar."
+                },
+                {
+                    "name": "modalMaxHeight",
+                    "type": "double?",
+                    "default": "null",
+                    "desc": "Batas tinggi ekstrem. Jika null, ConstrainedBox otomatis mengunci di 90% tinggi viewport layar."
+                },
+                {
+                    "name": "onConfirm",
+                    "type": "FutureOr<bool?> Function()?",
+                    "default": "null",
+                    "desc": "Callback reaktif tombol konfirmasi bawaan. State modal terkunci (isLoading = true) dan PopScope diblokir selama promise berjalan. Return 'true' menutup dialog; 'false/null' mempertahankan modal."
+                },
+                {
+                    "name": "showCancelButton",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menampilkan tombol Outlined (Secondary) untuk membatalkan dialog."
+                },
+                {
+                    "name": "confirmText",
+                    "type": "String",
+                    "default": "'OK'",
+                    "desc": "Label teks untuk tombol konfirmasi utama (Primary)."
+                },
+                {
+                    "name": "cancelText",
+                    "type": "String",
+                    "default": "'Cancel'",
+                    "desc": "Label teks untuk tombol batal."
+                },
+                {
+                    "name": "afterClose",
+                    "type": "VoidCallback?",
+                    "default": "null",
+                    "desc": "Callback yang dipanggil sesaat setelah fungsi showGeneralDialog mengembalikan hasil (rute ditutup)."
+                },
+                {
+                    "name": "inEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Mengganti transisi default (Fade + Scale) dengan efek animasi kustom saat fase masuk layar."
+                },
+                {
+                    "name": "outEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Mengganti transisi default dengan efek animasi kustom saat fase keluar layar (reverse)."
+                },
+                {
+                    "name": "afterShow",
+                    "type": "VoidCallback?",
+                    "default": "null",
+                    "desc": "Callback yang dieksekusi tepat setelah animasi transisi masuk layar mencapai status 'completed'. Dibungkus melalui _ModalLifecycleWrapper."
                 }
             ],
             "additionalInfo": {
-                "styling": "Pewarnaan elemen dan border bereaksi otomatis terhadap Brightness parent (tema terang/gelap).",
-                "animation": "Transisi masuk menggunakan penggabungan Tween opacity dengan Zoom-out ScaleTransition memakai kurva easeOutBack."
+                "styling": "Secara default menggunakan pewarnaan adaptif terhadap Brightness (Theme.of(context).brightness), kecuali pada tombol footer bawaan yang memiliki warna absolut.",
+                "animation": "Transisi bawaan menggunakan CurveTween (easeOut) untuk opacity dan ScaleTransition (easeOutBack) untuk skala konten."
             },
             "methods": [
-                {
-                    "name": "show<T>",
-                    "type": "static Future<T?>",
-                    "default": "",
-                    "desc": "Low-Level API. Merender modal polos ke layer showGeneralDialog. Menggunakan parameter child statis tanpa header/footer."
-                },
-                {
-                    "name": "replace<T>",
-                    "type": "static Future<T?>",
-                    "default": "",
-                    "desc": "Pintasan yang menutup dialog saat ini (Navigator.pop) sebelum membuka dialog baru. Ideal untuk flow wizard berantai."
-                },
                 {
                     "name": "modal<T>",
                     "type": "static Future<T?>",
                     "default": "",
-                    "desc": "High-Level API. Merajut tata letak otomatis dengan Header, Body dinamis via builder() yang terintegrasi dengan ModalController, serta Footer berisi tombol konfirmasi cerdas."
+                    "desc": "Satu-satunya metode publik saat ini. Merajut tata letak otomatis dan manajemen siklus hidup modal (loading state, drag offset, dan custom builder)."
                 }
             ],
             "behaviors": [
                 {
-                    "name": "Async State Blocking",
+                    "name": "State Blocking",
                     "type": "Lifecycle & State",
                     "default": "",
-                    "desc": "Saat 'onConfirm' me-return promise, modal otomatis mengunci state (isLoading = true), memblokir PopScope, menonaktifkan tombol lain, dan merender spinner di primary button. Anti spam-click."
+                    "desc": "Menjamin keamanan eksekusi fungsi async. Saat onConfirm memproses, state internal isLoading mengunci PopScope dan menonaktifkan trigger cancel/confirm untuk mencegah spam-click."
                 },
                 {
-                    "name": "Adaptive Frosted Barrier",
+                    "name": "Dynamic Backdrop",
                     "type": "UI Filter",
                     "default": "",
-                    "desc": "Lapisan barrier menggunakan ImageFilter.blur (sigma 6.0) untuk efek kaca buram iOS-style, warnanya menyesuaikan Brightness layar."
-                },
-                {
-                    "name": "Draggable By-pass",
-                    "type": "Interaction Constraint",
-                    "default": "",
-                    "desc": "Ketika isDraggable diaktifkan, layer akan membypass efek blur (BackdropFilter), menghapus elevasi bayangan (flat), dan mengubah background barrier menjadi Colors.transparent agar fokus pada konten."
-                },
-                {
-                    "name": "Safe Resolution Bound",
-                    "type": "Constraint",
-                    "default": "",
-                    "desc": "Ketinggian konten dibatasi aman maksimal 90% dari view port agar tidak menabrak batas ekstrem layar."
+                    "desc": "Lapisan barrier mengeksekusi BackdropFilter dengan blur dinamis (sigma berjenjang berdasarkan value animasi). Filter ini dilepas sepenuhnya ketika mode draggable aktif."
                 }
             ],
             "specialNotes": [
-                "Gunakan ModalController dari parameter `builder` untuk memicu aksi `onConfirm` via keyboard (seperti onFieldSubmitted) guna menghindari pembuatan ulang fungsi logika.",
-                "Gunakan parameter `modalState` untuk merubah UI lokal di dalam modal secara efisien tanpa perlu memanggil setState milik layar utama.",
-                "Warna primary-button footer bawaan di-set ke Colors.deepOrange (hardcoded). Jika butuh penyesuaian khusus, injeksi widget melalui footerActions."
+                "Parameter `builder` dan `statefulBuilder` tidak dapat digunakan secara bersamaan. Modul memiliki mekanisme `assert` untuk memvalidasi ini.",
+                "Gunakan instance `ModalControl` (variabel `control`) dari closure builder untuk memicu aksi konfirmasi secara terprogram, misalnya melalui `onFieldSubmitted` pada TextFormField.",
+                "Warna komponen interaktif utama di hardcode ke `Colors.deepOrange`. Jika Anda membutuhkan warna lain, sediakan widget khusus melalui parameter `footerActions`."
             ],
-            "code": "bool isAgreed = false;\n\nfinal bool? isSuccess = await ModalWidget.modal<bool>(\n  context,\n  title: 'Edit Detail Akun',\n  isDraggable: true,\n  showCancelButton: true,\n  confirmText: 'Simpan Perubahan',\n  builder: (context, modal, modalState) {\n    return Form(\n      key: _formKey,\n      child: Column(\n        children: [\n          TextFormField(\n            decoration: const InputDecoration(labelText: 'Nama Lengkap'),\n            onFieldSubmitted: (_) => modal.confirm(),\n          ),\n          CheckboxListTile(\n            title: const Text('Setuju dengan pembaruan'),\n            value: isAgreed,\n            onChanged: (val) {\n              // Mengubah UI hanya di dalam modal\n              modalState(() => isAgreed = val ?? false);\n            },\n          )\n        ],\n      ),\n    );\n  },\n  onConfirm: () async {\n    if (!_formKey.currentState!.validate() || !isAgreed) return false;\n    \n    final result = await apiService.updateProfile();\n    if (result.isError) return false;\n    \n    return true;\n  },\n);\n\nif (isSuccess == true) {\n  _refreshTable();\n}"
+            "code": "bool isAgreed = false;\n\nfinal bool? isSuccess = await ModalWidget.modal<bool>(\n  context,\n  title: 'Edit Detail Akun',\n  draggable: true,\n  showCancelButton: true,\n  confirmText: 'Simpan Perubahan',\n  builder: (ctx, control, stateModal) {\n    return Form(\n      key: _formKey,\n      child: Column(\n        mainAxisSize: MainAxisSize.min,\n        children: [\n          TextFormField(\n            decoration: const InputDecoration(labelText: 'Nama Lengkap'),\n            onFieldSubmitted: (_) => control.confirm(),\n          ),\n          CheckboxListTile(\n            title: const Text('Setuju dengan pembaruan'),\n            value: isAgreed,\n            onChanged: (val) => stateModal(() => isAgreed = val ?? false),\n          )\n        ],\n      ),\n    );\n  },\n  onConfirm: () async {\n    if (!_formKey.currentState!.validate() || !isAgreed) return false;\n    final result = await apiService.updateProfile();\n    return !result.isError;\n  },\n);\n\nif (isSuccess == true) {\n  _refreshTable();\n}"
         },
         {
             "id": "AnimationWidget",
@@ -410,7 +380,7 @@
             "description": "Widget wrapper cerdas berbasis Builder Pattern untuk menyuntikkan efek transisi murni secara mulus tanpa mengganggu dimensi fisik layout. Menggunakan paradigma mesin status tunggal di mana nilai 0.0 merepresentasikan kondisi tersembunyi dan 1.0 merepresentasikan kondisi utuh. Dilengkapi katalog preset terpadu yang mendeteksi fase masuk/keluar secara independen, mekanisme koordinasi multi-widget lewat AnimationRemote, serta Mutex Locking bawaan untuk menjamin keamanan state dari gangguan spam-clicking.",
             "mandatoryProps": [
                 {
-                    "name": "child",
+                    "name": "builder",
                     "type": "Widget Function(AnimationControl control)",
                     "default": "",
                     "desc": "Fungsi builder yang menyuplai objek kontroler ke dalam scope internal komponen. Mengembalikan widget utama yang akan dianimasikan dan membuka akses eksekusi fungsi playIn() serta playOut() secara langsung tanpa membutuhkan penanganan GlobalKey."
@@ -540,7 +510,7 @@
                 "RESTRUKTURISASI SKALA: Efek zoom() lama telah dipisah menjadi dua fungsi mutlak: zoomIn() untuk muncul dari ketiadaan membesar ke ukuran normal, dan zoomOut() untuk muncul dari dimensi raksasa mengecil ke ukuran normal.",
                 "SINKRONISASI REMOTE: Penggunaan properti 'id' yang sama pada beberapa AnimationWidget memungkinkan eksekusi animasi kolektif secara paralel hanya dengan memanggil satu metode tunggal dari objek AnimationRemote."
             ],
-            "code": "// ===========================================================================\n// SKENARIO 1: KENDALI LOKAL MANDIRI (Mekanisme Otonom via Worker Scope)\n// ===========================================================================\n// Digunakan saat widget mengontrol fase transisinya sendiri secara independen\n// melalui parameter instansiasi 'control' tanpa perlu registrasi ke objek luar.\nAnimationWidget(\n  // Prapasang cerdas: otomatis melesat dari bawah ke tengah (0.0 ke 1.0)\n  inEffect: AnimationEffect.slideUp(duration: const Duration(milliseconds: 500)),\n  // Prapasang cerdas: otomatis melesat dari tengah meneruskan ke atas (1.0 ke 0.0)\n  outEffect: AnimationEffect.slideUp(duration: const Duration(milliseconds: 400)),\n  child: (control) {\n    return ElevatedButton(\n      style: ElevatedButton.styleFrom(\n        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),\n      ),\n      child: const Text('EKSEKUSI LOKAL'),\n      onPressed: () async {\n        // Memicu fase transisi keluar. Proteksi Mutex internal langsung mengunci status\n        // untuk memblokir interaksi input susulan dari pengguna selama animasi berjalan.\n        await control.playOut();\n        \n        // Jeda penundaan asinkronus untuk simulasi penanganan logika bisnis (misal: Hit API)\n        await Future.delayed(const Duration(seconds: 2));\n        \n        // Mengembalikan visual widget ke kondisi utuh di layar setelah proses data selesai.\n        await control.playIn();\n      },\n    );\n  },\n)\n\n// ===========================================================================\n// SKENARIO 2: INISIALISASI INSTANCE REMOTE CONTROLLER\n// ===========================================================================\n// Deklarasikan objek pengontrol ini di level Stateful Widget utama atau scope State Management\n// untuk mengoordinasikan siklus hidup transisi banyak widget secara terpusat dan paralel.\nfinal AnimationRemote remoteController = AnimationRemote();\n\n// ===========================================================================\n// SKENARIO 3: REGISTRASI KOMPONEN KE SISTEM REMOTE (GLOBAL & GROUP ID)\n// ===========================================================================\n// Komponen mendaftarkan referensi status internalnya secara otomatis ke objek 'remote'\n// saat initState() dijalankan dan membersihkannya secara mandiri saat dispose().\nColumn(\n  children: [\n    // Elemen A: Terdaftar sebagai komponen Global karena properti 'id' dikosongkan (null)\n    AnimationWidget(\n      remote: remoteController,\n      inEffect: AnimationEffect.fade(),\n      outEffect: AnimationEffect.fade(),\n      child: (control) => const Card(child: Text('KOMPONEN GLOBAL ALPHA')),\n    ),\n    \n    // Elemen B: Dikelompokkan ke dalam klaster identifikasi grup 'auth_fields'\n    AnimationWidget(\n      remote: remoteController,\n      id: 'auth_fields',\n      // Masuk dari kanan ke tengah, lalu keluar meneruskan ke kiri (Continuous Momentum)\n      inEffect: AnimationEffect.slideLeft(),\n      outEffect: AnimationEffect.slideLeft(),\n      child: (control) => const TextField(decoration: InputDecoration(labelText: 'USERNAME')),\n    ),\n    \n    // Elemen C: Dimasukkan ke dalam kelompok 'auth_fields' yang sama dengan Elemen B\n    AnimationWidget(\n      remote: remoteController,\n      id: 'auth_fields',\n      inEffect: AnimationEffect.slideLeft(),\n      outEffect: AnimationEffect.slideLeft(),\n      child: (control) => const TextField(decoration: InputDecoration(labelText: 'PASSWORD')),\n    ),\n    \n    // Elemen D: Diisolasi ke dalam kelompok identifikasi grup terpisah 'banner_ads'\n    AnimationWidget(\n      remote: remoteController,\n      id: 'banner_ads',\n      inEffect: AnimationEffect.zoomIn(),\n      outEffect: AnimationEffect.zoomIn(),\n      child: (control) => const Container(height: 100, color: Colors.blue),\n    ),\n  ],\n)\n\n// ===========================================================================\n// SKENARIO 4: ORKESTRASI PEMICUAN TRANSISI ASINKRONUS VIA REMOTE CONTROLLER\n// ===========================================================================\n// Memanfaatkan pemrosesan Future.wait() di dalam engine untuk mengeksekusi subset kumpulan\n// widget secara paralel tanpa risiko tabrakan state visual.\nRow(\n  children: [\n    ElevatedButton(\n      child: const Text('TRIGGER GLOBAL (SEMUA WIDGET)'),\n      onPressed: () async {\n        // Memerintahkan SELURUH widget yang terikat pada instance 'remoteController' \n        // (Elemen A, B, C, dan D) untuk memainkan animasi keluar secara serempak.\n        await remoteController.playOut();\n        await Future.delayed(const Duration(seconds: 1));\n        // Mengembalikan seluruh elemen terdaftar ke kondisi visual utuh di layar.\n        await remoteController.playIn();\n      },\n    ),\n    ElevatedButton(\n      child: const Text('TRIGGER BY ID (HANYA GRUP AUTH)'),\n      onPressed: () async {\n        // Melakukan filter registri untuk hanya memicu transisi keluar pada Elemen B dan C.\n        // Elemen A dan Elemen D sama sekali tidak akan terpengaruh oleh pemicu ini.\n        await remoteController.playOut('auth_fields');\n        await Future.delayed(const Duration(milliseconds: 500));\n        // Hanya memunculkan kembali kelompok kolom input autentikasi ke layar.\n        await remoteController.playIn('auth_fields');\n      },\n    ),\n    ElevatedButton(\n      child: const Text('TRIGGER BY ID (HANYA GRUP BANNER)'),\n      onPressed: () async {\n        // Melakukan penargetan eksklusif untuk mengeksekusi transisi keluar hanya pada Elemen D.\n        await remoteController.playOut('banner_ads');\n        await Future.delayed(const Duration(seconds: 1));\n        // Mengembalikan elemen spanduk iklan ke layar secara presisi.\n        await remoteController.playIn('banner_ads');\n      },\n    ),\n  ],\n)"
+            "code": "// ===========================================================================\n// SKENARIO 1: KENDALI LOKAL MANDIRI (Mekanisme Otonom via Worker Scope)\n// ===========================================================================\n// Digunakan saat widget mengontrol fase transisinya sendiri secara independen\n// melalui parameter instansiasi 'control' tanpa perlu registrasi ke objek luar.\nAnimationWidget(\n  // Prapasang cerdas: otomatis melesat dari bawah ke tengah (0.0 ke 1.0)\n  inEffect: AnimationEffect.slideUp(duration: const Duration(milliseconds: 500)),\n  // Prapasang cerdas: otomatis melesat dari tengah meneruskan ke atas (1.0 ke 0.0)\n  outEffect: AnimationEffect.slideUp(duration: const Duration(milliseconds: 400)),\n  builder: (control) {\n    return ElevatedButton(\n      style: ElevatedButton.styleFrom(\n        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),\n      ),\n      child: const Text('EKSEKUSI LOKAL'),\n      onPressed: () async {\n        // Memicu fase transisi keluar. Proteksi Mutex internal langsung mengunci status\n        // untuk memblokir interaksi input susulan dari pengguna selama animasi berjalan.\n        await control.playOut();\n        \n        // Jeda penundaan asinkronus untuk simulasi penanganan logika bisnis (misal: Hit API)\n        await Future.delayed(const Duration(seconds: 2));\n        \n        // Mengembalikan visual widget ke kondisi utuh di layar setelah proses data selesai.\n        await control.playIn();\n      },\n    );\n  },\n)\n\n// ===========================================================================\n// SKENARIO 2: INISIALISASI INSTANCE REMOTE CONTROLLER\n// ===========================================================================\n// Deklarasikan objek pengontrol ini di level Stateful Widget utama atau scope State Management\n// untuk mengoordinasikan siklus hidup transisi banyak widget secara terpusat dan paralel.\nfinal AnimationRemote remoteController = AnimationRemote();\n\n// ===========================================================================\n// SKENARIO 3: REGISTRASI KOMPONEN KE SISTEM REMOTE (GLOBAL & GROUP ID)\n// ===========================================================================\n// Komponen mendaftarkan referensi status internalnya secara otomatis ke objek 'remote'\n// saat initState() dijalankan dan membersihkannya secara mandiri saat dispose().\nColumn(\n  children: [\n    // Elemen A: Terdaftar sebagai komponen Global karena properti 'id' dikosongkan (null)\n    AnimationWidget(\n      remote: remoteController,\n      inEffect: AnimationEffect.fade(),\n      outEffect: AnimationEffect.fade(),\n      builder: (control) => const Card(child: Text('KOMPONEN GLOBAL ALPHA')),\n    ),\n    \n    // Elemen B: Dikelompokkan ke dalam klaster identifikasi grup 'auth_fields'\n    AnimationWidget(\n      remote: remoteController,\n      id: 'auth_fields',\n      // Masuk dari kanan ke tengah, lalu keluar meneruskan ke kiri (Continuous Momentum)\n      inEffect: AnimationEffect.slideLeft(),\n      outEffect: AnimationEffect.slideLeft(),\n      builder: (control) => const TextField(decoration: InputDecoration(labelText: 'USERNAME')),\n    ),\n    \n    // Elemen C: Dimasukkan ke dalam kelompok 'auth_fields' yang sama dengan Elemen B\n    AnimationWidget(\n      remote: remoteController,\n      id: 'auth_fields',\n      inEffect: AnimationEffect.slideLeft(),\n      outEffect: AnimationEffect.slideLeft(),\n      builder: (control) => const TextField(decoration: InputDecoration(labelText: 'PASSWORD')),\n    ),\n    \n    // Elemen D: Diisolasi ke dalam kelompok identifikasi grup terpisah 'banner_ads'\n    AnimationWidget(\n      remote: remoteController,\n      id: 'banner_ads',\n      inEffect: AnimationEffect.zoomIn(),\n      outEffect: AnimationEffect.zoomIn(),\n      builder: (control) => const Container(height: 100, color: Colors.blue),\n    ),\n  ],\n)\n\n// ===========================================================================\n// SKENARIO 4: ORKESTRASI PEMICUAN TRANSISI ASINKRONUS VIA REMOTE CONTROLLER\n// ===========================================================================\n// Memanfaatkan pemrosesan Future.wait() di dalam engine untuk mengeksekusi subset kumpulan\n// widget secara paralel tanpa risiko tabrakan state visual.\nRow(\n  children: [\n    ElevatedButton(\n      child: const Text('TRIGGER GLOBAL (SEMUA WIDGET)'),\n      onPressed: () async {\n        // Memerintahkan SELURUH widget yang terikat pada instance 'remoteController' \n        // (Elemen A, B, C, dan D) untuk memainkan animasi keluar secara serempak.\n        await remoteController.playOut();\n        await Future.delayed(const Duration(seconds: 1));\n        // Mengembalikan seluruh elemen terdaftar ke kondisi visual utuh di layar.\n        await remoteController.playIn();\n      },\n    ),\n    ElevatedButton(\n      child: const Text('TRIGGER BY ID (HANYA GRUP AUTH)'),\n      onPressed: () async {\n        // Melakukan filter registri untuk hanya memicu transisi keluar pada Elemen B dan C.\n        // Elemen A dan Elemen D sama sekali tidak akan terpengaruh oleh pemicu ini.\n        await remoteController.playOut('auth_fields');\n        await Future.delayed(const Duration(milliseconds: 500));\n        // Hanya memunculkan kembali kelompok kolom input autentikasi ke layar.\n        await remoteController.playIn('auth_fields');\n      },\n    ),\n    ElevatedButton(\n      child: const Text('TRIGGER BY ID (HANYA GRUP BANNER)'),\n      onPressed: () async {\n        // Melakukan penargetan eksklusif untuk mengeksekusi transisi keluar hanya pada Elemen D.\n        await remoteController.playOut('banner_ads');\n        await Future.delayed(const Duration(seconds: 1));\n        // Mengembalikan elemen spanduk iklan ke layar secara presisi.\n        await remoteController.playIn('banner_ads');\n      },\n    ),\n  ],\n)"
         },
         {
             "id": "ButtonWidget",
@@ -1203,7 +1173,7 @@
                     "desc": "Ikon pemicu popup menu (biasanya Icon(Icons.more_vert)). Jika diisi, child tidak perlu diisi."
                 },
                 {
-                    "name": "child",
+                    "name": "builder",
                     "type": "Widget Function(VoidCallback next)?",
                     "default": "null",
                     "desc": "Fungsi builder yang mengembalikan widget pemicu kustom. Menyediakan callback 'next' yang digunakan untuk membuka popup menu secara programatik saat aksi dieksekusi."
@@ -1253,12 +1223,12 @@
                 "Hanya gunakan SATU antara parameter 'icon' atau 'child'. Jika menggunakan 'icon', Material design akan otomatis memberikan padding sirkular standar IconButton.",
                 "Komponen ini berjalan menggunakan GlobalKey secara internal agar pembukaan menu melalui parameter 'child' (programatik) berjalan aman tanpa pelemparan context tambahan."
             ],
-            "code": "PopupMenuWidget<String>(\n  enabled: true,\n  onSelected: (value) {\n  },\n  child: (next) => ElevatedButton(\n    onPressed: next,\n    child: const Text('Buka Menu'),\n  ),\n  items: const [\n    PopupMenuDataWidget(\n      value: 'profile',\n      label: 'Profile',\n      icon: Icons.person,\n    ),\n    PopupMenuDataWidget(\n      value: 'setting',\n      label: 'Setting',\n      icon: Icons.settings,\n    ),\n    PopupMenuDataWidget(\n      value: 'delete',\n      label: 'Hapus Akun',\n      icon: Icons.delete,\n      color: Colors.red,\n    ),\n  ],\n)"
+            "code": "PopupMenuWidget<String>(\n  enabled: true,\n  onSelected: (value) {\n  },\n  builder: (next) => ElevatedButton(\n    onPressed: next,\n    child: const Text('Buka Menu'),\n  ),\n  items: const [\n    PopupMenuDataWidget(\n      value: 'profile',\n      label: 'Profile',\n      icon: Icons.person,\n    ),\n    PopupMenuDataWidget(\n      value: 'setting',\n      label: 'Setting',\n      icon: Icons.settings,\n    ),\n    PopupMenuDataWidget(\n      value: 'delete',\n      label: 'Hapus Akun',\n      icon: Icons.delete,\n      color: Colors.red,\n    ),\n  ],\n)"
         },
         {
             "id": "ToastWidget",
             "group": "Alert",
-            "name": "Toast Widget",
+            "name": "Toast",
             "icon": "fa-solid fa-message",
             "description": "Widget utilitas tingkat tinggi untuk menampilkan notifikasi mengambang (toast) secara independen di atas seluruh UI menggunakan sistem Overlay. Sepenuhnya lepas dari batasan Scaffold/SnackBar bawaan, mendukung penempatan posisi bebas (9 arah), responsif terhadap ukuran layar, serta terintegrasi dengan AnimationWidget untuk transisi masuk dan keluar yang super mulus.",
             "mandatoryProps": [
