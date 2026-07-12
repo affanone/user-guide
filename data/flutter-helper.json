@@ -803,37 +803,37 @@
             "group": "Widget",
             "name": "Menu Sidebar",
             "icon": "fa-solid fa-bars-staggered",
-            "description": "Widget navigasi sidebar interaktif dan beranimasi yang dirancang untuk membangun menu dasbor profesional. Mendukung pengelompokan menu (grouping), submenu bersarang (nested), efek hover, mode collapse/expand (buka-tutup), responsivitas mobile (drawer melayang dengan dukungan gestur usap/swipe murni) [cite: 1, 87, 117], sistem kontrol eksternal (Controller) [cite: 1, 67], injeksi pembungkus (builder) [cite: 1, 79], serta menyediakan integrasi langsung dan mulus dengan GoRouter[cite: 1, 85].",
+            "description": "Widget navigasi sidebar interaktif dan beranimasi yang dirancang untuk membangun menu dasbor profesional. Mendukung pengelompokan menu (grouping), submenu bersarang (nested), efek hover, mode collapse/expand (buka-tutup), responsivitas mobile (drawer melayang dengan dukungan gestur usap/swipe murni) , sistem kontrol eksternal (Controller) , injeksi pembungkus (builder) , serta menyediakan integrasi langsung dan mulus dengan GoRouter.",
             "mandatoryProps": [
                 {
                     "name": "groups",
                     "type": "List<SidebarGroup>",
                     "default": "",
-                    "desc": "Kumpulan data (grup dan item) yang akan dirender menjadi struktur menu di dalam sidebar. Diwajibkan untuk semua metode. [cite: 3, 78, 79]"
+                    "desc": "Kumpulan data (grup dan item) yang akan dirender menjadi struktur menu di dalam sidebar. Diwajibkan untuk semua metode. "
                 },
                 {
                     "name": "currentRoute",
                     "type": "String",
                     "default": "",
-                    "desc": "Rute atau path aktif saat ini. Digunakan sistem untuk menandai (highlight) menu mana yang sedang aktif. Hanya diwajibkan untuk konstruktor default statis MenuSidebarWidget. [cite: 5, 78]"
+                    "desc": "Rute atau path aktif saat ini. Digunakan sistem untuk menandai (highlight) menu mana yang sedang aktif. Hanya diwajibkan untuk konstruktor default statis MenuSidebarWidget. "
                 },
                 {
                     "name": "onRouteSelected",
                     "type": "ValueChanged<String>",
                     "default": "",
-                    "desc": "Callback yang dipicu ketika pengguna mengklik menu yang memiliki route. Hanya diwajibkan untuk konstruktor default statis MenuSidebarWidget. [cite: 7, 78]"
+                    "desc": "Callback yang dipicu ketika pengguna mengklik menu yang memiliki route. Hanya diwajibkan untuk konstruktor default statis MenuSidebarWidget. "
                 },
                 {
                     "name": "routes",
                     "type": "List<RouteBase>",
                     "default": "",
-                    "desc": "Daftar halaman anak (child pages) dari GoRouter yang akan dirender di sisi kanan sidebar. Hanya diwajibkan untuk metode pembungkus MenuSidebarWidget.createApp. [cite: 9, 79]"
+                    "desc": "Daftar halaman anak (child pages) dari GoRouter yang akan dirender di sisi kanan sidebar. Hanya diwajibkan untuk metode pembungkus MenuSidebarWidget.createApp. "
                 },
                 {
                     "name": "initialLocation",
                     "type": "String",
                     "default": "",
-                    "desc": "Path awal ketika aplikasi pertama kali dimuat oleh GoRouter. Hanya diwajibkan untuk metode MenuSidebarWidget.createApp. [cite: 11, 79]"
+                    "desc": "Path awal ketika aplikasi pertama kali dimuat oleh GoRouter. Hanya diwajibkan untuk metode MenuSidebarWidget.createApp. "
                 }
             ],
             "optionalProps": [
@@ -841,91 +841,91 @@
                     "name": "builder",
                     "type": "Widget Function(BuildContext ctx, GoRouterState state, Widget child)?",
                     "default": "null",
-                    "desc": "Fungsi injeksi terpadu. Digunakan untuk memproses atau membungkus konten rute (child page) sebelum dimasukkan ke dalam kerangka sidebar. [cite: 15, 79, 81]"
+                    "desc": "Fungsi injeksi terpadu. Digunakan untuk memproses atau membungkus konten rute (child page) sebelum dimasukkan ke dalam kerangka sidebar. "
                 },
                 {
                     "name": "title",
                     "type": "String",
                     "default": "'My App'",
-                    "desc": "Judul aplikasi (title) yang diteruskan ke konfigurasi MaterialApp. Hanya berlaku untuk metode MenuSidebarWidget.createApp. [cite: 17, 79, 86]"
+                    "desc": "Judul aplikasi (title) yang diteruskan ke konfigurasi MaterialApp. Hanya berlaku untuk metode MenuSidebarWidget.createApp. "
                 },
                 {
                     "name": "theme",
                     "type": "ThemeData?",
                     "default": "null",
-                    "desc": "Konfigurasi tema kustom untuk MaterialApp. Jika tidak diisi (null), sistem akan menggunakan AppTheme.lightTheme. Hanya berlaku untuk metode MenuSidebarWidget.createApp. [cite: 19, 79, 86]"
+                    "desc": "Konfigurasi tema kustom untuk MaterialApp. Jika tidak diisi (null), sistem akan menggunakan AppTheme.lightTheme. Hanya berlaku untuk metode MenuSidebarWidget.createApp. "
                 },
                 {
                     "name": "decorator",
                     "type": "SidebarDecorator",
                     "default": "const SidebarDecorator()",
-                    "desc": "Konfigurasi visual (warna, font, padding) untuk mengustomisasi tampilan antarmuka sidebar. Padding bawaan diatur ke horizontal 16.0 dan vertical 24.0. [cite: 21, 73, 78]"
+                    "desc": "Konfigurasi visual (warna, font, padding) untuk mengustomisasi tampilan antarmuka sidebar. Padding bawaan diatur ke horizontal 16.0 dan vertical 24.0. "
                 },
                 {
                     "name": "initialSidebarOpen",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Menentukan status awal sidebar ketika pertama kali dirender (terbuka lebar atau tersembunyi). [cite: 23, 78, 79]"
+                    "desc": "Menentukan status awal sidebar ketika pertama kali dirender (terbuka lebar atau tersembunyi). "
                 },
                 {
                     "name": "orientation",
                     "type": "TextDirection",
                     "default": "TextDirection.ltr",
-                    "desc": "Arah orientasi antarmuka. Mendukung penuh tata letak bahasa Arab/Ibrani (RTL), yang juga mempengaruhi arah gestur usap/swipe drawer. [cite: 25, 78, 102, 106]"
+                    "desc": "Arah orientasi antarmuka. Mendukung penuh tata letak bahasa Arab/Ibrani (RTL), yang juga mempengaruhi arah gestur usap/swipe drawer. "
                 },
                 {
                     "name": "isMobile",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Mengaktifkan mode responsif. Sidebar akan melayang dan mendukung interaksi geser ujung layar (edge drag). [cite: 27, 78, 116, 120]"
+                    "desc": "Mengaktifkan mode responsif. Sidebar akan melayang dan mendukung interaksi geser ujung layar (edge drag). "
                 },
                 {
                     "name": "isOverlay",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Jika digabungkan dengan isMobile=true, sidebar akan memunculkan efek bayangan (shadow) dan backdrop gelap yang meredup otomatis sesuai progres geser. [cite: 29, 78, 125, 175]"
+                    "desc": "Jika digabungkan dengan isMobile=true, sidebar akan memunculkan efek bayangan (shadow) dan backdrop gelap yang meredup otomatis sesuai progres geser. "
                 },
                 {
                     "name": "controller",
                     "type": "MenuSidebarController?",
                     "default": "null",
-                    "desc": "Controller eksternal untuk mengendalikan state sidebar secara imperatif dari widget lain. [cite: 31, 67, 78]"
+                    "desc": "Controller eksternal untuk mengendalikan state sidebar secara imperatif dari widget lain. "
                 },
                 {
                     "name": "hideIfSelectMenu",
                     "type": "bool",
                     "default": "true",
-                    "desc": "UX Behavior: Otomatis menutup sidebar (hide) setelah pengguna memilih item rute menu, terutama pada mode mobile. [cite: 33, 78, 160, 209]"
+                    "desc": "UX Behavior: Otomatis menutup sidebar (hide) setelah pengguna memilih item rute menu, terutama pada mode mobile. "
                 },
                 {
                     "name": "hideIfTapOverlay",
                     "type": "bool",
                     "default": "true",
-                    "desc": "UX Behavior: Otomatis menutup sidebar ketika pengguna men-tap area gelap di luar sidebar pada mode Overlay. [cite: 35, 78, 123]"
+                    "desc": "UX Behavior: Otomatis menutup sidebar ketika pengguna men-tap area gelap di luar sidebar pada mode Overlay. "
                 }
             ],
             "additionalInfo": {
-                "dependencies": "flutter/material.dart, go_router, google_fonts, respo/app/theme/app_theme.dart [cite: 37, 67]",
-                "models": "SidebarGroup, SidebarItem, SidebarDecorator, MenuSidebarController [cite: 37, 67, 71, 74, 75]"
+                "dependencies": "flutter/material.dart, go_router, google_fonts, respo/app/theme/app_theme.dart ",
+                "models": "SidebarGroup, SidebarItem, SidebarDecorator, MenuSidebarController "
             },
             "methods": [
                 {
                     "name": "MenuSidebarWidget()",
                     "type": "Widget",
                     "default": "",
-                    "desc": "Konstruktor standar (default) untuk penggunaan statis atau standalone. Digunakan jika Anda menyusun layout mandiri atau mengelola navigasi secara manual. [cite: 38, 78]"
+                    "desc": "Konstruktor standar (default) untuk penggunaan statis atau standalone. Digunakan jika Anda menyusun layout mandiri atau mengelola navigasi secara manual. "
                 },
                 {
                     "name": "MenuSidebarWidget.createApp()",
                     "type": "static Widget",
                     "default": "",
-                    "desc": "Metode bundling yang mengembalikan MaterialApp.router beserta konfigurasi GoRouter terpadu menggunakan ShellRoute. Cocok untuk penerapan instan (plug-and-play). [cite: 40, 79, 81, 86]"
+                    "desc": "Metode bundling yang mengembalikan MaterialApp.router beserta konfigurasi GoRouter terpadu menggunakan ShellRoute. Cocok untuk penerapan instan (plug-and-play). "
                 },
                 {
                     "name": "MenuSidebarController",
                     "type": "Class Controller",
                     "default": "",
-                    "desc": "Memiliki status isOpen dan metode .show(), .hide(), serta .toggle() untuk memanipulasi tampilan sidebar dari luar widget. [cite: 42, 68, 69, 70]"
+                    "desc": "Memiliki status isOpen dan metode .show(), .hide(), serta .toggle() untuk memanipulasi tampilan sidebar dari luar widget. "
                 }
             ],
             "behaviors": [
@@ -933,40 +933,40 @@
                     "name": "Smart Submenu Popup",
                     "type": "UI Reaction",
                     "default": "",
-                    "desc": "Ketika sidebar dalam kondisi tidak terekspansi, item yang memiliki submenu dirender cerdas sebagai PopupMenu melayang. [cite: 44, 207]"
+                    "desc": "Ketika sidebar dalam kondisi tidak terekspansi, item yang memiliki submenu dirender cerdas sebagai PopupMenu melayang. "
                 },
                 {
                     "name": "Auto Initials Icon",
                     "type": "UI Generation",
                     "default": "",
-                    "desc": "Jika sebuah item tidak didefinisikan icon-nya, sistem otomatis membuat ikon kotak berisi dua huruf inisial dari nama menu tersebut. [cite: 46, 146, 147]"
+                    "desc": "Jika sebuah item tidak didefinisikan icon-nya, sistem otomatis membuat ikon kotak berisi dua huruf inisial dari nama menu tersebut. "
                 },
                 {
                     "name": "Theme Reactive",
                     "type": "UI Reaction",
                     "default": "",
-                    "desc": "Warna default otomatis merespons tema aktif (Dark/Light Mode) dari aplikasi, dengan menghasilkan warna fallback yang presisi jika SidebarDecorator tidak diisi. [cite: 48, 163, 164, 165]"
+                    "desc": "Warna default otomatis merespons tema aktif (Dark/Light Mode) dari aplikasi, dengan menghasilkan warna fallback yang presisi jika SidebarDecorator tidak diisi. "
                 },
                 {
                     "name": "Fluid Swipe Gestures & Layout Safety",
                     "type": "UX & Layout Physics",
                     "default": "",
-                    "desc": "Sidebar dapat ditarik dari ujung layar (edge drag) dengan kecepatan lempar murni (fling velocity). Panel bergeser menggunakan Transform.translate sehingga lebar tetap statis, mencegah error RenderFlex overflow pada teks saat animasi berjalan. [cite: 50, 87, 107, 117, 126, 132]"
+                    "desc": "Sidebar dapat ditarik dari ujung layar (edge drag) dengan kecepatan lempar murni (fling velocity). Panel bergeser menggunakan Transform.translate sehingga lebar tetap statis, mencegah error RenderFlex overflow pada teks saat animasi berjalan. "
                 },
                 {
                     "name": "Premium Overlay System",
                     "type": "UX Feature",
                     "default": "",
-                    "desc": "Memunculkan bayangan eksklusif dan backdrop redup (opacity) adaptif secara berkesinambungan sejalan dengan seberapa jauh panel ditarik oleh gestur pengguna. [cite: 52, 125, 175]"
+                    "desc": "Memunculkan bayangan eksklusif dan backdrop redup (opacity) adaptif secara berkesinambungan sejalan dengan seberapa jauh panel ditarik oleh gestur pengguna. "
                 }
             ],
             "specialNotes": [
-                "Sistem Navigasi Instan: Pada metode MenuSidebarWidget.createApp, currentRoute dan onRouteSelected dikonfigurasi secara otomatis menuju state.uri.toString() dan context.go(route). [cite: 53, 82]",
-                "Logika Aktif (Active State) Submenu: Parent item otomatis menyala (aktif) jika salah satu child rutenya cocok dengan currentRoute yang sedang aktif. [cite: 54, 202, 203]",
-                "Akses Mode Mobile: Karena properti 'initialSidebarOpen' secara default adalah false, pasang tombol eksternal dengan memanggil sidebarController.show() atau .toggle() jika tidak menggunakan gestur usap. [cite: 54, 68, 78, 111]",
-                "Pemangkasan Injeksi: Parameter lama 'injectChild' telah dihapuskan. Pada metode createApp, gunakan prop 'builder' tunggal untuk memodifikasi atau membungkus halaman (child widget) yang di-render oleh GoRouter. [cite: 55, 79, 81]"
+                "Sistem Navigasi Instan: Pada metode MenuSidebarWidget.createApp, currentRoute dan onRouteSelected dikonfigurasi secara otomatis menuju state.uri.toString() dan context.go(route). ",
+                "Logika Aktif (Active State) Submenu: Parent item otomatis menyala (aktif) jika salah satu child rutenya cocok dengan currentRoute yang sedang aktif. ",
+                "Akses Mode Mobile: Karena properti 'initialSidebarOpen' secara default adalah false, pasang tombol eksternal dengan memanggil sidebarController.show() atau .toggle() jika tidak menggunakan gestur usap. ",
+                "Pemangkasan Injeksi: Parameter lama 'injectChild' telah dihapuskan. Pada metode createApp, gunakan prop 'builder' tunggal untuk memodifikasi atau membungkus halaman (child widget) yang di-render oleh GoRouter. "
             ],
-            "code": "// =========================================================\n// 1. CONTOH PENGGUNAAN STATIS (Hanya Widget Sidebar Saja)\n// =========================================================\nMenuSidebarWidget(\n  currentRoute: '/dashboard',\n  onRouteSelected: (route) {\n    print('Navigasi menuju: $route');\n  },\n  groups: [\n    SidebarGroup(\n      title: 'Main Menu',\n      items: [\n        SidebarItem(\n          title: 'Dashboard',\n          icon: Icons.dashboard_rounded,\n          route: '/dashboard',\n        ),\n        SidebarItem(\n          title: 'Settings',\n          icon: Icons.settings,\n          submenus: [\n            SidebarItem(title: 'Profile', route: '/settings/profile'),\n            SidebarItem(title: 'Security', route: '/settings/security'),\n          ],\n        ),\n      ],\n    ),\n  ],\n)\n\n// =========================================================\n// 2. CONTOH PENGGUNAAN LENGKAP (GoRouter + Drawer Geser)\n// =========================================================\nimport 'package:flutter/material.dart';\nimport 'package:go_router/go_router.dart';\n\nfinal MenuSidebarController sidebarController = MenuSidebarController();\n\nvoid main() {\n  runApp(\n    MenuSidebarWidget.createApp(\n      title: 'Aplikasi Admin Premium',\n      initialLocation: '/dashboard',\n      isMobile: true,      // Aktifkan interaksi gestur usap/swipe layar\n      isOverlay: true,     // Tampilkan backdrop gelap & efek bayangan\n      controller: sidebarController, \n      hideIfSelectMenu: true,\n      initialSidebarOpen: false,\n      \n      // [BARU] Injeksi Child melalui builder tunggal\n      builder: (context, state, child) {\n        // Contoh: Membungkus halaman dengan background abu-abu\n        return Container(\n          color: Colors.grey[50],\n          child: child,\n        );\n      },\n\n      decorator: const SidebarDecorator(\n        activeColor: Colors.blueAccent,\n        backgroundColor: Colors.white,\n      ),\n      groups: [\n        SidebarGroup(\n          title: 'Overview',\n          items: [\n            SidebarItem(\n              title: 'Dashboard',\n              icon: Icons.dashboard_rounded,\n              route: '/dashboard',\n            ),\n          ],\n        ),\n      ],\n      routes: [\n        GoRoute(\n          path: '/dashboard',\n          builder: (context, state) => const DummyPage(title: 'Dashboard'),\n        ),\n      ],\n    ),\n  );\n}\n\n// Template Halaman dengan Tombol Pemanggil\nclass DummyPage extends StatelessWidget {\n  final String title;\n  const DummyPage({super.key, required this.title});\n\n  @override\n  Widget build(BuildContext context) {\n    return Scaffold(\n      backgroundColor: Colors.transparent,\n      appBar: AppBar(\n        title: Text(title),\n        leading: IconButton(\n          icon: const Icon(Icons.menu),\n          onPressed: () {\n             // Membuka sidebar secara manual via tombol (opsional selain swipe)\n            sidebarController.show();\n          },\n        ),\n      ),\n      body: Center(child: Text(title)),\n    );\n  }\n} [cite: 56, 58, 64, 78, 79, 81]"
+            "code": "// =========================================================\n// 1. CONTOH PENGGUNAAN STATIS (Hanya Widget Sidebar Saja)\n// =========================================================\nMenuSidebarWidget(\n  currentRoute: '/dashboard',\n  onRouteSelected: (route) {\n    print('Navigasi menuju: $route');\n  },\n  groups: [\n    SidebarGroup(\n      title: 'Main Menu',\n      items: [\n        SidebarItem(\n          title: 'Dashboard',\n          icon: Icons.dashboard_rounded,\n          route: '/dashboard',\n        ),\n        SidebarItem(\n          title: 'Settings',\n          icon: Icons.settings,\n          submenus: [\n            SidebarItem(title: 'Profile', route: '/settings/profile'),\n            SidebarItem(title: 'Security', route: '/settings/security'),\n          ],\n        ),\n      ],\n    ),\n  ],\n)\n\n// =========================================================\n// 2. CONTOH PENGGUNAAN LENGKAP (GoRouter + Drawer Geser)\n// =========================================================\nimport 'package:flutter/material.dart';\nimport 'package:go_router/go_router.dart';\n\nfinal MenuSidebarController sidebarController = MenuSidebarController();\n\nvoid main() {\n  runApp(\n    MenuSidebarWidget.createApp(\n      title: 'Aplikasi Admin Premium',\n      initialLocation: '/dashboard',\n      isMobile: true,      // Aktifkan interaksi gestur usap/swipe layar\n      isOverlay: true,     // Tampilkan backdrop gelap & efek bayangan\n      controller: sidebarController, \n      hideIfSelectMenu: true,\n      initialSidebarOpen: false,\n      \n      // [BARU] Injeksi Child melalui builder tunggal\n      builder: (context, state, child) {\n        // Contoh: Membungkus halaman dengan background abu-abu\n        return Container(\n          color: Colors.grey[50],\n          child: child,\n        );\n      },\n\n      decorator: const SidebarDecorator(\n        activeColor: Colors.blueAccent,\n        backgroundColor: Colors.white,\n      ),\n      groups: [\n        SidebarGroup(\n          title: 'Overview',\n          items: [\n            SidebarItem(\n              title: 'Dashboard',\n              icon: Icons.dashboard_rounded,\n              route: '/dashboard',\n            ),\n          ],\n        ),\n      ],\n      routes: [\n        GoRoute(\n          path: '/dashboard',\n          builder: (context, state) => const DummyPage(title: 'Dashboard'),\n        ),\n      ],\n    ),\n  );\n}\n\n// Template Halaman dengan Tombol Pemanggil\nclass DummyPage extends StatelessWidget {\n  final String title;\n  const DummyPage({super.key, required this.title});\n\n  @override\n  Widget build(BuildContext context) {\n    return Scaffold(\n      backgroundColor: Colors.transparent,\n      appBar: AppBar(\n        title: Text(title),\n        leading: IconButton(\n          icon: const Icon(Icons.menu),\n          onPressed: () {\n             // Membuka sidebar secara manual via tombol (opsional selain swipe)\n            sidebarController.show();\n          },\n        ),\n      ),\n      body: Center(child: Text(title)),\n    );\n  }\n} "
         },
         {
             "id": "NoteWidget",
@@ -3355,49 +3355,49 @@
             "group": "Service",
             "name": "Socket Helper & Chunking Engine",
             "icon": "fa-solid fa-network-wired",
-            "description": "Kelas pembantu untuk koneksi dan komunikasi dengan server via socket.io yang menyediakan fitur reaktif, auto-reconnect, retry queue, interceptor, logging, dan sinkronisasi CHUNKING[cite: 72]. Ini merupakan satu kesatuan ekosistem terpadu antara klien (Flutter) dan server (Node.js) untuk mentransmisikan dan merakit lalu lintas data masif secara presisi[cite: 1, 67].",
+            "description": "Kelas pembantu untuk koneksi dan komunikasi dengan server via socket.io yang menyediakan fitur reaktif, auto-reconnect, retry queue, interceptor, logging, dan sinkronisasi CHUNKING. Ini merupakan satu kesatuan ekosistem terpadu antara klien (Flutter) dan server (Node.js) untuk mentransmisikan dan merakit lalu lintas data masif secara presisi.",
             "mandatoryProps": [],
             "optionalProps": [],
             "additionalInfo": {
-                "Dependencies Flutter": "socket_io_client [cite: 67]",
-                "Dependencies Node.js": "fs, path [cite: 1]"
+                "Dependencies Flutter": "socket_io_client ",
+                "Dependencies Node.js": "fs, path "
             },
             "methods": [
                 {
                     "name": "connect (Flutter)",
                     "type": "static Future<SocketConnection?>",
                     "default": "",
-                    "desc": "Menghubungkan ke server Socket.IO dengan pengaturan opsional seperti token, auth, dan query, sembari mengaktifkan auto-connect[cite: 77, 80, 81]. Menyediakan fallback HttpOverrides bawaan untuk menembus/by-pass validasi sertifikat bad-cert pada host 'ws.uinmadura.ac.id'[cite: 68, 77]."
+                    "desc": "Menghubungkan ke server Socket.IO dengan pengaturan opsional seperti token, auth, dan query, sembari mengaktifkan auto-connect. Menyediakan fallback HttpOverrides bawaan untuk menembus/by-pass validasi sertifikat bad-cert pada host 'ws.uinmadura.ac.id'."
                 },
                 {
                     "name": "send (Flutter)",
                     "type": "static Future<bool>",
                     "default": "",
-                    "desc": "Mengirim payload data ke server tanpa menunggu balasan (fire-and-forget)[cite: 91]. Jika socket terdeteksi sedang offline, data secara pintar dimasukkan ke dalam antrean memori internal untuk dikirim ulang secara otomatis saat terhubung kembali[cite: 93]."
+                    "desc": "Mengirim payload data ke server tanpa menunggu balasan (fire-and-forget). Jika socket terdeteksi sedang offline, data secara pintar dimasukkan ke dalam antrean memori internal untuk dikirim ulang secara otomatis saat terhubung kembali."
                 },
                 {
                     "name": "sendChunk (Flutter)",
                     "type": "static Future<dynamic>",
                     "default": "",
-                    "desc": "Memecah objek besar (File mentah atau JSON Map) menjadi struktur data List of bytes, lalu mentransmisikannya lapis demi lapis sebagai string base64 sekuensial kepada server sesuai batasan ukuran[cite: 96, 99, 108]."
+                    "desc": "Memecah objek besar (File mentah atau JSON Map) menjadi struktur data List of bytes, lalu mentransmisikannya lapis demi lapis sebagai string base64 sekuensial kepada server sesuai batasan ukuran."
                 },
                 {
                     "name": "getStream (Flutter)",
                     "type": "static Stream<dynamic>",
                     "default": "",
-                    "desc": "Mendengarkan event socket sebagai aliran Stream yang terus terbuka dan memancarkan (emit) data secara berkelanjutan[cite: 120, 121]."
+                    "desc": "Mendengarkan event socket sebagai aliran Stream yang terus terbuka dan memancarkan (emit) data secara berkelanjutan."
                 },
                 {
                     "name": "getOnce (Flutter)",
                     "type": "static Future<dynamic>",
                     "default": "",
-                    "desc": "Menyiapkan listener pasif, mengirimkan data, menangguhkan eksekusi asinkron, dan otomatis mencabut/mematikan listener seketika setelah tepat satu balasan spesifik berhasil ditangkap dari server[cite: 129, 130]."
+                    "desc": "Menyiapkan listener pasif, mengirimkan data, menangguhkan eksekusi asinkron, dan otomatis mencabut/mematikan listener seketika setelah tepat satu balasan spesifik berhasil ditangkap dari server."
                 },
                 {
                     "name": "Constructor (Node.js)",
                     "type": "class Chunk",
                     "default": "",
-                    "desc": "Menginisiasi antarmuka pendengar (listener) chunk di sisi server Node.js. Menahan status pada Map '#transfers' berdasarkan eventName dan transferId klien[cite: 2, 3]. Menetapkan 'maxSize' batas ukuran kelewat-batas default sebesar 10MB dan rute reassembly ke folder 'uploads'[cite: 4, 5]."
+                    "desc": "Menginisiasi antarmuka pendengar (listener) chunk di sisi server Node.js. Menahan status pada Map '#transfers' berdasarkan eventName dan transferId klien. Menetapkan 'maxSize' batas ukuran kelewat-batas default sebesar 10MB dan rute reassembly ke folder 'uploads'."
                 }
             ],
             "behaviors": [
@@ -3405,25 +3405,25 @@
                     "name": "Offline Emit Queuing",
                     "type": "Reliability",
                     "default": "",
-                    "desc": "Permintaan komunikasi yang dikirim saat aplikasi tidak terhubung jaringan tidak akan memicu error gagal kirim, melainkan digantung di dalam memori internal (_emitQueue) untuk kemudian di-flush/dieksekusi seluruh antreannya saat status jaringan kembali pulih[cite: 75, 82, 93]."
+                    "desc": "Permintaan komunikasi yang dikirim saat aplikasi tidak terhubung jaringan tidak akan memicu error gagal kirim, melainkan digantung di dalam memori internal (_emitQueue) untuk kemudian di-flush/dieksekusi seluruh antreannya saat status jaringan kembali pulih."
                 },
                 {
                     "name": "Global Payload Interceptor",
                     "type": "Middleware",
                     "default": "",
-                    "desc": "Menyediakan fungsi static setInterceptor untuk mencegat atau membungkus ulang (wrap) data dengan informasi tambahan secara global tepat sebelum perintah emisi (_socket?.emit) dilepaskan ke jaringan[cite: 89, 149, 151]."
+                    "desc": "Menyediakan fungsi static setInterceptor untuk mencegat atau membungkus ulang (wrap) data dengan informasi tambahan secara global tepat sebelum perintah emisi (_socket?.emit) dilepaskan ke jaringan."
                 },
                 {
                     "name": "Server-side Streaming & Garbage Collection",
                     "type": "Memory Management",
                     "default": "",
-                    "desc": "Kepingan biner (buffer) dari klien langsung dituang ke sistem disk OS menggunakan pendekatan fs.createWriteStream untuk jenis pengunggahan dokumen/file (mencegah overflow RAM)[cite: 12, 18]. Setelah perakitan beres atau timeout (30.000 ms), fungsi pembersihan (#cleanup) bertugas menyapu bersih semua temporary event listeners[cite: 3, 58, 60]."
+                    "desc": "Kepingan biner (buffer) dari klien langsung dituang ke sistem disk OS menggunakan pendekatan fs.createWriteStream untuk jenis pengunggahan dokumen/file (mencegah overflow RAM). Setelah perakitan beres atau timeout (30.000 ms), fungsi pembersihan (#cleanup) bertugas menyapu bersih semua temporary event listeners."
                 }
             ],
             "specialNotes": [
-                "Auto Directory Builder (Node.js): Pada metode chunking yang ditujukan untuk menyimpan file, apabila rute penyimpanan (saveDir) belum tersedia di mesin server, algoritma akan otomatis membangun direktorinya dengan setelan { recursive: true }[cite: 8, 9].",
-                "Threshold Rejection (Node.js): Saat server menerima total data yang divalidasi melanggar batasan ukuran opsi maxSize yang diizinkan, server langsung memotong aliran proses dan menembakkan galat 'max_size_exceeded' kembali kepada klien[cite: 16].",
-                "String Reassembly Engine (Node.js): Jika transferId dideklarasikan sebagai transmisi non-file (seperti JSON berukuran raksasa), Node.js server akan menempelkan semua keping Buffer (Buffer.concat), mengonversinya kembali menjadi tipe string format utf8, dan melakukan perakitan balik ke bentuk Object via JSON.parse()[cite: 33, 35, 36]."
+                "Auto Directory Builder (Node.js): Pada metode chunking yang ditujukan untuk menyimpan file, apabila rute penyimpanan (saveDir) belum tersedia di mesin server, algoritma akan otomatis membangun direktorinya dengan setelan { recursive: true }.",
+                "Threshold Rejection (Node.js): Saat server menerima total data yang divalidasi melanggar batasan ukuran opsi maxSize yang diizinkan, server langsung memotong aliran proses dan menembakkan galat 'max_size_exceeded' kembali kepada klien.",
+                "String Reassembly Engine (Node.js): Jika transferId dideklarasikan sebagai transmisi non-file (seperti JSON berukuran raksasa), Node.js server akan menempelkan semua keping Buffer (Buffer.concat), mengonversinya kembali menjadi tipe string format utf8, dan melakukan perakitan balik ke bentuk Object via JSON.parse()."
             ],
             "code": "// --- [1. SISI NODE.JS / SERVER] --- \n// Mengolah Datanya & Menerima Kepingan Chunk\nconst { Chunk } = require('./Chunk');\n\nio.on('connection', (socket) => {\n  console.log('Klien terkoneksi:', socket.id);\n\n  // Inisiasi Handler Engine untuk File Besar (Misal: Video/Dokumen)\n  const uploadEngine = new Chunk('UPLOAD_BIG_DATA', socket, {\n    maxSize: 50 * 1024 * 1024, // Batasi penerimaan maskimal 50MB\n    saveDir: path.join(__dirname, 'storage_data') // Otomatis bikin folder ini jika belum ada\n  });\n\n  // Cara Mengolah Datanya Setelah 100% Dirakit Server\n  uploadEngine.done((result, transferId) => {\n    if (result.status && result.isFile) {\n      console.log('Mantap! File berhasil di-reassembly di lokasi disk:', result.data);\n      // Aksi Database: Disini Anda bisa simpan 'result.data' path lokal ini ke MySQL/MongoDB\n    } else if (result.status && !result.isFile) {\n       console.log('Menerima String/JSON Utuh dari klien:', result.data);\n       // Aksi Database: Lakukan batch-insert JSON object ini\n    }\n  });\n});\n\n\n// --- [2. SISI FLUTTER / KLIEN] ---\n// Cara Menggunakan SocketHelper & Menyuplai Data ke Server\nimport 'dart:io';\nimport 'socket_helper.dart';\n\nvoid main() async {\n  // 1. Hubungkan Flutter SocketHelper ke endpoint Node.js kita\n  await SocketHelper.connect('https://ws.uinmadura.ac.id', token: 'jwt-auth-token');\n\n  // 2. Siapkan file masif berukuran besar\n  File hugeFile = File('/storage/emulated/0/Download/presentasi_proyek.mp4');\n\n  try {\n    // 3. Panggil chunking engine untuk menembakkan potongan data sekuensial\n    final response = await SocketHelper.sendChunk(\n      'UPLOAD_BIG_DATA',\n      hugeFile, \n      onProgress: (double percent) {\n        // Perbarui state UI Loading Bar\n        print('Mengunggah... ${percent.toStringAsFixed(1)}% selesai');\n      }\n    );\n    \n    print('Pengunggahan selesai, respons backend: $response');\n  } catch (err) {\n    print('Pengunggahan dibatalkan/Gagal karena: $err');\n  }\n}"
         },
