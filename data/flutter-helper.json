@@ -1769,6 +1769,76 @@
             "code": "SmartInfoWidget(\n  layout: Axis.horizontal,\n  labelWidth: 100,\n  spacing: 16,\n  scale: 1.1,\n  valueMaxLines: 2,\n  showDivider: true,\n  dividerStyle: SmartDividerStyle.dashed,\n  dividerThickness: 1.5,\n  horizontalVerticalAlign: CrossAxisAlignment.center,\n  data: [\n    const InfoItemWidget(label: 'Nama Lengkap', value: 'John Doe'),\n    const InfoItemWidget(label: 'Status Aktif', value: true),\n    InfoItemWidget(label: 'Tindakan', value: ElevatedButton(onPressed: () {}, child: const Text('Edit'))),\n    const InfoItemWidget(label: 'Alamat', value: 'Jalan Pahlawan Kemerdekaan No. 123, Blok C, Jakarta Selatan, 12345'),\n  ],\n)"
         },
         {
+            "id": "InfoPopoverWidget",
+            "group": "Widget",
+            "name": "Info Popover",
+            "icon": "fa-solid fa-circle-question",
+            "description": "Widget petunjuk kontekstual cerdas (popover) yang merender overlay informasi saat ditap. Mendukung posisi 4 arah (Top, Bottom, Left, Right) dengan sistem deteksi tabrakan layar penuh (Collision Detection). Dilengkapi segitiga penunjuk (arrow) dinamis yang aman dari distorsi sudut berkat teknik Path Union, serta adaptasi tema pintar untuk Light/Dark mode. Desain dibangun menggunakan standar Material 3, aksen Deep Orange, dan tipografi Poppins.",
+            "mandatoryProps": [
+                {
+                    "name": "message",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Pesan informasi atau petunjuk utama yang ingin ditampilkan di dalam popover."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "title",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Judul opsional yang akan ditampilkan di bagian atas pesan dengan gaya cetak tebal dan aksen warna Deep Orange."
+                },
+                {
+                    "name": "icon",
+                    "type": "Widget?",
+                    "default": "null",
+                    "desc": "Widget kustom yang menjadi trigger (area tap). Jika null, otomatis menggunakan ikon tanda tanya (Icons.help) berwarna biru."
+                },
+                {
+                    "name": "preferredDirection",
+                    "type": "PopoverDirection",
+                    "default": "PopoverDirection.auto",
+                    "desc": "Menentukan arah prioritas popover muncul (auto, top, bottom, left, right). Jika ruang di arah yang dipilih tidak mencukupi (akan menabrak tepi layar), sistem secara cerdas akan mengabaikan paksaan tersebut dan mencari ruang lain yang paling lega (fallback ke auto)."
+                }
+            ],
+            "additionalInfo": {
+                "dependencies": "Membutuhkan package google_fonts. Rendering menggunakan mekanisme native Overlay Flutter, sistem koordinat ancestor, dan penggabungan bentuk (Path.combine) pada CustomPainter."
+            },
+            "methods": [],
+            "behaviors": [
+                {
+                    "name": "4-Way Collision Detection & Fallback",
+                    "type": "UI Responsive",
+                    "default": "",
+                    "desc": "Mendeteksi ketersediaan ruang layar di keempat sisi (atas, bawah, kiri, kanan) secara otomatis. Jika preferredDirection memaksa ke satu sisi namun ruangannya sempit, posisi akan otomatis ditolak dan dipindahkan ke sisi lain yang aman agar popover tidak pernah tenggelam atau terpotong tepi layar."
+                },
+                {
+                    "name": "Safe Arrow Tracking & Union Path",
+                    "type": "Layout Logic",
+                    "default": "",
+                    "desc": "Segitiga penunjuk selalu mengarah persis ke titik trigger. Posisi segitiga dibatasi (clamp) agar tidak menabrak lengkungan sudut box. Digambar menggunakan Path.combine (union) sehingga bentuk segitiga dan kotak menyatu dengan sempurna tanpa cacat garis/overlap."
+                },
+                {
+                    "name": "Theme-Aware Rendering",
+                    "type": "UI Reactive",
+                    "default": "",
+                    "desc": "Otomatis beradaptasi dengan Theme.of(context).brightness. Menggunakan warna latar solid putih untuk Light Mode dan abu-abu gelap (0xFF1E1E1E) untuk Dark Mode, memastikan visibilitas maksimal secara otomatis."
+                },
+                {
+                    "name": "Modal Barrier Dismissal",
+                    "type": "Overlay Interaction",
+                    "default": "",
+                    "desc": "Membentuk lapisan transparan penuh di seluruh dimensi layar (di belakang popover) yang memblokir interaksi dengan UI background. Mengetuk area kosong ini (atau ikon 'Close') akan menutup popover."
+                }
+            ],
+            "specialNotes": [
+                "Direkomendasikan berada di dalam context widget yang ter-mount sempurna agar RenderBox dapat menghitung Offset global dengan akurat menggunakan referensi ancestor Overlay.",
+                "Komponen ini tidak memblokir scroll di belakangnya secara absolut, melainkan menutup (dismiss) secara elegan jika terjadi ketukan di luar area popover."
+            ],
+            "code": "InfoPopoverWidget(\n  title: 'Informasi Penting',\n  message: 'Ini adalah penjelasan detail. Jika ruang di sebelah kanan tidak cukup, popover otomatis pindah ke area lain yang lega.',\n  preferredDirection: PopoverDirection.right,\n  icon: const Icon(\n    Icons.info_outline,\n    color: Colors.deepOrange,\n    size: 24,\n  ),\n)"
+        },
+        {
             "id": "AutoRetryImageWidget",
             "group": "Widget",
             "name": "Auto Retry Image",
