@@ -935,6 +935,24 @@
                     "desc": "Mesin modifikasi teks (contoh: toUpperCase, trim) sebelum data masuk ke node."
                 },
                 {
+                    "name": "maxLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Membatasi jumlah karakter maksimal yang dapat diketik oleh pengguna di dalam text field."
+                },
+                {
+                    "name": "minLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Batas minimal jumlah karakter yang harus diinputkan. Jika jumlah karakter di bawah nilai ini, form akan otomatis memicu error validasi."
+                },
+                {
+                    "name": "showCounter",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah teks indikator penghitung karakter (contoh: 0/100) ditampilkan di sudut bawah field. Hanya relevan jika maxLength diatur."
+                },
+                {
                     "name": "onKeyEvent",
                     "type": "KeyEventResult Function(FocusNode node, KeyEvent event)?",
                     "default": "null",
@@ -1071,6 +1089,24 @@
                     "type": "ValueTransformer<String>?",
                     "default": "null",
                     "desc": "Memodifikasi input data sebelum masuk state."
+                },
+                {
+                    "name": "maxLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Membatasi jumlah karakter maksimal yang dapat diketik oleh pengguna di dalam text field."
+                },
+                {
+                    "name": "minLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Batas minimal jumlah karakter yang harus diinputkan. Jika jumlah karakter di bawah nilai ini, form akan otomatis memicu error validasi."
+                },
+                {
+                    "name": "showCounter",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah teks indikator penghitung karakter (contoh: 0/100) ditampilkan di sudut bawah field. Hanya relevan jika maxLength diatur."
                 },
                 {
                     "name": "onKeyEvent",
@@ -1211,6 +1247,24 @@
                     "desc": "Memodifikasi input data sebelum masuk state."
                 },
                 {
+                    "name": "maxLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Membatasi jumlah karakter maksimal yang dapat diketik oleh pengguna di dalam text field."
+                },
+                {
+                    "name": "minLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Batas minimal jumlah karakter yang harus diinputkan. Jika jumlah karakter di bawah nilai ini, form akan otomatis memicu error validasi."
+                },
+                {
+                    "name": "showCounter",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah teks indikator penghitung karakter (contoh: 0/100) ditampilkan di sudut bawah field. Hanya relevan jika maxLength diatur."
+                },
+                {
                     "name": "onKeyEvent",
                     "type": "KeyEventResult Function(FocusNode node, KeyEvent event)?",
                     "default": "null",
@@ -1349,6 +1403,24 @@
                     "desc": "Memodifikasi input data sebelum masuk state."
                 },
                 {
+                    "name": "maxLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Membatasi jumlah karakter maksimal yang dapat diketik oleh pengguna di dalam text field."
+                },
+                {
+                    "name": "minLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Batas minimal jumlah karakter yang harus diinputkan. Jika jumlah karakter di bawah nilai ini, form akan otomatis memicu error validasi."
+                },
+                {
+                    "name": "showCounter",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah teks indikator penghitung karakter (contoh: 0/100) ditampilkan di sudut bawah field. Hanya relevan jika maxLength diatur."
+                },
+                {
                     "name": "onKeyEvent",
                     "type": "KeyEventResult Function(FocusNode node, KeyEvent event)?",
                     "default": "null",
@@ -1473,6 +1545,24 @@
                     "type": "ValueTransformer<String>?",
                     "default": "null",
                     "desc": "Memodifikasi input data sebelum masuk state."
+                },
+                {
+                    "name": "maxLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Membatasi jumlah karakter maksimal yang dapat diketik oleh pengguna di dalam text field."
+                },
+                {
+                    "name": "minLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Batas minimal jumlah karakter yang harus diinputkan. Jika jumlah karakter di bawah nilai ini, form akan otomatis memicu error validasi."
+                },
+                {
+                    "name": "showCounter",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah teks indikator penghitung karakter (contoh: 0/100) ditampilkan di sudut bawah field. Hanya relevan jika maxLength diatur."
                 },
                 {
                     "name": "onKeyEvent",
@@ -1617,6 +1707,24 @@
                     "type": "ValueTransformer<String>?",
                     "default": "null",
                     "desc": "Mesin modifikasi teks secara instan sebelum data masuk ke node."
+                },
+                {
+                    "name": "maxLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Membatasi jumlah karakter maksimal yang dapat diketik oleh pengguna di dalam text field."
+                },
+                {
+                    "name": "minLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Batas minimal jumlah karakter yang harus diinputkan. Jika jumlah karakter di bawah nilai ini, form akan otomatis memicu error validasi."
+                },
+                {
+                    "name": "showCounter",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah teks indikator penghitung karakter (contoh: 0/100) ditampilkan di sudut bawah field. Hanya relevan jika maxLength diatur."
                 },
                 {
                     "name": "icon",
@@ -1907,6 +2015,24 @@
                     "desc": "Mesin modifikasi teks secara instan sebelum data masuk ke node."
                 },
                 {
+                    "name": "maxLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Membatasi jumlah karakter maksimal yang dapat diketik oleh pengguna di dalam text field."
+                },
+                {
+                    "name": "minLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Batas minimal jumlah karakter yang harus diinputkan. Jika jumlah karakter di bawah nilai ini, form akan otomatis memicu error validasi."
+                },
+                {
+                    "name": "showCounter",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah teks indikator penghitung karakter (contoh: 0/100) ditampilkan di sudut bawah field. Hanya relevan jika maxLength diatur."
+                },
+                {
                     "name": "onKeyEvent",
                     "type": "KeyEventResult Function(FocusNode node, KeyEvent event)?",
                     "default": "null",
@@ -2055,6 +2181,24 @@
                     "desc": "Mesin transformasi teks."
                 },
                 {
+                    "name": "maxLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Membatasi jumlah karakter maksimal yang dapat diketik oleh pengguna di dalam text field."
+                },
+                {
+                    "name": "minLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Batas minimal jumlah karakter yang harus diinputkan. Jika jumlah karakter di bawah nilai ini, form akan otomatis memicu error validasi."
+                },
+                {
+                    "name": "showCounter",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah teks indikator penghitung karakter (contoh: 0/100) ditampilkan di sudut bawah field. Hanya relevan jika maxLength diatur."
+                },
+                {
                     "name": "onKeyEvent",
                     "type": "KeyEventResult Function(FocusNode node, KeyEvent event)?",
                     "default": "null",
@@ -2143,10 +2287,10 @@
             "code": "FormHelperWidget.Address(\n  label: 'Alamat Rumah',\n  node: _formCtrl.node('alamat'),\n  hintText: 'Masukkan alamat lengkap...',\n  validator: (val) => val.isEmpty ? 'Alamat wajib diisi!' : null,\n)"
         },
         {
-            "id": "pin_code",
+            "id": "otp",
             "group": "Advanced Inputs",
-            "name": "Pin Code",
-            "icon": "fa-solid fa-lock",
+            "name": "OTP",
+            "icon": "fa-solid fa-key",
             "description": "Widget input PIN / OTP modern dengan tampilan kotak digit terpisah. Mendukung OTP autofill, validasi form, callback selesai input, karakter tersembunyi untuk keamanan, serta sistem fokus dan backspace native yang stabil di Android maupun iOS.",
             "mandatoryProps": [],
             "optionalProps": [
@@ -2286,7 +2430,7 @@
                 "onCompleted dipanggil otomatis ketika jumlah digit terpenuhi.",
                 "Cocok digunakan untuk OTP, PIN transaksi, verifikasi SMS, maupun kode keamanan."
             ],
-            "code": "FormHelperWidget.PinCode(\n  label: 'Kode OTP',\n  digitInfoText: 'Masukkan 6 digit kode verifikasi',\n  node: _formCtrl.node('otp'),\n  length: 6,\n  onlyNumber: true,\n  obscureText: false,\n  prefix: Icon(Icons.lock_outline),\n  suffix: Icon(Icons.sms_outlined),\n  onChanged: (val) {\n    debugPrint('OTP berubah: $val');\n  },\n  onCompleted: (val) {\n    debugPrint('OTP selesai: $val');\n  },\n)"
+            "code": "FormHelperWidget.Otp(\n  label: 'Kode OTP',\n  digitInfoText: 'Masukkan 6 digit kode verifikasi',\n  node: _formCtrl.node('otp'),\n  length: 6,\n  onlyNumber: true,\n  obscureText: false,\n  prefix: Icon(Icons.lock_outline),\n  suffix: Icon(Icons.sms_outlined),\n  onChanged: (val) {\n    debugPrint('OTP berubah: $val');\n  },\n  onCompleted: (val) {\n    debugPrint('OTP selesai: $val');\n  },\n)"
         },
         {
             "id": "richtext",
@@ -5191,6 +5335,24 @@
                     "type": "ValueTransformer<num?>?",
                     "default": "null",
                     "desc": "Modifikasi nilai (contoh: kompresi desimal) sebelum masuk ke node."
+                },
+                {
+                    "name": "maxLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Membatasi jumlah karakter maksimal yang dapat diketik oleh pengguna di dalam text field."
+                },
+                {
+                    "name": "minLength",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Batas minimal jumlah karakter yang harus diinputkan. Jika jumlah karakter di bawah nilai ini, form akan otomatis memicu error validasi."
+                },
+                {
+                    "name": "showCounter",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah teks indikator penghitung karakter (contoh: 0/100) ditampilkan di sudut bawah field. Hanya relevan jika maxLength diatur."
                 },
                 {
                     "name": "onKeyEvent",
