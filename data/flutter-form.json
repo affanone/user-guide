@@ -1685,6 +1685,12 @@
                     "desc": "Nilai awal editor. Disarankan menggunakan Delta JSON dari flutter_quill."
                 },
                 {
+                    "name": "allowToggleVisibility",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Jika diset ke false, tombol mata (eye icon) di sebelah kanan akan disembunyikan dan teks akan secara absolut dikunci dalam mode tersembunyi (dot), mengabaikan state apapun yang ada."
+                },
+                {
                     "name": "inputFormatters",
                     "type": "List<TextInputFormatter>?",
                     "default": "null",
