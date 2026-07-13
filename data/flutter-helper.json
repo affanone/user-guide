@@ -803,37 +803,31 @@
             "group": "Widget",
             "name": "Menu Sidebar",
             "icon": "fa-solid fa-bars-staggered",
-            "description": "Widget navigasi sidebar interaktif dan beranimasi yang dirancang untuk membangun menu dasbor profesional. Mendukung pengelompokan menu (grouping), submenu bersarang (nested), efek hover, mode collapse/expand (buka-tutup), responsivitas mobile (drawer melayang dengan dukungan gestur usap/swipe murni) , sistem kontrol eksternal (Controller) , injeksi pembungkus (builder) , serta menyediakan integrasi langsung dan mulus dengan GoRouter.",
+            "description": "Widget navigasi sidebar interaktif dan beranimasi premium yang dirancang untuk membangun menu dasbor profesional lintas platform (Mobile, Desktop, Web). Mendukung pengelompokan menu (grouping), submenu bersasar (nested), efek hover dinamis, manajemen bukaan (collapse/expand), serta manajemen responsivitas mobile murni lewat gestur usap (fluid swipe). Versi terbaru kini dilengkapi dengan manajemen tema gelap otomatis (Explicit Dark Mode), kustomisasi transisi halaman seragam lewat efek animasi kustom, serta sistem otomatisasi registrasi rute GoRouter langsung dari struktur menu.",
             "mandatoryProps": [
                 {
                     "name": "groups",
                     "type": "List<SidebarGroup>",
                     "default": "",
-                    "desc": "Kumpulan data (grup dan item) yang akan dirender menjadi struktur menu di dalam sidebar. Diwajibkan untuk semua metode. "
+                    "desc": "Kumpulan struktur data grup dan item menu yang akan dirender ke dalam arsitektur sidebar. Diwajibkan baik untuk konstruktor standar maupun metode statis .createApp()."
                 },
                 {
                     "name": "currentRoute",
                     "type": "String",
                     "default": "",
-                    "desc": "Rute atau path aktif saat ini. Digunakan sistem untuk menandai (highlight) menu mana yang sedang aktif. Hanya diwajibkan untuk konstruktor default statis MenuSidebarWidget. "
+                    "desc": "Rute atau path URL aktif saat ini (misal: '/dashboard'). Digunakan sistem untuk memberikan highlight visual (active state) pada item menu terpilih."
                 },
                 {
                     "name": "onRouteSelected",
                     "type": "ValueChanged<String>",
                     "default": "",
-                    "desc": "Callback yang dipicu ketika pengguna mengklik menu yang memiliki route. Hanya diwajibkan untuk konstruktor default statis MenuSidebarWidget. "
-                },
-                {
-                    "name": "routes",
-                    "type": "List<RouteBase>",
-                    "default": "",
-                    "desc": "Daftar halaman anak (child pages) dari GoRouter yang akan dirender di sisi kanan sidebar. Hanya diwajibkan untuk metode pembungkus MenuSidebarWidget.createApp. "
+                    "desc": "Fungsi callback yang dipicu ketika pengguna memilih atau menekan item menu rute tunggal yang tidak memiliki submenu."
                 },
                 {
                     "name": "initialLocation",
                     "type": "String",
                     "default": "",
-                    "desc": "Path awal ketika aplikasi pertama kali dimuat oleh GoRouter. Hanya diwajibkan untuk metode MenuSidebarWidget.createApp. "
+                    "desc": "Alamat path URL awal yang akan dimuat pertama kali ketika aplikasi diinisialisasi oleh GoRouter. Hanya diwajibkan jika menggunakan metode statis MenuSidebarWidget.createApp()."
                 }
             ],
             "optionalProps": [
@@ -841,91 +835,103 @@
                     "name": "builder",
                     "type": "Widget Function(BuildContext ctx, GoRouterState state, Widget child)?",
                     "default": "null",
-                    "desc": "Fungsi injeksi terpadu. Digunakan untuk memproses atau membungkus konten rute (child page) sebelum dimasukkan ke dalam kerangka sidebar. "
+                    "desc": "Fungsi pembungkus terpadu (Shell Route Builder) untuk memproses, memodifikasi, atau menyisipkan widget global tambahan pada konten halaman anak sebelum dirender di sisi kanan layar."
                 },
                 {
                     "name": "title",
                     "type": "String",
                     "default": "'My App'",
-                    "desc": "Judul aplikasi (title) yang diteruskan ke konfigurasi MaterialApp. Hanya berlaku untuk metode MenuSidebarWidget.createApp. "
+                    "desc": "Judul aplikasi utama yang akan diteruskan secara langsung ke konfigurasi penamaan core MaterialApp.router."
                 },
                 {
                     "name": "theme",
                     "type": "ThemeData?",
                     "default": "null",
-                    "desc": "Konfigurasi tema kustom untuk MaterialApp. Jika tidak diisi (null), sistem akan menggunakan AppTheme.lightTheme. Hanya berlaku untuk metode MenuSidebarWidget.createApp. "
+                    "desc": "Konfigurasi skema tema light mode kustom untuk MaterialApp. Jika bernilai null, secara otomatis menggunakan fallback bawaan dari AppTheme.lightTheme."
                 },
                 {
                     "name": "decorator",
                     "type": "SidebarDecorator",
                     "default": "const SidebarDecorator()",
-                    "desc": "Konfigurasi visual (warna, font, padding) untuk mengustomisasi tampilan antarmuka sidebar. Padding bawaan diatur ke horizontal 16.0 dan vertical 24.0. "
+                    "desc": "Objek dekorator visual untuk mengontrol pewarnaan (latar, item aktif, teks, hover) dan jarak padding internal area sidebar."
                 },
                 {
                     "name": "initialSidebarOpen",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Menentukan status awal sidebar ketika pertama kali dirender (terbuka lebar atau tersembunyi). "
+                    "desc": "Menentukan status visual awal sidebar saat aplikasi pertama kali dimuat; bernilai true untuk terbuka lebar (expand) dan false untuk mengecil (collapse)."
                 },
                 {
                     "name": "orientation",
                     "type": "TextDirection",
                     "default": "TextDirection.ltr",
-                    "desc": "Arah orientasi antarmuka. Mendukung penuh tata letak bahasa Arab/Ibrani (RTL), yang juga mempengaruhi arah gestur usap/swipe drawer. "
+                    "desc": "Arah orientasi layout dasar sistem navigasi. Mendukung transisi penuh ke mode Right-to-Left (RTL) untuk standarisasi aplikasi multi-bahasa global."
                 },
                 {
                     "name": "isMobile",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Mengaktifkan mode responsif. Sidebar akan melayang dan mendukung interaksi geser ujung layar (edge drag). "
+                    "desc": "Mengaktifkan mode adaptif mobile/tablet. Sidebar akan berubah menjadi drawer tersembunyi yang melayang di atas konten utama."
                 },
                 {
                     "name": "isOverlay",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Jika digabungkan dengan isMobile=true, sidebar akan memunculkan efek bayangan (shadow) dan backdrop gelap yang meredup otomatis sesuai progres geser. "
+                    "desc": "Kondisi pendukung mode mobile. Jika bernilai true, sistem menyisipkan scrim backdrop gelap adaptif yang meredup sesuai rasio tarikan gestur."
                 },
                 {
                     "name": "controller",
                     "type": "MenuSidebarController?",
                     "default": "null",
-                    "desc": "Controller eksternal untuk mengendalikan state sidebar secara imperatif dari widget lain. "
+                    "desc": "Pengendali eksternal berbasis ChangeNotifier untuk memanipulasi status buka-tutup bodi sidebar secara imperatif dari widget luar lainnya."
                 },
                 {
                     "name": "hideIfSelectMenu",
                     "type": "bool",
                     "default": "true",
-                    "desc": "UX Behavior: Otomatis menutup sidebar (hide) setelah pengguna memilih item rute menu, terutama pada mode mobile. "
+                    "desc": "UX Behavior: Otomatis menutup panel drawer secara instan setelah pengguna berhasil mengetuk atau memilih item menu tujuan."
                 },
                 {
                     "name": "hideIfTapOverlay",
                     "type": "bool",
                     "default": "true",
-                    "desc": "UX Behavior: Otomatis menutup sidebar ketika pengguna men-tap area gelap di luar sidebar pada mode Overlay. "
+                    "desc": "UX Behavior: Otomatis menyembunyikan kembali panel sidebar ketika pengguna mengetuk area kosong/scrim redup di luar bodi drawer."
+                },
+                {
+                    "name": "isDarkMode",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Manajemen Mode Gelap: Parameter baru untuk memaksa aplikasi berpindah ke skema ThemeMode.dark secara eksplisit, sekaligus merubah interpolasi warna fallback komponen internal sidebar."
+                },
+                {
+                    "name": "effect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Mesin Transisi Kustom: Jika diatur, sistem akan mengabaikan animasi default platform dan menerapkan efek animasi transisi halaman premium seragam lintas platform menggunakan CustomTransitionsBuilder."
                 }
             ],
             "additionalInfo": {
-                "dependencies": "flutter/material.dart, go_router, google_fonts, respo/app/theme/app_theme.dart ",
-                "models": "SidebarGroup, SidebarItem, SidebarDecorator, MenuSidebarController "
+                "dependencies": "flutter/material.dart, go_router, google_fonts, respo/app/theme/app_theme.dart, respo/src/widgets/animation_widget.dart",
+                "models": "SidebarGroup, SidebarItem, SidebarDecorator, MenuSidebarController"
             },
             "methods": [
                 {
                     "name": "MenuSidebarWidget()",
                     "type": "Widget",
                     "default": "",
-                    "desc": "Konstruktor standar (default) untuk penggunaan statis atau standalone. Digunakan jika Anda menyusun layout mandiri atau mengelola navigasi secara manual. "
+                    "desc": "Konstruktor standar untuk diletakkan ke dalam struktur layout kustom yang telah Anda buat sendiri. Membutuhkan sinkronisasi manual rute lewat state eksternal."
                 },
                 {
                     "name": "MenuSidebarWidget.createApp()",
                     "type": "static Widget",
                     "default": "",
-                    "desc": "Metode bundling yang mengembalikan MaterialApp.router beserta konfigurasi GoRouter terpadu menggunakan ShellRoute. Cocok untuk penerapan instan (plug-and-play). "
+                    "desc": "Metode pembungkus instan berkinerja tinggi yang langsung menghasilkan struktur MaterialApp.router lengkap yang terintegrasi secara otomatis dengan ShellRoute GoRouter berdasarkan data hirarki di dalam variabel groups."
                 },
                 {
                     "name": "MenuSidebarController",
                     "type": "Class Controller",
                     "default": "",
-                    "desc": "Memiliki status isOpen dan metode .show(), .hide(), serta .toggle() untuk memanipulasi tampilan sidebar dari luar widget. "
+                    "desc": "Kelas kontrol eksternal yang menyediakan properti reaktif '.isOpen' serta fungsi manipulasi state stateful murni yaitu '.show()', '.hide()', dan '.toggle()'."
                 }
             ],
             "behaviors": [
@@ -933,40 +939,40 @@
                     "name": "Smart Submenu Popup",
                     "type": "UI Reaction",
                     "default": "",
-                    "desc": "Ketika sidebar dalam kondisi tidak terekspansi, item yang memiliki submenu dirender cerdas sebagai PopupMenu melayang. "
+                    "desc": "Ketika bodi sidebar mengecil (collapsed), item induk yang mengemas submenu secara pintar dikonversi menjadi komponen PopupMenu melayang di samping bodi utama guna menjaga fungsionalitas navigasi."
                 },
                 {
-                    "name": "Auto Initials Icon",
+                    "name": "Auto Initials Icon Placeholder",
                     "type": "UI Generation",
                     "default": "",
-                    "desc": "Jika sebuah item tidak didefinisikan icon-nya, sistem otomatis membuat ikon kotak berisi dua huruf inisial dari nama menu tersebut. "
+                    "desc": "Apabila item menu tidak memiliki data visual IconData, sistem secara otomatis mengekstrak teks judul menu dan membuat ikon inisial alfabetikal (maksimal 2 karakter) berlatar transparan secara dinamis."
                 },
                 {
-                    "name": "Theme Reactive",
+                    "name": "Explicit Dark Mode Logic",
                     "type": "UI Reaction",
                     "default": "",
-                    "desc": "Warna default otomatis merespons tema aktif (Dark/Light Mode) dari aplikasi, dengan menghasilkan warna fallback yang presisi jika SidebarDecorator tidak diisi. "
+                    "desc": "Warna fallback teks non-aktif dan warna sorotan hover area item menu secara reaktif berubah menyesuaikan variabel parameter 'isDarkMode' demi mempertahankan rasio kontras aksesibilitas (contrast ratio) yang tinggi."
                 },
                 {
                     "name": "Fluid Swipe Gestures & Layout Safety",
                     "type": "UX & Layout Physics",
                     "default": "",
-                    "desc": "Sidebar dapat ditarik dari ujung layar (edge drag) dengan kecepatan lempar murni (fling velocity). Panel bergeser menggunakan Transform.translate sehingga lebar tetap statis, mencegah error RenderFlex overflow pada teks saat animasi berjalan. "
+                    "desc": "Mendukung tarikan murni (edge drag) berkecepatan tinggi (fling velocity). Panel bergeser mulus memanfaatkan pemosisian Transform.translate untuk menjamin teks di dalamnya tidak mengalami error RenderFlex overflow sewaktu transisi ukuran bodi berjalan."
                 },
                 {
-                    "name": "Premium Overlay System",
-                    "type": "UX Feature",
+                    "name": "Universal Transitions Unification",
+                    "type": "Animation Engine",
                     "default": "",
-                    "desc": "Memunculkan bayangan eksklusif dan backdrop redup (opacity) adaptif secara berkesinambungan sejalan dengan seberapa jauh panel ditarik oleh gestur pengguna. "
+                    "desc": "Sistem secara seragam mengunci perilaku perpindahan layar di Android, iOS, macOS, Windows, dan Linux agar berjalan seirama mengikuti struktur PageTransitionsTheme yang Anda pilih."
                 }
             ],
             "specialNotes": [
-                "Sistem Navigasi Instan: Pada metode MenuSidebarWidget.createApp, currentRoute dan onRouteSelected dikonfigurasi secara otomatis menuju state.uri.toString() dan context.go(route). ",
-                "Logika Aktif (Active State) Submenu: Parent item otomatis menyala (aktif) jika salah satu child rutenya cocok dengan currentRoute yang sedang aktif. ",
-                "Akses Mode Mobile: Karena properti 'initialSidebarOpen' secara default adalah false, pasang tombol eksternal dengan memanggil sidebarController.show() atau .toggle() jika tidak menggunakan gestur usap. ",
-                "Pemangkasan Injeksi: Parameter lama 'injectChild' telah dihapuskan. Pada metode createApp, gunakan prop 'builder' tunggal untuk memodifikasi atau membungkus halaman (child widget) yang di-render oleh GoRouter. "
+                "Otomatisasi Navigasi GoRouter: Pada pemanggilan MenuSidebarWidget.createApp(), parameter lama 'routes' telah dihapus sepenuhnya. Rute halaman anak kini dibuat secara rekursif otomatis dari parameter 'route' dan 'child' (atau objek 'base' jika ingin kustomisasi penuh) yang ditempel langsung pada setiap instansiasi kelas SidebarItem.",
+                "Logika Induk Aktif (Parent Active State): Komponen menu induk yang membawahi submenu otomatis ikut menyala (highlighted aktif) apabila salah satu alamat sub-rute anak di dalamnya sedang aktif diakses.",
+                "Aksesibilitas Drawer Mobile: Saat mode mobile aktif, status awal sidebar selalu tertutup secara default. Anda disarankan menaruh komponen IconButton menu di AppBar eksternal halaman anak untuk memicu perintah 'sidebarController.show()' sebagai alternatif dari gestur usap layar.",
+                "Migrasi Konten Rute: Parameter usang 'injectChild' telah ditiadakan dari sistem. Untuk melakukan kustomisasi layout pembungkus halaman global, gunakan properti parameter 'builder' tunggal bawaan .createApp()."
             ],
-            "code": "// =========================================================\n// 1. CONTOH PENGGUNAAN STATIS (Hanya Widget Sidebar Saja)\n// =========================================================\nMenuSidebarWidget(\n  currentRoute: '/dashboard',\n  onRouteSelected: (route) {\n    print('Navigasi menuju: $route');\n  },\n  groups: [\n    SidebarGroup(\n      title: 'Main Menu',\n      items: [\n        SidebarItem(\n          title: 'Dashboard',\n          icon: Icons.dashboard_rounded,\n          route: '/dashboard',\n        ),\n        SidebarItem(\n          title: 'Settings',\n          icon: Icons.settings,\n          submenus: [\n            SidebarItem(title: 'Profile', route: '/settings/profile'),\n            SidebarItem(title: 'Security', route: '/settings/security'),\n          ],\n        ),\n      ],\n    ),\n  ],\n)\n\n// =========================================================\n// 2. CONTOH PENGGUNAAN LENGKAP (GoRouter + Drawer Geser)\n// =========================================================\nimport 'package:flutter/material.dart';\nimport 'package:go_router/go_router.dart';\n\nfinal MenuSidebarController sidebarController = MenuSidebarController();\n\nvoid main() {\n  runApp(\n    MenuSidebarWidget.createApp(\n      title: 'Aplikasi Admin Premium',\n      initialLocation: '/dashboard',\n      isMobile: true,      // Aktifkan interaksi gestur usap/swipe layar\n      isOverlay: true,     // Tampilkan backdrop gelap & efek bayangan\n      controller: sidebarController, \n      hideIfSelectMenu: true,\n      initialSidebarOpen: false,\n      \n      // [BARU] Injeksi Child melalui builder tunggal\n      builder: (context, state, child) {\n        // Contoh: Membungkus halaman dengan background abu-abu\n        return Container(\n          color: Colors.grey[50],\n          child: child,\n        );\n      },\n\n      decorator: const SidebarDecorator(\n        activeColor: Colors.blueAccent,\n        backgroundColor: Colors.white,\n      ),\n      groups: [\n        SidebarGroup(\n          title: 'Overview',\n          items: [\n            SidebarItem(\n              title: 'Dashboard',\n              icon: Icons.dashboard_rounded,\n              route: '/dashboard',\n            ),\n          ],\n        ),\n      ],\n      routes: [\n        GoRoute(\n          path: '/dashboard',\n          builder: (context, state) => const DummyPage(title: 'Dashboard'),\n        ),\n      ],\n    ),\n  );\n}\n\n// Template Halaman dengan Tombol Pemanggil\nclass DummyPage extends StatelessWidget {\n  final String title;\n  const DummyPage({super.key, required this.title});\n\n  @override\n  Widget build(BuildContext context) {\n    return Scaffold(\n      backgroundColor: Colors.transparent,\n      appBar: AppBar(\n        title: Text(title),\n        leading: IconButton(\n          icon: const Icon(Icons.menu),\n          onPressed: () {\n             // Membuka sidebar secara manual via tombol (opsional selain swipe)\n            sidebarController.show();\n          },\n        ),\n      ),\n      body: Center(child: Text(title)),\n    );\n  }\n} "
+            "code": "// =========================================================\n// 1. CONTOH PENGGUNAAN STANDAR / STANDALONE (MANUAL LAYOUT)\n// =========================================================\nMenuSidebarWidget(\n  currentRoute: '/analytics',\n  isDarkMode: true, // Memaksa pewarnaan tema gelap pada sidebar\n  onRouteSelected: (route) {\n    print('Navigasi eksternal dipicu menuju path: $route');\n  },\n  groups: [\n    SidebarGroup(\n      title: 'Menu Utama',\n      items: [\n        SidebarItem(\n          title: 'Dashboard',\n          icon: Icons.dashboard_rounded,\n          route: '/dashboard',\n        ),\n        SidebarItem(\n          title: 'Laporan Analitik',\n          icon: Icons.analytics_outlined,\n          route: '/analytics',\n        ),\n      ],\n    ),\n  ],\n)\n\n// =========================================================\n// 2. CONTOH PENGGUNAAN PLUG-AND-PLAY (OTOMATISASI MATERIALLAPP)\n// =========================================================\nimport 'package:flutter/material.dart';\nimport 'package:go_router/go_router.dart';\n\nfinal MenuSidebarController coreSidebarController = MenuSidebarController(initialOpen: false);\n\nvoid main() {\n  runApp(\n    MenuSidebarWidget.createApp(\n      title: 'Sistem Dasbor Eksekutif',\n      initialLocation: '/home',\n      isMobile: true,            // Mengaktifkan drawer gestur usap pada mobile\n      isOverlay: true,           // Backdrop redup otomatis aktif\n      isDarkMode: false,          // Mode terang aktif (menggunakan lightTheme)\n      controller: coreSidebarController,\n      hideIfSelectMenu: true,    // Tutup drawer secara otomatis saat menu ditekan\n      hideIfTapOverlay: true,    // Tutup drawer saat area luar diketuk\n      \n      // Menggunakan fungsi builder tunggal sebagai penata layout global tambahan\n      builder: (context, state, child) {\n        return Container(\n          color: Colors.grey[100],\n          child: child,\n        );\n      },\n      decorator: const SidebarDecorator(\n        activeColor: Colors.indigo,\n        backgroundColor: Colors.white,\n      ),\n      groups: [\n        SidebarGroup(\n          title: 'Menu Navigasi',\n          items: [\n            SidebarItem(\n              title: 'Beranda',\n              icon: Icons.home_max_rounded,\n              route: '/home',\n              child: const MainWorkspacePage(title: 'Halaman Beranda'),\n            ),\n            SidebarItem(\n              title: 'Manajemen Akun',\n              icon: Icons.manage_accounts_rounded,\n              route: '/accounts',\n              child: const MainWorkspacePage(title: 'Halaman Akun'),\n            ),\n            SidebarItem(\n              title: 'Pengaturan',\n              icon: Icons.settings_applications,\n              route: '/nested',\n              submenus: [\n                SidebarItem(\n                  title: 'Profil Keamanan',\n                  route: '/nested/security',\n                  child: const MainWorkspacePage(title: 'Opsi Keamanan'),\n                ),\n              ],\n            ),\n          ],\n        ),\n      ],\n    ),\n  );\n}\n\nclass MainWorkspacePage extends StatelessWidget {\n  final String title;\n  const MainWorkspacePage({super.key, required this.title});\n\n  @override\n  Widget build(BuildContext context) {\n    return Scaffold(\n      backgroundColor: Colors.transparent,\n      appBar: AppBar(\n        title: Text(title),\n        leading: IconButton(\n          icon: const Icon(Icons.menu_rounded),\n          onPressed: () {\n            // Membuka sidebar secara imperatif via tombol kontrol eksternal\n            coreSidebarController.show();\n          },\n        ),\n      ),\n      body: Center(\n        child: Text(\n          title,\n          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),\n        ),\n      ),\n    );\n  }\n}"
         },
         {
             "id": "NoteWidget",
