@@ -247,79 +247,95 @@
                 {
                     "name": "initialValue",
                     "type": "String",
-                    "default": "",
+                    "default": "''",
                     "desc": "Nilai awal node jika node belum memiliki value."
-                }
-            ],
-            "additionalInfo": {},
-            "properties": [
-                {
-                    "name": ".text",
-                    "type": "String",
-                    "default": "",
-                    "desc": "Value utama FormNode dalam bentuk String."
                 },
                 {
-                    "name": ".hasFocus",
+                    "name": "isEnabled",
                     "type": "bool",
-                    "default": "",
-                    "desc": "Mengecek apakah widget/node tersebut sedang dalam posisi fokus atau tidak."
+                    "default": "true",
+                    "desc": "Status inisialisasi apakah node dapat diinteraksi (aktif) atau tidak."
                 },
                 {
-                    "name": ".controller",
-                    "type": "TextEditingController",
-                    "default": "",
-                    "desc": "Controller internal bawaan FormNode."
+                    "name": "isVisible",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Status inisialisasi apakah node terlihat di UI atau disembunyikan."
                 },
                 {
-                    "name": ".focusNode",
-                    "type": "FocusNode",
-                    "default": "",
-                    "desc": "FocusNode internal bawaan FormNode."
+                    "name": "shakeOnError",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika aktif, node akan secara otomatis bergetar (shake) ketika validasi gagal/error."
                 },
                 {
-                    "name": ".enabled",
-                    "type": "ValueNotifier<bool>",
-                    "default": "",
-                    "desc": "State enabled reactive bawaan node."
+                    "name": "theme",
+                    "type": "FormElementTheme?",
+                    "default": "null",
+                    "desc": "Konfigurasi tema spesifik yang dapat disematkan ke dalam node."
                 },
                 {
-                    "name": ".visible",
-                    "type": "ValueNotifier<bool>",
-                    "default": "",
-                    "desc": "State visible reactive bawaan node."
+                    "name": "size",
+                    "type": "FormElementSize?",
+                    "default": "null",
+                    "desc": "Konfigurasi ukuran (size) spesifik untuk widget yang terhubung ke node."
+                },
+                {
+                    "name": "scale",
+                    "type": "double?",
+                    "default": "null",
+                    "desc": "Faktor skala (scale) spesifik untuk elemen form."
+                },
+                {
+                    "name": "onValidate",
+                    "type": "String? Function(String? value)?",
+                    "default": "null",
+                    "desc": "Fungsi callback untuk melakukan validasi input. Mengembalikan String pesan error jika tidak valid, atau null jika valid."
                 }
             ],
+            "additionalInfo": {
+                "katalogPresetCerdas": [
+                    ".text -> Value utama FormNode dalam bentuk String. Dapat digunakan untuk get maupun set nilai. [Tipe: String, Default: \"\"]",
+                    ".hasFocus -> Mengecek apakah widget/node tersebut sedang dalam posisi fokus atau tidak. [Tipe: bool, Default: \"false\"]",
+                    ".controller -> Controller internal bawaan FormNode. [Tipe: TextEditingController, Default: \"\"]",
+                    ".focusNode -> FocusNode internal bawaan FormNode. [Tipe: FocusNode, Default: \"\"]",
+                    ".enabled -> State enabled reactive bawaan node. [Tipe: ValueNotifier<bool>, Default: \"true\"]",
+                    ".visible -> State visible reactive bawaan node. [Tipe: ValueNotifier<bool>, Default: \"true\"]",
+                    ".isValid -> Mengecek apakah isi text saat ini lulus validasi berdasarkan fungsi onValidate. [Tipe: bool, Default: \"true\"]",
+                    ".errorMessage -> Mengembalikan pesan error dari fungsi onValidate, atau string kosong jika valid / onValidate belum diatur. [Tipe: String, Default: \"''\"]"
+                ]
+            },
+            "properties": [],
             "methods": [
                 {
-                    "name": ".getString()",
+                    "name": ".getString({bool trim = true, String fallback = ''})",
                     "type": "String",
                     "default": "",
-                    "desc": "Mengambil value node sebagai String."
+                    "desc": "Mengambil value node sebagai String. Memiliki opsi untuk auto-trim (default true) dan fallback nilai."
                 },
                 {
-                    "name": ".getInt()",
+                    "name": ".getInt({int fallback = 0})",
                     "type": "int",
                     "default": "",
-                    "desc": "Mengambil value node lalu parse ke int."
+                    "desc": "Mengambil value node lalu di-parse secara aman ke int. Mengembalikan fallback jika parse gagal."
                 },
                 {
-                    "name": ".getDouble()",
+                    "name": ".getDouble({double fallback = 0.0})",
                     "type": "double",
                     "default": "",
-                    "desc": "Mengambil value node lalu parse ke double."
+                    "desc": "Mengambil value node lalu di-parse secara aman ke double. Mengembalikan fallback jika parse gagal."
                 },
                 {
-                    "name": ".getNumber()",
+                    "name": ".getNumber({num fallback = 0})",
                     "type": "num",
                     "default": "",
-                    "desc": "Mengambil value node lalu parse ke num."
+                    "desc": "Mengambil value node lalu di-parse secara aman ke num. Mengembalikan fallback jika parse gagal."
                 },
                 {
-                    "name": ".getBool()",
+                    "name": ".getBool({bool fallback = false})",
                     "type": "bool",
                     "default": "",
-                    "desc": "Mengambil value node lalu parse ke boolean."
+                    "desc": "Mengambil value node lalu di-parse ke boolean (mendukung: 'true', '1', 'yes' -> true, dan 'false', '0', 'no' -> false)."
                 },
                 {
                     "name": ".focus()",
@@ -337,79 +353,85 @@
                     "name": ".clear()",
                     "type": "void",
                     "default": "",
-                    "desc": "Menghapus seluruh isi value node."
+                    "desc": "Menghapus seluruh isi value (text) pada node."
                 },
                 {
                     "name": ".enable()",
                     "type": "void",
                     "default": "",
-                    "desc": "Mengaktifkan node/widget."
+                    "desc": "Mengaktifkan interaksi pada node/widget."
                 },
                 {
                     "name": ".disable()",
                     "type": "void",
                     "default": "",
-                    "desc": "Menonaktifkan node/widget."
+                    "desc": "Menonaktifkan interaksi pada node/widget."
                 },
                 {
                     "name": ".toggleEnabled()",
                     "type": "void",
                     "default": "",
-                    "desc": "Toggle status enabled."
+                    "desc": "Toggle status enabled (membalik kondisi dari aktif ke nonaktif atau sebaliknya)."
                 },
                 {
                     "name": ".show()",
                     "type": "void",
                     "default": "",
-                    "desc": "Menampilkan widget terkait node."
+                    "desc": "Menampilkan widget terkait node di UI."
                 },
                 {
                     "name": ".hide()",
                     "type": "void",
                     "default": "",
-                    "desc": "Menyembunyikan widget terkait node."
+                    "desc": "Menyembunyikan widget terkait node dari UI."
                 },
                 {
                     "name": ".toggleVisible()",
                     "type": "void",
                     "default": "",
-                    "desc": "Toggle status visible."
+                    "desc": "Toggle status visible (membalik kondisi visibilitas)."
                 },
                 {
-                    "name": ".serialize()",
+                    "name": ".serialize({bool includeDisabled = false, bool includeHidden = false})",
                     "type": "Object?",
                     "default": "",
-                    "desc": "Mengambil value node untuk kebutuhan submit/export form."
+                    "desc": "Mengambil value node untuk disubmit/export. Secara default akan mengabaikan (return null) node yang disabled atau hidden, kecuali argumen diset true."
                 },
                 {
                     "name": ".shake([bool fromValidator = false])",
                     "type": "void",
                     "default": "",
-                    "desc": "Memicu animasi getar (shake animation) pada widget yang terhubung dengan node. Cocok digunakan untuk menandai error validasi, input salah, OTP gagal, atau feedback visual interaktif."
+                    "desc": "Memicu animasi getar dengan dukungan debounce (400ms). Parameter fromValidator menentukan asal pemicu; jika dipicu validator, ia akan memeriksa rules `shakeOnError` sebelum mengeksekusi."
                 },
                 {
                     "name": ".addListener(void Function(FormNode node) listener)",
                     "type": "void",
                     "default": "",
-                    "desc": "Suntikan cerdas untuk memantau event dari node (seperti perubahan fokus) dengan mengirimkan seluruh context instance FormNode ke dalam callback. Anda bisa mengakses node.hasFocus, node.text, dsb secara fleksibel."
+                    "desc": "Suntikan cerdas memantau event fokus node. Mengirim seluruh context instance FormNode ke callback, serta mencegah pendaftaran duplikat."
                 },
                 {
                     "name": ".removeListener(void Function(FormNode node) listener)",
                     "type": "void",
                     "default": "",
-                    "desc": "Menghapus event listener secara spesifik (opsional, karena formController.dispose() sudah menanganinya secara otomatis)."
+                    "desc": "Menghapus event listener fokus secara spesifik dari registry internal."
                 },
                 {
                     "name": ".addTextListener(void Function(String text) listener)",
                     "type": "void",
                     "default": "",
-                    "desc": "Suntikan cerdas untuk memantau perubahan teks secara realtime. Mendukung anonymous function dan secara otomatis dibersihkan dari memori saat controller di-dispose."
+                    "desc": "Suntikan cerdas memantau perubahan teks realtime dengan sistem anti-duplikasi otomatis."
                 },
                 {
                     "name": ".removeTextListener(void Function(String text) listener)",
                     "type": "void",
                     "default": "",
-                    "desc": "Menghapus listener teks secara spesifik (opsional)."
+                    "desc": "Menghapus event listener teks secara spesifik dari registry internal."
+                },
+                {
+                    "name": ".dispose()",
+                    "type": "void",
+                    "default": "",
+                    "desc": "Membersihkan seluruh Focus Listener & Text Listener dari registry, membatalkan timer debounce shake, serta menghancurkan seluruh core object (Controller, FocusNode, Notifier) demi mencegah memory leak."
                 }
             ],
             "behaviors": [
@@ -417,23 +439,27 @@
                     "name": "shakeOnError",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Jika aktif, maka shake() hanya akan berjalan ketika dipanggil dari validator/error validation."
+                    "desc": "Jika aktif, maka shake(true) yang umumnya dipanggil dari proses validator/error akan mengeksekusi animasi getar."
+                },
+                {
+                    "name": "_suppressShake",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "(Internal Behavior) Mekanisme aman untuk meredam pemanggilan shake tak sengaja saat getter `.isValid` sedang melakukan validasi teks."
                 }
             ],
             "specialNotes": [
-                "Method node() akan otomatis membuat FormNode jika path belum ada.",
+                "Method node() dari FormHelperController akan otomatis membuat FormNode jika path belum ada.",
                 "Path bersifat unik dan menjadi identitas state field di dalam FormHelperController.",
                 "Jika FormNode sudah ada sebelumnya, node() akan mengembalikan instance yang sama.",
-                "initialValue hanya akan diterapkan jika node belum memiliki value.",
+                "initialValue, isEnabled, isVisible, dsb, di dalam parameter konstruktor hanya akan diterapkan ketika node dibuat pertama kali.",
                 "Seluruh widget FormHelperWidget direkomendasikan menggunakan node() dibanding membuat FormNode manual.",
-                "FormNode sudah memiliki TextEditingController, FocusNode, enabled state, dan visible state internal.",
-                "Perubahan value pada widget akan otomatis sinkron ke FormNode secara reaktif.",
-                "Method addListener menggunakan pola Context Passing (mempassing FormNode). Memudahkan pengecekan multi-kondisi seperti mencocokkan hasFocus dengan nilai teks field secara bersamaan.",
-                "Sistem dilengkapi Smart Event Registry: Event listener (addListener & addTextListener) akan otomatis di-garbage collect saat controller di-dispose. Anda bebas menggunakan anonymous function tanpa takut memory leak.",
-                "FormNode mendukung kontrol focus, hide/show, enable/disable, serialize, clear, dan shake animation.",
-                "Method shake() sangat cocok digunakan untuk memberikan feedback error visual tanpa harus mengubah state field."
+                "Perubahan value pada widget akan otomatis sinkron ke FormNode secara reaktif karena terikat langsung dengan Controller.",
+                "Method addListener dan addTextListener dilengkapi Smart Event Registry. Sistem mem-wrapper fungsi Anda untuk mendeteksi leak dan dapat dihapus seketika saat dispose().",
+                "Pemanggilan getter `.isValid` bersifat 'silent'. Ini tidak akan pernah secara tidak sengaja memicu UI getar berkat mekanisme `_suppressShake = true` sebelum mengeksekusi `onValidate`.",
+                "Pemanggilan fungsi get tipe data (getInt, getBool, dsb) sepenuhnya aman dan tidak menyebabkan runtime error berkat implementasi `tryParse` serta `fallback` default."
             ],
-            "code": "final form = FormHelperController();\n\n@override\nvoid initState() {\n  super.initState();\n  \n  final amountNode = form.node('amount', initialValue: '10000');\n\n  // Smart Event Listener: Memantau event dengan context passing\n  amountNode.addListener((node) {\n    if (node.hasFocus) {\n      print('Field fokus! Teks saat ini: ${node.text}');\n    } else {\n      // Contoh logic ketika kehilangan fokus\n      if (node.text.isEmpty) {\n        node.shake(); // getarkan jika kosong\n      }\n    }\n  });\n\n  // Smart Event Listener: Memantau perubahan teks realtime\n  amountNode.addTextListener((text) {\n    print('Nilai amount berubah menjadi: $text');\n  });\n\n  // Contoh penggunaan method lain\n  amountNode.disable();\n}\n\n@override\nvoid dispose() {\n  // Cukup panggil form.dispose(). Seluruh node, Controller, FocusNode,\n  // beserta anonymous function (listeners) di atas akan disapu bersih otomatis.\n  form.dispose();\n  super.dispose();\n}"
+            "code": "final form = FormHelperController();\n\n@override\nvoid initState() {\n  super.initState();\n  \n  // Inisialisasi node dengan parameter komplit\n  final amountNode = form.node(\n    'amount',\n    initialValue: '10000',\n    isEnabled: true,\n    isVisible: true,\n    shakeOnError: true,\n  );\n\n  // Menetapkan rule validasi ke dalam node\n  amountNode.onValidate = (value) {\n    if (value == null || value.isEmpty) return 'Harga wajib diisi';\n    if (int.tryParse(value) == null) return 'Harus berupa angka';\n    if (int.parse(value) < 1000) return 'Minimal harga 1000';\n    return null; // Valid\n  };\n\n  // Smart Event Listener: Memantau event dengan context passing\n  amountNode.addListener((node) {\n    if (!node.hasFocus) {\n      // Pengecekan saat kehilangan fokus\n      if (!node.isValid) {\n        print('Error terdeteksi: ${node.errorMessage}');\n        node.shake(); // getarkan jika input salah\n      }\n    }\n  });\n\n  // Smart Event Listener: Memantau perubahan teks realtime\n  amountNode.addTextListener((text) {\n    print('Nilai amount berubah menjadi: $text');\n    print('Angka murni: ${amountNode.getInt(fallback: 0)}');\n  });\n}\n\n@override\nvoid dispose() {\n  // Memanggil form.dispose() akan memicu amountNode.dispose() di dalamnya.\n  // Seluruh registry Listener (Smart Event Registry), Timer, ValueNotifier,\n  // TextEditingController, dan FocusNode akan dibersihkan dari memori secara sempurna.\n  form.dispose();\n  super.dispose();\n}"
         },
         {
             "id": "controller",
@@ -905,6 +931,12 @@
                     "desc": "Simpul reaktif (FormNode) dari FormHelperController untuk kontrol jarak jauh."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "keyboardType",
                     "type": "TextInputType",
                     "default": "TextInputType.text",
@@ -1073,6 +1105,12 @@
                     "desc": "Simpul reaktif (FormNode)."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "onChanged",
                     "type": "ValueChanged<String>?",
                     "default": "null",
@@ -1227,6 +1265,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif (FormNode)."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "onChanged",
@@ -1385,6 +1429,12 @@
                     "desc": "Simpul reaktif (FormNode)."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "onChanged",
                     "type": "ValueChanged<String>?",
                     "default": "null",
@@ -1527,6 +1577,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif (FormNode)."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "onChanged",
@@ -1677,6 +1733,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif (FormNode) pusat penyimpanan nilai password."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "value",
@@ -1847,6 +1909,12 @@
                     "desc": "Simpul reaktif (FormNode)."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "onChanged",
                     "type": "ValueChanged<String>?",
                     "default": "null",
@@ -1995,6 +2063,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif (FormNode)."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "inputFormatters",
@@ -2169,6 +2243,12 @@
                     "desc": "Simpul reaktif dari FormHelperController."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "onChanged",
                     "type": "ValueChanged<String>?",
                     "default": "null",
@@ -2325,6 +2405,12 @@
                     "desc": "Simpul reaktif FormNode untuk sinkronisasi data form."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "value",
                     "type": "String?",
                     "default": "null",
@@ -2469,6 +2555,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif FormNode untuk sinkronisasi data editor secara realtime."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "onChanged",
@@ -2690,6 +2782,12 @@
                     "desc": "Simpul reaktif (FormNode) penyimpanan angka mutlak."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "value",
                     "type": "double?",
                     "default": "null",
@@ -2838,6 +2936,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Source of truth reaktif. Nilai slider disimpan sebagai string desimal pada textController."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "onChanged",
@@ -3075,6 +3179,12 @@
                     "desc": "Source of truth reaktif untuk sinkronisasi dua arah. Nilai disimpan menggunakan format string 'start,end'."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "onChanged",
                     "type": "ValueChanged<RangeValues?>?",
                     "default": "null",
@@ -3305,6 +3415,12 @@
                     "desc": "Simpul reaktif penyimpan nilai terpilih."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "value",
                     "type": "T?",
                     "default": "null",
@@ -3429,6 +3545,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif penyimpanan data mentah tanggal. Metode Date mengembalikan 'YYYY-MM-DD', metode DateTime mengembalikan 'YYYY-MM-DD HH:MM:SS'."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "value",
@@ -3571,6 +3693,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif (FormNode) penyimpanan nilai 'YYYY-MM-DD HH:MM:00'."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "value",
@@ -3717,6 +3845,12 @@
                     "desc": "Simpul reaktif penyimpanan data waktu mentah. Format: 'HH:mm:00'."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "value",
                     "type": "String?",
                     "default": "null",
@@ -3839,6 +3973,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif pusat penyimpanan rentang waktu. Format baku: 'HH:mm:00 - HH:mm:59'."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "value",
@@ -3981,6 +4121,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif penyimpanan rentang tanggal. Format: 'YYYY-MM-DD 00:00:00 - YYYY-MM-DD 23:59:59'."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "value",
@@ -4130,6 +4276,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif penyimpanan data hasil pilihan ke dalam string yang digabung menggunakan separator."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "values",
@@ -4298,6 +4450,12 @@
                     "desc": "Source of truth reaktif. Disimpan sebagai string 'true' / 'false'."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "validator",
                     "type": "FormValidator<bool>?",
                     "default": "null",
@@ -4411,6 +4569,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif yang menyimpan nilai value yang terpilih."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "value",
@@ -4549,6 +4713,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Controller/state reaktif utama untuk menyimpan warna yang dipilih."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "onChanged",
@@ -4712,6 +4882,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Controller/state reaktif utama. Menyimpan path atau data image terpilih."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "onPick",
@@ -4903,6 +5079,12 @@
                     "desc": "Reactive state utama untuk menyimpan path atau data file."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "onPick",
                     "type": "Future<List<io.File>?> Function({required int maxFiles, List<FormFormatFile>? formats})?",
                     "default": "null",
@@ -5062,6 +5244,12 @@
                     "desc": "Simpul reaktif penyimpan value generik T dari hasil lookup."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "validator",
                     "type": "FormValidator<T?>?",
                     "default": "null",
@@ -5201,6 +5389,12 @@
                     "desc": "Simpul reaktif untuk mengaktifkan Error Registry dan manipulasi remote hide/disable."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "validator",
                     "type": "FormValidator<T>?",
                     "default": "null",
@@ -5323,6 +5517,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif penyimpanan nilai angka dalam format String."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "value",
@@ -5518,6 +5718,12 @@
                     "desc": "Simpul reaktif penyimpanan nilai value yang terpilih sebagai String."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "value",
                     "type": "T?",
                     "default": "null",
@@ -5655,6 +5861,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif penyimpan nilai terpilih sebagai string yang digabung dengan separator."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "values",
@@ -5800,6 +6012,12 @@
                     "desc": "Simpul reaktif penyimpan teks hasil ketikan atau hasil pilihan dari dropdown."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "value",
                     "type": "double",
                     "default": "null",
@@ -5939,6 +6157,12 @@
                     "desc": "Simpul reaktif penyimpan data tunggal."
                 },
                 {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
                     "name": "value",
                     "type": "T?",
                     "default": "null",
@@ -6074,6 +6298,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif penyimpanan string digabung separator."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "values",
@@ -6216,6 +6446,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif yang menyimpan seluruh tag yang terbentuk sebagai satu string utuh (dipisah separator)."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "onChanged",
@@ -6367,6 +6603,12 @@
                     "type": "FormNode?",
                     "default": "null",
                     "desc": "Simpul reaktif penyimpanan value asli (bukan label) yang dipilih dari menu melayang."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
                 },
                 {
                     "name": "initialValue",
