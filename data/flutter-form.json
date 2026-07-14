@@ -1729,6 +1729,12 @@
                     "desc": "Label teks mengambang di atas form."
                 },
                 {
+                    "name": "hintText",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Teks placeholder."
+                },
+                {
                     "name": "node",
                     "type": "FormNode?",
                     "default": "null",
@@ -3407,6 +3413,12 @@
                     "type": "String?",
                     "default": "null",
                     "desc": "Label teks mengambang di atas form."
+                },
+                {
+                    "name": "hintText",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Teks placeholder."
                 },
                 {
                     "name": "node",
