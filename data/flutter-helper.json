@@ -844,6 +844,12 @@
                     "desc": "Mengontrol visibilitas dan interaksi sistem sidebar secara menyeluruh. Jika bernilai false, fisik sidebar beserta triggernya akan dihilangkan sepenuhnya, sementara rendering komponen child tetap berjalan normal sesuai dengan rute aktif saat ini."
                 },
                 {
+                    "name": "cachePages",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah halaman yang telah dibuka akan dipertahankan di dalam memori. Jika bernilai true, setiap halaman hanya dibuat satu kali dan state akan tetap tersimpan selama aplikasi berjalan, sehingga perpindahan halaman menjadi lebih cepat. Jika bernilai false, halaman sebelumnya akan dihancurkan setiap kali berpindah rute dan akan dibuat ulang saat dibuka kembali, sehingga penggunaan memori menjadi lebih efisien."
+                },
+                {
                     "name": "title",
                     "type": "String",
                     "default": "'My App'",
