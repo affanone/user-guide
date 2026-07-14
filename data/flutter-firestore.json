@@ -1,0 +1,773 @@
+{
+    "appInfo": {
+        "prefix": "F",
+        "title": "Firestore & Storage Service",
+        "description": "Pusat dokumentasi modular per-metode untuk kelas utilitas Firebase Firestore dan Storage menggunakan kueri dinamis WhereClause.",
+        "version": "1.0.0"
+    },
+    "docsData": [
+        {
+            "id": "WhereClause",
+            "group": "Utility",
+            "name": "Where Clause Modifier",
+            "icon": "fa-solid fa-filter",
+            "description": "Model data konfigurasi untuk mendefinisikan parameter filter kueri kustom secara dinamis pada operasi Firestore.",
+            "mandatoryProps": [
+                {
+                    "name": "field",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Nama field target di dalam dokumen Firestore yang akan difilter."
+                },
+                {
+                    "name": "value",
+                    "type": "dynamic",
+                    "default": "",
+                    "desc": "Nilai pembanding yang digunakan untuk mencocokkan kriteria filter."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "operator",
+                    "type": "String",
+                    "default": "== (WhereClause.equal)",
+                    "desc": "Operator pembanding kueri Firestore (seperti ==, !=, <, <=, >, >=, array-contains, dll)."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [
+                {
+                    "name": "Operator Constants",
+                    "type": "Static Constants",
+                    "default": "",
+                    "desc": "Menyediakan 10 konstanta string operator standar Firestore untuk menghindari kesalahan pengetikan manual."
+                }
+            ],
+            "specialNotes": [
+                "Selalu gunakan konstanta statis dari kelas ini (seperti WhereClause.equal) saat menyusun daftar filter."
+            ],
+            "code": "final clause = WhereClause(field: 'status', operator: WhereClause.equal, value: 'active');"
+        },
+        {
+            "id": "getCollect",
+            "group": "Get",
+            "name": "Get Collection Realtime",
+            "icon": "fa-solid fa-sync",
+            "description": "Mengambil dan mendengarkan perubahan data secara realtime (Stream) dari koleksi Firestore tertentu dengan dukungan filter, pengurutan, dan batas dokumen.",
+            "mandatoryProps": [
+                {
+                    "name": "collectionPath",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Path atau nama koleksi target di database Firestore."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "where",
+                    "type": "List<WhereClause>?",
+                    "default": "null",
+                    "desc": "Daftar objek parameter filter untuk menyaring data dokumen."
+                },
+                {
+                    "name": "orderBy",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Nama field yang digunakan sebagai acuan pengurutan data."
+                },
+                {
+                    "name": "descending",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Arah urutan data. Jika true, data diurutkan secara menurun."
+                },
+                {
+                    "name": "limit",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Batas maksimal jumlah dokumen yang diambil."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "getCollect",
+                    "type": "static Stream<QuerySnapshot<Object?>>",
+                    "default": "",
+                    "desc": "Mengembalikan Stream berupa objek QuerySnapshot realtime."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Automated Query Pipeline",
+                    "type": "Query Parsing",
+                    "default": "",
+                    "desc": "Memproses List WhereClause melalui fungsi internal _queryHenadler untuk memetakan operator ke fungsi klausa bawaan Firestore."
+                }
+            ],
+            "specialNotes": [
+                "Sangat cocok diintegrasikan dengan FirestoreListView atau StreamBuilder untuk UI realtime."
+            ],
+            "code": "final stream = FirestoreService.getCollect('products', where: [WhereClause(field: 'stock', operator: WhereClause.greaterThan, value: 0)], orderBy: 'createdAt', descending: true, limit: 20);"
+        },
+        {
+            "id": "getCollectOnce",
+            "group": "Get",
+            "name": "Get Collection Once",
+            "icon": "fa-solid fa-download",
+            "description": "Mengambil snapshot data dari seluruh koleksi Firestore hanya satu kali eksekusi (Future) tanpa mendengarkan perubahan setelahnya.",
+            "mandatoryProps": [
+                {
+                    "name": "collectionPath",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Path atau nama koleksi target di database Firestore."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "where",
+                    "type": "List<WhereClause>?",
+                    "default": "null",
+                    "desc": "Daftar objek parameter filter kueri."
+                },
+                {
+                    "name": "orderBy",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Nama field acuan pengurutan dokumen."
+                },
+                {
+                    "name": "descending",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Status arah urutan data dokumen."
+                },
+                {
+                    "name": "limit",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Batas maksimal dokumen yang ditarik."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "getCollectOnce",
+                    "type": "static Future<QuerySnapshot<Object?>>",
+                    "default": "",
+                    "desc": "Mengembalikan Future yang berisi objek QuerySnapshot data sekali panggil."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Single Fetch Execution",
+                    "type": "Future Fetch",
+                    "default": "",
+                    "desc": "Menggunakan perintah query.get() untuk mengambil data statis saat itu juga tanpa membebani bandwidth listener berkelanjutan."
+                }
+            ],
+            "specialNotes": [],
+            "code": "final snapshot = await FirestoreService.getCollectOnce('logs', limit: 50);"
+        },
+        {
+            "id": "insert",
+            "group": "Write",
+            "name": "Insert Document",
+            "icon": "fa-solid fa-plus",
+            "description": "Menyisipkan atau membuat data dokumen baru ke dalam koleksi Firestore dengan opsi ID kustom atau Auto-ID acak bawaan.",
+            "mandatoryProps": [
+                {
+                    "name": "collectionPath",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Path atau nama koleksi tujuan penyimpanan data."
+                },
+                {
+                    "name": "data",
+                    "type": "Map<String, dynamic>",
+                    "default": "",
+                    "desc": "Payload data berformat Map pasangan key-value yang akan disimpan."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "id",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "ID khusus untuk dokumen baru. Jika kosong, sistem otomatis membuatkan Auto-ID unik."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "insert",
+                    "type": "static Future<DocumentReference>",
+                    "default": "",
+                    "desc": "Mengembalikan objek DocumentReference dari dokumen yang berhasil dibuat."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Conditional ID Routing",
+                    "type": "Write Operation",
+                    "default": "",
+                    "desc": "Jika parameter id disuplai, maka mengeksekusi doc(id).set(). Jika null, menggunakan collection.add() untuk menghasilkan Auto-ID."
+                }
+            ],
+            "specialNotes": [],
+            "code": "final ref = await FirestoreService.insert('users', {'name': 'John Doe', 'role': 'member'});"
+        },
+        {
+            "id": "updateAndInsert",
+            "group": "Write",
+            "name": "Upsert Document",
+            "icon": "fa-solid fa-save",
+            "description": "Melakukan operasi Upsert (Update atau Insert). Jika dokumen ditemukan berdasarkan ID atau kondisi filter, data akan digabungkan (merge), jika tidak, dokumen baru akan dibuat.",
+            "mandatoryProps": [
+                {
+                    "name": "collectionPath",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Path atau nama koleksi target data."
+                },
+                {
+                    "name": "data",
+                    "type": "Map<String, dynamic>",
+                    "default": "",
+                    "desc": "Payload data baru yang ingin dimasukkan atau diperbarui."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "idPrimary",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "ID dokumen utama yang dijadikan acuan pengecekan."
+                },
+                {
+                    "name": "where",
+                    "type": "List<WhereClause>?",
+                    "default": "null",
+                    "desc": "Filter kueri pencarian alternatif untuk mendeteksi keberadaan dokumen jika idPrimary kosong."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "updateAndInsert",
+                    "type": "static Future<void>",
+                    "default": "",
+                    "desc": "Menjalankan proses asinkronupsert dokumen tanpa nilai balik."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Merge Option Protection",
+                    "type": "Upsert System",
+                    "default": "",
+                    "desc": "Menggunakan konfigurasi SetOptions(merge: true) untuk memastikan field lama yang tidak dikirimkan di dalam parameter data tidak terhapus."
+                }
+            ],
+            "specialNotes": [],
+            "code": "await FirestoreService.updateAndInsert('settings', {'theme': 'dark'}, idPrimary: 'user_theme_01');"
+        },
+        {
+            "id": "update",
+            "group": "Write",
+            "name": "Update Document",
+            "icon": "fa-solid fa-pen",
+            "description": "Mengubah isi field data dari satu dokumen spesifik yang sudah ada di dalam database Firestore berdasarkan ID atau kondisi filter tertentu.",
+            "mandatoryProps": [
+                {
+                    "name": "collectionPath",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Path atau nama koleksi dokumen target."
+                },
+                {
+                    "name": "data",
+                    "type": "Map<String, dynamic>",
+                    "default": "",
+                    "desc": "Map berisi field-field data terbaru yang ingin diperbarui."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "idPrimary",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "ID Dokumen spesifik yang akan diperbarui secara langsung."
+                },
+                {
+                    "name": "where",
+                    "type": "List<WhereClause>?",
+                    "default": "null",
+                    "desc": "Filter pencarian untuk mendeteksi satu dokumen awal yang akan diubah jika idPrimary tidak diset."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "update",
+                    "type": "static Future<void>",
+                    "default": "",
+                    "desc": "Menjalankan proses pembaruan data secara asinkron."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Target Validation",
+                    "type": "Mutation",
+                    "default": "",
+                    "desc": "Jika menggunakan filter where, metode akan membatasi pencarian melalui limit(1) lalu memodifikasi data pada dokumen pertama yang cocok."
+                }
+            ],
+            "specialNotes": [
+                "Metode ini akan gagal/error jika dokumen target yang dirujuk berdasarkan idPrimary tidak ditemukan di Firestore."
+            ],
+            "code": "await FirestoreService.update('users', {'status': 'suspend'}, idPrimary: 'user_id_99');"
+        },
+        {
+            "id": "delete",
+            "group": "Write",
+            "name": "Delete Document",
+            "icon": "fa-solid fa-trash",
+            "description": "Menghapus secara permanen satu dokumen dari koleksi Firestore menggunakan referensi ID langsung atau filter pencarian data.",
+            "mandatoryProps": [
+                {
+                    "name": "collectionPath",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Path koleksi tempat dokumen bernaung."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "idPrimary",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "ID Dokumen unik target penghapusan langsung."
+                },
+                {
+                    "name": "where",
+                    "type": "List<WhereClause>?",
+                    "default": "null",
+                    "desc": "Kondisi penyaringan data untuk menemukan dokumen awal yang akan dihapus jika idPrimary tidak diisi."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "delete",
+                    "type": "static Future<void>",
+                    "default": "",
+                    "desc": "Prosedur asinkron pemusnahan dokumen."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Single Document Restraint",
+                    "type": "Destruction",
+                    "default": "",
+                    "desc": "Saat menghapus dengan parameter filter, sistem membatasi pencarian dengan limit(1) untuk memastikan hanya satu dokumen yang terhapus."
+                }
+            ],
+            "specialNotes": [],
+            "code": "await FirestoreService.delete('carts', idPrimary: 'cart_item_05');"
+        },
+        {
+            "id": "streamFirst",
+            "group": "Get",
+            "name": "Stream First Document",
+            "icon": "fa-solid fa-play",
+            "description": "Mendengarkan arus perubahan data secara kontinu (Stream) khusus untuk satu dokumen pertama yang memenuhi kriteria pencarian atau ID.",
+            "mandatoryProps": [
+                {
+                    "name": "collectionPath",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Nama atau path koleksi target."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "idPrimary",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "ID dokumen tunggal yang ingin dipantau langsung."
+                },
+                {
+                    "name": "where",
+                    "type": "List<WhereClause>?",
+                    "default": "null",
+                    "desc": "Filter kueri penyaringan dokumen."
+                },
+                {
+                    "name": "orderBy",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Nama field pengurutan sebelum memotong hasil dokumen pertama."
+                },
+                {
+                    "name": "descending",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Pengkondisian arah urutan pencarian."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "streamFirst",
+                    "type": "static Stream<Map<String, dynamic>?>",
+                    "default": "",
+                    "desc": "Mengembalikan Stream objek data Map yang bernilai null jika dokumen kosong."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Context Injection",
+                    "type": "Data Injection",
+                    "default": "",
+                    "desc": "Secara otomatis menyuntikkan key tambahan 'id' dan 'ref' ke dalam objek Map data hasil kembalian dari dokumen asli."
+                }
+            ],
+            "specialNotes": [],
+            "code": "final singleStream = FirestoreService.streamFirst('profiles', idPrimary: 'my_auth_id');"
+        },
+        {
+            "id": "getFirst",
+            "group": "Get",
+            "name": "Get First Document Realtime Listener",
+            "icon": "fa-solid fa-headset",
+            "description": "Mendengarkan entitas satu dokumen awal secara realtime menggunakan subscription callback onData.",
+            "mandatoryProps": [
+                {
+                    "name": "collectionPath",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Nama koleksi target data."
+                },
+                {
+                    "name": "onData",
+                    "type": "Function(Map<String, dynamic>? data)",
+                    "default": "",
+                    "desc": "Callback fungsi pemicu yang menerima hasil data Map setiap terjadi modifikasi database."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "idPrimary",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "ID dokumen untuk didengarkan langsung."
+                },
+                {
+                    "name": "where",
+                    "type": "List<WhereClause>?",
+                    "default": "null",
+                    "desc": "Kriteria penyaringan dokumen awal."
+                },
+                {
+                    "name": "orderBy",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Field referensi pengurutan kueri."
+                },
+                {
+                    "name": "descending",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Aturan tipe arah urutan."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "getFirst",
+                    "type": "static StreamSubscription?",
+                    "default": "",
+                    "desc": "Mengembalikan objek StreamSubscription untuk mengontrol daur hidup pembatalan (cancel) listener."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Subscription Routing",
+                    "type": "Event Listener",
+                    "default": "",
+                    "desc": "Membuka jembatan listen secara asinkron dan otomatis menyalurkan Map berisi injeksi 'id' ke fungsi parameter onData."
+                }
+            ],
+            "specialNotes": [
+                "Pastikan memanggil method .cancel() pada objek kembalian saat dispose widget untuk mencegah memori bocor."
+            ],
+            "code": "final sub = FirestoreService.getFirst('notifications', onData: (data) { print(data?['id']); });"
+        },
+        {
+            "id": "getFirstOnce",
+            "group": "Get",
+            "name": "Get First Document Once",
+            "icon": "fa-solid fa-bullseye",
+            "description": "Mengambil isi data satu dokumen pertama yang cocok dengan kriteria pencarian hanya satu kali eksekusi (Future).",
+            "mandatoryProps": [
+                {
+                    "name": "collectionPath",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Path koleksi di database."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "idPrimary",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "ID target dokumen langsung."
+                },
+                {
+                    "name": "where",
+                    "type": "List<WhereClause>?",
+                    "default": "null",
+                    "desc": "Filter penyaringan data dokumen."
+                },
+                {
+                    "name": "orderBy",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Field acuan pengurutan dokumen."
+                },
+                {
+                    "name": "descending",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Arah penyusunan urutan kueri."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "getFirstOnce",
+                    "type": "static Future<Map<String, dynamic>?>",
+                    "default": "",
+                    "desc": "Mengembalikan Future berupa objek data Map tunggal atau null jika tidak ditemukan."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Type Safety Guard",
+                    "type": "Data Parsing",
+                    "default": "",
+                    "desc": "Melakukan validasi tipe 'is Map<String, dynamic>' serta menyematkan key 'id' dan 'ref' sebelum memberikan hasil akhir."
+                }
+            ],
+            "specialNotes": [],
+            "code": "final data = await FirestoreService.getFirstOnce('app_config', idPrimary: 'version_control');"
+        },
+        {
+            "id": "getReference",
+            "group": "Get",
+            "name": "Get Document Reference",
+            "icon": "fa-solid fa-link",
+            "description": "Mengambil objek penunjuk lokasi referensi dokumen (DocumentReference) yang valid dari Firestore berdasarkan pencarian tertentu.",
+            "mandatoryProps": [
+                {
+                    "name": "collectionPath",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Nama atau path koleksi."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "idPrimary",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "ID unik dokumen yang dituju."
+                },
+                {
+                    "name": "where",
+                    "type": "List<WhereClause>?",
+                    "default": "null",
+                    "desc": "List filter kueri pencarian dokumen."
+                },
+                {
+                    "name": "orderBy",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Nama field pengurutan."
+                },
+                {
+                    "name": "descending",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Status arah urutan dokumen."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "getReference",
+                    "type": "static Future<DocumentReference<Object?>?>",
+                    "default": "",
+                    "desc": "Mengembalikan penunjuk referensi dokumen Firestore yang valid."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Existence Verification",
+                    "type": "Validation",
+                    "default": "",
+                    "desc": "Jika idPrimary dipasok, metode memvalidasi via doc.get() dan memastikan doc.exists bernilai true sebelum mengembalikan referensi."
+                }
+            ],
+            "specialNotes": [],
+            "code": "final docRef = await FirestoreService.getReference('categories', idPrimary: 'cat_01');"
+        },
+        {
+            "id": "uploadFile",
+            "group": "Storage",
+            "name": "Upload File",
+            "icon": "fa-solid fa-cloud-upload",
+            "description": "Mengunggah file dalam bentuk mentah byte (Uint8List) ke Firebase Storage dan mengembalikan URL unduhan publik.",
+            "mandatoryProps": [
+                {
+                    "name": "fileBytes",
+                    "type": "Uint8List",
+                    "default": "",
+                    "desc": "Data biner mentah dari berkas yang akan diunggah."
+                },
+                {
+                    "name": "fileName",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Nama file yang digunakan untuk menyimpan berkas di storage."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "folder",
+                    "type": "String",
+                    "default": "'uploads'",
+                    "desc": "Nama direktori atau folder penampung file di dalam Firebase Storage."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "uploadFile",
+                    "type": "static Future<String?>",
+                    "default": "",
+                    "desc": "Mengembalikan String berupa tautan unduhan publik (Download URL), atau null jika gagal."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Cross Platform Binary Upload",
+                    "type": "Storage Upload",
+                    "default": "",
+                    "desc": "Menggunakan ref.putData(fileBytes) berbasis Uint8List yang kompatibel sepenuhnya di Android, iOS, maupun Flutter Web."
+                },
+                {
+                    "name": "Silent Exception Handling",
+                    "type": "Error Defend",
+                    "default": "",
+                    "desc": "Dibungkus menggunakan blok try-catch senyap yang akan langsung mengembalikan nilai null tanpa menghentikan aplikasi jika upload terganggu."
+                }
+            ],
+            "specialNotes": [],
+            "code": "final url = await FirestoreService.uploadFile(bytesData, 'invoice_102.pdf', folder: 'invoices');"
+        },
+        {
+            "id": "replaceFile",
+            "group": "Storage",
+            "name": "Replace File",
+            "icon": "fa-solid fa-exchange-alt",
+            "description": "Mengganti berkas lama di Firebase Storage dengan menghapus berkas di nama tujuan terlebih dahulu sebelum menulis data baru.",
+            "mandatoryProps": [
+                {
+                    "name": "fileBytes",
+                    "type": "Uint8List",
+                    "default": "",
+                    "desc": "Data komponen biner file baru."
+                },
+                {
+                    "name": "fileName",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Nama berkas target yang ingin ditimpa/diganti."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "folder",
+                    "type": "String",
+                    "default": "'uploads'",
+                    "desc": "Nama folder lokasi penyimpanan berkas."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "replaceFile",
+                    "type": "static Future<String?>",
+                    "default": "",
+                    "desc": "Mengembalikan String tautan URL baru atau null jika terjadi error."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Purge Before Upload",
+                    "type": "Sequence Action",
+                    "default": "",
+                    "desc": "Menjalankan instruksi ref.delete() untuk membersihkan objek lama sebelum mengunggah muatan data baru menggunakan putData()."
+                }
+            ],
+            "specialNotes": [],
+            "code": "final newUrl = await FirestoreService.replaceFile(newBytes, 'avatar.png', folder: 'users/avatars');"
+        },
+        {
+            "id": "removeFile",
+            "group": "Storage",
+            "name": "Remove File",
+            "icon": "fa-solid fa-file-excel",
+            "description": "Menghapus berkas statis yang tersimpan di dalam direktori cloud Firebase Storage secara permanen.",
+            "mandatoryProps": [
+                {
+                    "name": "fileName",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Nama berkas lengkap yang ingin dihapus."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "folder",
+                    "type": "String",
+                    "default": "'uploads'",
+                    "desc": "Folder penampung berkas target di storage."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "removeFile",
+                    "type": "static Future<void>",
+                    "default": "",
+                    "desc": "Prosedur asinkron penghapusan berkas tanpa nilai balik."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Swallow Exception Shield",
+                    "type": "Safety Void",
+                    "default": "",
+                    "desc": "Menggunakan blok try-catch dengan penanganan kosong. Jika berkas memang tidak ada dari awal di storage, operasi tidak memicu error."
+                }
+            ],
+            "specialNotes": [],
+            "code": "await FirestoreService.removeFile('old_banner.jpg', folder: 'promos');"
+        }
+    ]
+}
