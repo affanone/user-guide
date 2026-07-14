@@ -838,6 +838,12 @@
                     "desc": "Fungsi pembungkus terpadu (Shell Route Builder) untuk memproses, memodifikasi, atau menyisipkan widget global tambahan pada konten halaman anak sebelum dirender di sisi kanan layar."
                 },
                 {
+                    "name": "enabled",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Mengontrol visibilitas dan interaksi sistem sidebar secara menyeluruh. Jika bernilai false, fisik sidebar beserta triggernya akan dihilangkan sepenuhnya, sementara rendering komponen child tetap berjalan normal sesuai dengan rute aktif saat ini."
+                },
+                {
                     "name": "title",
                     "type": "String",
                     "default": "'My App'",
