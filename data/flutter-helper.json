@@ -283,7 +283,7 @@
             "group": "Alert",
             "name": "Modal Premium",
             "icon": "fa-solid fa-window-maximize",
-            "description": "Widget pengelola dialog (modal) tingkat lanjut. Menyediakan API .modal() yang dibungkus rapi dengan Header, Scrollable Body via builder/statefulBuilder (terintegrasi dengan ModalControl dan StateSetter), Actions, dan Loading Spinner otomatis. Mendukung mode draggable kustom.",
+            "description": "Widget pengelola dialog (modal) tingkat lanjut. Menyediakan API .modal<T>() yang dibungkus rapi dengan Header, Scrollable Body via builder (terintegrasi dengan ModalControl dan StateSetter), Actions, dan Loading Spinner otomatis. Mendukung mode draggable kustom serta kontrol aksi onConfirm yang menggunakan ModalConfirmControl untuk fleksibilitas pengembalian data kustom bertipe T.",
             "mandatoryProps": [
                 {
                     "name": "context",
@@ -361,9 +361,9 @@
                 },
                 {
                     "name": "onConfirm",
-                    "type": "FutureOr<bool?> Function()?",
+                    "type": "FutureOr<void> Function(BuildContext ctx, ModalConfirmControl<T> control, StateSetter stateModal)?",
                     "default": "null",
-                    "desc": "Callback reaktif tombol konfirmasi bawaan. State modal terkunci (isLoading = true) dan PopScope diblokir selama promise berjalan. Return 'true' menutup dialog; 'false/null' mempertahankan modal."
+                    "desc": "Callback reaktif untuk tombol konfirmasi bawaan. Menyediakan akses ke ModalConfirmControl. Selama proses async berjalan, state internal isLoading otomatis aktif (mengunci PopScope dan tombol). Alur penutupan dialog dikendalikan melalui control.next(data) untuk mengembalikan hasil kustom bertipe T ke pemanggil modal."
                 },
                 {
                     "name": "showCancelButton",
@@ -403,13 +403,13 @@
                 },
                 {
                     "name": "afterShow",
-                    "type": "VoidCallback?",
+                    "type": "void Function(BuildContext ctx, ModalControl control, StateSetter stateModal)?",
                     "default": "null",
-                    "desc": "Callback yang dieksekusi tepat setelah animasi transisi masuk layar mencapai status 'completed'. Dibungkus melalui _ModalLifecycleWrapper."
+                    "desc": "Callback yang dieksekusi tepat setelah animasi transisi masuk layar mencapai status 'completed'. Menerima parameter context, control, dan stateModal yang sinkron dengan builder, sangat berguna untuk aksi awal pasca-animasi seperti auto-focus."
                 }
             ],
             "additionalInfo": {
-                "styling": "Secara default menggunakan pewarnaan adaptif terhadap Brightness (Theme.of(context).brightness), kecuali pada tombol footer bawaan yang memiliki warna absolut.",
+                "styling": "Secara default menggunakan pewarnaan adaptif terhadap Brightness (Theme.of(context).brightness), dibungkus Material dengan border-radius 16.",
                 "animation": "Transisi bawaan menggunakan CurveTween (easeOut) untuk opacity dan ScaleTransition (easeOutBack) untuk skala konten."
             },
             "methods": [
@@ -417,7 +417,7 @@
                     "name": "modal<T>",
                     "type": "static Future<T?>",
                     "default": "",
-                    "desc": "Satu-satunya metode publik saat ini. Merajut tata letak otomatis dan manajemen siklus hidup modal (loading state, drag offset, dan custom builder)."
+                    "desc": "Satu-satunya metode publik saat ini. Merajut tata letak otomatis, menangani siklus hidup modal (loading state via internal StatefulBuilder, penanganan drag offset, dan custom builder)."
                 }
             ],
             "behaviors": [
@@ -425,7 +425,7 @@
                     "name": "State Blocking",
                     "type": "Lifecycle & State",
                     "default": "",
-                    "desc": "Menjamin keamanan eksekusi fungsi async. Saat onConfirm memproses, state internal isLoading mengunci PopScope dan menonaktifkan trigger cancel/confirm untuk mencegah spam-click."
+                    "desc": "Menjamin keamanan eksekusi fungsi async. Saat onConfirm memproses data, state internal isLoading mengunci PopScope dan menonaktifkan tombol konfirmasi/batal untuk mencegah spam-click."
                 },
                 {
                     "name": "Dynamic Backdrop",
@@ -435,11 +435,11 @@
                 }
             ],
             "specialNotes": [
-                "Parameter `builder` dan `statefulBuilder` tidak dapat digunakan secara bersamaan. Modul memiliki mekanisme `assert` untuk memvalidasi ini.",
-                "Gunakan instance `ModalControl` (variabel `control`) dari closure builder untuk memicu aksi konfirmasi secara terprogram, misalnya melalui `onFieldSubmitted` pada TextFormField.",
-                "Warna komponen interaktif utama di hardcode ke `Colors.deepOrange`. Jika Anda membutuhkan warna lain, sediakan widget khusus melalui parameter `footerActions`."
+                "Parameter `onConfirm` kini menggunakan objek `ModalConfirmControl<T>` khusus. Anda tidak lagi mengembalikan nilai boolean, melainkan secara eksplisit memanggil `control.next(data)` untuk meneruskan data bertipe T ke pemanggil modal.",
+                "Gunakan instance `ModalControl` (variabel `control`) dari closure builder atau afterShow untuk memicu aksi konfirmasi secara terprogram, misalnya melalui `control.confirm()` saat event enter di keyboard dipicu.",
+                "Parameter `afterShow` berjalan di dalam LifecycleWrapper yang menjamin ketersediaan konteks modal setelah animasi masuk selesai secara presisi."
             ],
-            "code": "bool isAgreed = false;\n\nfinal bool? isSuccess = await ModalWidget.modal<bool>(\n  context,\n  title: 'Edit Detail Akun',\n  draggable: true,\n  showCancelButton: true,\n  confirmText: 'Simpan Perubahan',\n  builder: (ctx, control, stateModal) {\n    return Form(\n      key: _formKey,\n      child: Column(\n        mainAxisSize: MainAxisSize.min,\n        children: [\n          TextFormField(\n            decoration: const InputDecoration(labelText: 'Nama Lengkap'),\n            onFieldSubmitted: (_) => control.confirm(),\n          ),\n          CheckboxListTile(\n            title: const Text('Setuju dengan pembaruan'),\n            value: isAgreed,\n            onChanged: (val) => stateModal(() => isAgreed = val ?? false),\n          )\n        ],\n      ),\n    );\n  },\n  onConfirm: () async {\n    if (!_formKey.currentState!.validate() || !isAgreed) return false;\n    final result = await apiService.updateProfile();\n    return !result.isError;\n  },\n);\n\nif (isSuccess == true) {\n  _refreshTable();\n}"
+            "code": "final String? result = await ModalWidget.modal<String>(\n  context,\n  title: 'Konfirmasi Sandi',\n  showCancelButton: true,\n  confirmText: 'Verifikasi',\n  afterShow: (ctx, control, stateModal) {\n    // Memicu fokus secara presisi setelah modal selesai beranimasi\n    formControl.node('password').focus();\n  },\n  builder: (ctx, control, stateModal) {\n    return FormHelperWidget.Form(\n      controller: formControl,\n      child: FormHelperWidget.Password(\n        node: formControl.node('password'),\n        label: 'Password',\n        validator: (v) => v.isEmpty ? 'Wajib diisi' : formControl.error('password'),\n      ),\n    );\n  },\n  onConfirm: (ctx, control, stateModal) async {\n    if (await formControl.validateAll()) {\n      final password = formControl.node('password').getString();\n      final isVerified = await AuthService().verifyPassword(password);\n      \n      if (isVerified) {\n        // Menutup modal dan mengirim data String kembali ke penyeru modal\n        control.next('VERIFIED_SUCCESS');\n      } else {\n        formControl.setError('password', 'Password yang anda masukkan salah.');\n        formControl.node('password').shake();\n      }\n    }\n  },\n);\n\nif (result == 'VERIFIED_SUCCESS') {\n  _executeSecureAction();\n}"
         },
         {
             "id": "AnimationWidget",
