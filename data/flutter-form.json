@@ -1801,6 +1801,12 @@
                     "desc": "Menentukan apakah teks indikator penghitung karakter (contoh: 0/100) ditampilkan di sudut bawah field. Hanya relevan jika maxLength diatur."
                 },
                 {
+                    "name": "onKeyEvent",
+                    "type": "KeyEventResult Function(FocusNode node, KeyEvent event)?",
+                    "default": "null",
+                    "desc": "Event keyboard: Menangkap aksi tombol keyboard seperti Enter, Escape, Tab, atau shortcut lainnya melalui FocusNode."
+                },
+                {
                     "name": "icon",
                     "type": "IconData?",
                     "default": "Icons.lock_outline_rounded",
