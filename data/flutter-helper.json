@@ -2641,7 +2641,7 @@
             "group": "Alert",
             "name": "Loading Widget",
             "icon": "fa-solid fa-spinner",
-            "description": "Helper class utilitas (Super Premium) untuk menangani indikator pemuatan (loading). Komponen ini memiliki dua mode operasi: 1. Mode Imperatif (Overlay), memblokir layar penuh secara programmatic dengan method chaining. 2. Mode Deklaratif (Inline), menempel langsung ke dalam widget tree, mengelola siklus async/await otomatis, ukurannya dapat disesuaikan (xs-xl), mendukug tata letak vertikal/horizontal, serta tampil 'telanjang' (tanpa background) untuk kebebasan desain eksternal. Keduanya mendukung pembaruan pesan secara real-time dan otomatis beradaptasi dengan mode gelap (Dark Mode).",
+            "description": "Helper class utilitas (Super Premium) untuk menangani indikator pemuatan (loading). Komponen ini memiliki dua mode operasi: 1. Mode Imperatif (Overlay), memblokir layar penuh secara programmatic dengan method chaining. 2. Mode Deklaratif (Inline), menempel langsung ke dalam widget tree, mengelola siklus async/await otomatis, ukurannya dapat disesuaikan (xs-xl), mendukug tata letak vertikal/horizontal, serta tampil 'telanjang' (tanpa background) untuk kebebasan desain eksternal. Mode Deklaratif juga mendukung Custom Wrapper (loadingWrapper) untuk membungkus UI loading. Keduanya mendukung pembaruan pesan secara real-time dan otomatis beradaptasi dengan mode gelap (Dark Mode).",
             "mandatoryProps": [
                 {
                     "name": "context",
@@ -2674,11 +2674,17 @@
                     "type": "LoadingTheme",
                     "default": "LoadingTheme.vertical",
                     "desc": "Pilihan tata letak untuk elemen loading (khusus Mode Deklaratif / .widget()). 'vertical' menampilkan spinner di atas teks, 'horizontal' menampilkan spinner dan teks sebaris."
+                },
+                {
+                    "name": "loadingWrapper",
+                    "type": "Widget Function(Widget child)?",
+                    "default": "null",
+                    "desc": "Callback opsional (khusus Mode Deklaratif / .widget()) yang memungkinkan developer membungkus UI default spinner/teks ke dalam widget lain (seperti Card, Container, atau Padding) selama masa loading. Setelah builder selesai, wrapper ini akan ikut hilang tergantikan oleh hasil final."
                 }
             ],
             "additionalInfo": {
                 "dependencies": "google_fonts",
-                "architecture": "Overlay Injection (Imperative) & Future-Driven State Wrapper dengan AnimatedSwitcher (Declarative)"
+                "architecture": "Overlay Injection (Imperative) & Future-Driven State Wrapper dengan AnimatedSwitcher (Declarative) & UI Builder Pattern"
             },
             "methods": [
                 {
@@ -2691,7 +2697,7 @@
                     "name": "widget",
                     "type": "static Widget",
                     "default": "",
-                    "desc": "Fungsi statis utama untuk Mode Deklaratif (Super Premium). Mengembalikan widget yang membungkus proses async secara mandiri. Menerima named parameter wajib 'builder', serta named parameter opsional 'message', 'size', dan 'theme'. Mengelola transisi loading ke widget target secara otomatis."
+                    "desc": "Fungsi statis utama untuk Mode Deklaratif (Super Premium). Mengembalikan widget yang membungkus proses async secara mandiri. Menerima named parameter wajib 'builder', serta named parameter opsional 'message', 'size', 'theme', dan 'loadingWrapper'. Mengelola transisi loading ke widget target secara otomatis."
                 },
                 {
                     "name": "show",
@@ -2756,6 +2762,12 @@
                     "desc": "Pada metode .widget(), komponen dirender tanpa container, background, margin, maupun padding. Hal ini membebaskan developer untuk meletakkan indikator di dalam tombol, kartu, atau app bar tanpa masalah bentrokan desain."
                 },
                 {
+                    "name": "External Wrapper Architecture",
+                    "type": "UI Composition",
+                    "default": "",
+                    "desc": "Parameter loadingWrapper mengeksekusi fungsi pembungkus di luar siklus AnimatedBuilder. Memastikan wrapper seperti Card/Container tidak dirender ulang secara paksa saat hanya teks loading yang berubah, memaksimalkan efisiensi frame."
+                },
+                {
                     "name": "Conditional Layout Optimization",
                     "type": "Memory & Performance",
                     "default": "",
@@ -2768,7 +2780,7 @@
                 "Limitation: Metode .show() akan diabaikan jika .close() sudah pernah dieksekusi sebelumnya.",
                 "Design Detail (Imperative): Khusus Mode Overlay, Box loading masih menggunakan margin horizontal 40px, padding 32x24px, radius 20px, blur shadow 20px, serta spinner berwarna Colors.deepOrange."
             ],
-            "code": "// --- CONTOH 1: MODE IMPERATIF (OVERLAY PENUH) ---\nFuture prosesDataOverlay(BuildContext context) async {\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    loader.message('Mengunduh aset dari server...');\n    await Future.delayed(const Duration(seconds: 2));\n  } catch (e) {\n    print('Error: $e');\n  } finally {\n    loader.close();\n  }\n}\n\n// --- CONTOH 2: MODE DEKLARATIF (INLINE SMART WIDGET) ---\n@override\nWidget build(BuildContext context) {\n  return Container(\n    padding: const EdgeInsets.all(16),\n    color: Colors.grey[200],\n    child: LoadingWidget.widget(\n      message: 'Menganalisis sistem...', // Opsional: Bisa dihapus jika hanya ingin spinner\n      size: LoadingSize.sm,\n      theme: LoadingTheme.horizontal,\n      builder: (contro) async {\n        await Future.delayed(const Duration(seconds: 2));\n        contro.updateMessage('Membuat widget antarmuka...');\n        await Future.delayed(const Duration(seconds: 2));\n        \n        return const Text(\n          'Sukses! Data telah dimuat.',\n          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n        );\n      },\n    ),\n  );\n}"
+            "code": "// --- CONTOH 1: MODE IMPERATIF (OVERLAY PENUH) ---\nFuture prosesDataOverlay(BuildContext context) async {\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    loader.message('Mengunduh aset dari server...');\n    await Future.delayed(const Duration(seconds: 2));\n  } catch (e) {\n    print('Error: $e');\n  } finally {\n    loader.close();\n  }\n}\n\n// --- CONTOH 2: MODE DEKLARATIF (INLINE SMART WIDGET) ---\n@override\nWidget build(BuildContext context) {\n  return Container(\n    padding: const EdgeInsets.all(16),\n    color: Colors.grey[200],\n    child: LoadingWidget.widget(\n      message: 'Menganalisis sistem...',\n      size: LoadingSize.sm,\n      theme: LoadingTheme.horizontal,\n      // Contoh penggunaan loadingWrapper untuk membungkus spinner dengan Card\n      loadingWrapper: (child) => Card(\n        elevation: 4,\n        child: Padding(\n          padding: const EdgeInsets.all(24.0),\n          child: child,\n        ),\n      ),\n      builder: (contro) async {\n        await Future.delayed(const Duration(seconds: 2));\n        contro.updateMessage('Membuat widget antarmuka...');\n        await Future.delayed(const Duration(seconds: 2));\n        \n        return const Text(\n          'Sukses! Data telah dimuat.',\n          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n        );\n      },\n    ),\n  );\n}"
         },
         {
             "id": "datetime-formatting",
