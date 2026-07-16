@@ -2641,13 +2641,13 @@
             "group": "Alert",
             "name": "Loading Widget",
             "icon": "fa-solid fa-spinner",
-            "description": "Helper class utilitas untuk menampilkan indikator pemuatan (loading overlay) layar penuh secara programmatic. Komponen ini dirender menggunakan OverlayEntry, sehingga tidak mengganggu hierarki antarmuka utama. Mendukung pembaruan pesan secara real-time menggunakan method chaining tanpa memicu setState di layar pemanggil, serta otomatis beradaptasi dengan mode gelap (Dark Mode).",
+            "description": "Helper class utilitas (Super Premium) untuk menangani indikator pemuatan (loading). Komponen ini memiliki dua mode operasi: 1. Mode Imperatif (Overlay), memblokir layar penuh secara programmatic dengan method chaining. 2. Mode Deklaratif (Inline), menempel langsung ke dalam widget tree dan mengelola siklus async/await otomatis. Keduanya mendukung pembaruan pesan secara real-time dan otomatis beradaptasi dengan mode gelap (Dark Mode).",
             "mandatoryProps": [
                 {
                     "name": "context",
                     "type": "BuildContext",
                     "default": "",
-                    "desc": "Konteks aplikasi saat ini yang memiliki akses ke struktur Navigator dan Overlay. Dibutuhkan untuk menginisialisasi dan menyuntikkan OverlayEntry ke dalam layar."
+                    "desc": "Konteks aplikasi saat ini yang memiliki akses ke struktur Navigator dan Overlay. Hanya dibutuhkan untuk inisialisasi pada Mode Imperatif (metode .init())."
                 }
             ],
             "optionalProps": [
@@ -2655,25 +2655,37 @@
                     "name": "message",
                     "type": "String",
                     "default": "'Loading...'",
-                    "desc": "Teks pesan awal yang ditampilkan di bawah indikator putar (spinner) saat overlay pertama kali dimunculkan."
+                    "desc": "Teks pesan awal yang ditampilkan di bawah indikator putar (spinner)."
+                },
+                {
+                    "name": "builder",
+                    "type": "Future<Widget> Function(LoadingController)",
+                    "default": "",
+                    "desc": "Fungsi callback asynchronous yang diwajibkan (required) khusus untuk pemanggilan metode statis .widget(). Menyediakan LoadingController untuk mengontrol pesan di tengah proses await."
                 }
             ],
             "additionalInfo": {
                 "dependencies": "google_fonts",
-                "architecture": "Overlay Injection berbasis Singleton-like instance (dengan method chaining)"
+                "architecture": "Overlay Injection (Imperative) & Future-Driven State Wrapper dengan AnimatedSwitcher (Declarative)"
             },
             "methods": [
                 {
                     "name": "init",
                     "type": "static LoadingWidget",
                     "default": "",
-                    "desc": "Fungsi statis (factory) utama untuk membuat instance LoadingWidget baru. Menerima parameter wajib berupa context dan parameter opsional berupa pesan awal."
+                    "desc": "Fungsi statis (factory) utama untuk Mode Imperatif. Membuat instance LoadingWidget baru. Menerima parameter wajib context dan parameter opsional pesan awal."
+                },
+                {
+                    "name": "widget",
+                    "type": "static Widget",
+                    "default": "",
+                    "desc": "Fungsi statis utama untuk Mode Deklaratif (Super Premium). Mengembalikan widget yang membungkus proses async secara mandiri. Menerima pesan awal dan fungsi builder asynchronous. Mengelola transisi loading ke widget target secara otomatis."
                 },
                 {
                     "name": "show",
                     "type": "LoadingWidget",
                     "default": "",
-                    "desc": "Mengeksekusi penyisipan (insert) OverlayEntry ke layar, sehingga memblokir interaksi pengguna dan menampilkan indikator loading. Mengembalikan instance dirinya sendiri."
+                    "desc": "Mengeksekusi penyisipan (insert) OverlayEntry ke layar, sehingga memblokir interaksi pengguna. Mengembalikan instance dirinya sendiri (Method Chaining)."
                 },
                 {
                     "name": "hide",
@@ -2685,13 +2697,13 @@
                     "name": "message",
                     "type": "LoadingWidget",
                     "default": "",
-                    "desc": "Memperbarui teks informasi loading di layar secara instan (real-time). Menerima string baru dan hanya me-rebuild konteks OverlayEntry tanpa menyentuh widget tree induk."
+                    "desc": "Memperbarui teks loading di Mode Imperatif secara real-time. Memanggil markNeedsBuild() hanya pada lapisan overlay tanpa menyentuh widget tree induk."
                 },
                 {
                     "name": "close",
                     "type": "void",
                     "default": "",
-                    "desc": "Menyembunyikan overlay dan menandai (flag) instance tersebut sebagai disposed. Instance yang sudah di-close tidak akan bisa digunakan untuk memanggil show() lagi demi mencegah memory leak."
+                    "desc": "Menyembunyikan overlay dan menandai instance sebagai disposed. Mencegah pemanggilan show() berulang untuk menghindari memory leak."
                 }
             ],
             "behaviors": [
@@ -2699,34 +2711,40 @@
                     "name": "Fluent Interface (Method Chaining)",
                     "type": "Architecture",
                     "default": "",
-                    "desc": "Semua metode manipulasi status seperti show(), hide(), dan message() mengembalikan objek yang sama (this), memungkinkan eksekusi kode berantai yang ringkas seperti LoadingWidget.init(context).show().message('Tunggu...')."
+                    "desc": "Pada Mode Imperatif, metode seperti show(), hide(), dan message() mengembalikan objek yang sama (this), memungkinkan eksekusi kode berantai seperti LoadingWidget.init(context).show().message('Tunggu...')."
+                },
+                {
+                    "name": "Declarative Async Automation",
+                    "type": "Architecture",
+                    "default": "",
+                    "desc": "Pada Mode Deklaratif (.widget()), komponen ini menghilangkan keharusan menggunakan variabel setState/isLoading boolean. Siklus Future (Waiting, Error, Success) ditangani secara otomatis dari dalam."
+                },
+                {
+                    "name": "Smooth Animated Transitions",
+                    "type": "UI Animation",
+                    "default": "",
+                    "desc": "Metode .widget() dilengkapi dengan AnimatedSwitcher berdurasi 400ms (kurva easeOutCubic/easeInCubic). Pergantian dari state loading ke widget hasil atau error terjadi dengan efek fade natural tanpa jitter/kedipan kasar."
                 },
                 {
                     "name": "Isolated Repaint",
                     "type": "State Management",
                     "default": "",
-                    "desc": "Metode message() memicu _overlayEntry?.markNeedsBuild(). Teknik ini sangat efisien karena hanya me-rebuild komponen overlay itu sendiri tanpa harus menjalankan ulang fungsi build() pada halaman tempat fungsi ini dipanggil."
-                },
-                {
-                    "name": "Interactive Barrier",
-                    "type": "UI Flow",
-                    "default": "",
-                    "desc": "Menambahkan lapisan modal dengan latar belakang Colors.black45 yang secara otomatis mencegat (intercept) seluruh interaksi sentuh (touch events) pengguna terhadap tombol atau form di belakangnya."
+                    "desc": "Baik Mode Imperatif (melalui _overlayEntry.markNeedsBuild) maupun Mode Deklaratif (melalui ChangeNotifier di LoadingController), keduanya memastikan UI diperbarui secara terisolasi tanpa me-rebuild halaman utama (Scaffold)."
                 },
                 {
                     "name": "Theme Auto-Adaptation",
                     "type": "UI Responsive",
                     "default": "",
-                    "desc": "Membaca Brightness dari Theme perangkat. Pada Dark Mode, kotak loading dirender dengan warna 0xFF1E1E1E dan teks putih, sementara pada Light Mode menggunakan warna putih dan teks hitam."
+                    "desc": "Membaca Brightness perangkat. Pada Dark Mode menggunakan kotak warna 0xFF1E1E1E dan teks putih, sementara pada Light Mode menggunakan putih dan teks hitam."
                 }
             ],
             "specialNotes": [
-                "Best Practice: Selalu simpan instansiasi LoadingWidget.init() ke dalam sebuah variabel, lalu wajib memanggil metode .close() di dalam blok try-finally pada operasi asynchronous untuk menjamin loading hilang meskipun terjadi error/exception.",
-                "Limitation: Jangan memanggil metode .show() kembali pada instance yang metode .close()-nya telah dipanggil, karena aksi tersebut akan diblokir oleh flag _isDisposed.",
-                "Integration Notes: Warna spinner (CircularProgressIndicator) di-hardcode menggunakan Colors.deepOrange. Apabila Anda membutuhkan penyesuaian tema warna, warna ini harus diubah secara manual di dalam kode sumber.",
-                "Warning: Pastikan BuildContext yang dilempar valid dan terhubung dengan pohon Navigator yang memiliki akses ke state Overlay (bukan context yang berada di luar hierarki Material/WidgetsApp)."
+                "Best Practice (Imperative): Selalu panggil metode .close() di dalam blok try-finally pada operasi asynchronous untuk menjamin overlay hilang meskipun terjadi exception.",
+                "Best Practice (Declarative): Gunakan fungsi contro.updateMessage('Teks Baru') di dalam builder .widget() untuk memberikan feedback proses berlapis kepada user.",
+                "Limitation: Metode .show() akan diabaikan jika .close() sudah pernah dieksekusi sebelumnya.",
+                "Design Detail: Box loading menggunakan margin horizontal 40px, padding 32x24px, radius 20px, blur shadow 20px, serta spinner berwarna Colors.deepOrange."
             ],
-            "code": "Future prosesData(BuildContext context) async {\n  // 1. Inisialisasi dan tampilkan loading screen\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    \n    // 2. Ubah pesan loading di tengah proses tanpa memblokir UI\n    loader.message('Mengunduh aset dari server...');\n    await Future.delayed(const Duration(seconds: 2));\n    \n    loader.message('Menyimpan ke memori lokal...');\n    await Future.delayed(const Duration(seconds: 1));\n\n  } catch (e) {\n    print('Terjadi kesalahan: $e');\n  } finally {\n    // 3. Wajib panggil close() di finally agar layar tidak hang\n    loader.close();\n  }\n}"
+            "code": "// --- CONTOH 1: MODE IMPERATIF (OVERLAY PENUH) ---\nFuture prosesDataOverlay(BuildContext context) async {\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    loader.message('Mengunduh aset dari server...');\n    await Future.delayed(const Duration(seconds: 2));\n  } catch (e) {\n    print('Error: $e');\n  } finally {\n    loader.close();\n  }\n}\n\n// --- CONTOH 2: MODE DEKLARATIF (INLINE SMART WIDGET) ---\n@override\nWidget build(BuildContext context) {\n  return LoadingWidget.widget(\n    'Menganalisis sistem...',\n    builder: (contro) async {\n      // 1. Loading box tampil di tengah layar\n      await Future.delayed(const Duration(seconds: 2));\n      \n      // 2. Teks loading otomatis berubah tanpa rebuild parent!\n      contro.updateMessage('Membuat widget antarmuka...');\n      await Future.delayed(const Duration(seconds: 2));\n      \n      // 3. Loading otomatis fade-out dan terganti widget di bawah ini\n      return const Text(\n        'Sukses! Data telah dimuat.',\n        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n      );\n    },\n  );\n}"
         },
         {
             "id": "datetime-formatting",
