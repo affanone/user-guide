@@ -2676,6 +2676,12 @@
                     "desc": "Pilihan tata letak untuk elemen loading (khusus Mode Deklaratif / .widget()). 'vertical' menampilkan spinner di atas teks, 'horizontal' menampilkan spinner dan teks sebaris."
                 },
                 {
+                    "name": "animate",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Opsi untuk menghidupkan atau mematikan efek transisi saat pergantian dari state loading ke widget hasil (khusus Mode Deklaratif / .widget()). Jika disetel ke false, pergantian terjadi secara instan dan menghemat beban rendering dengan mem-bypass penggunaan AnimatedSwitcher dari widget tree."
+                },
+                {
                     "name": "loadingWrapper",
                     "type": "Widget Function(Widget child)?",
                     "default": "null",
