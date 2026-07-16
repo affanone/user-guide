@@ -2653,9 +2653,9 @@
             "optionalProps": [
                 {
                     "name": "message",
-                    "type": "String",
-                    "default": "'Loading...'",
-                    "desc": "Teks pesan awal yang ditampilkan bersama indikator putar (spinner)."
+                    "type": "String?",
+                    "default": "null / 'Loading...'",
+                    "desc": "Teks pesan. Pada metode statis .widget(), parameter ini bertindak sebagai named parameter opsional. Jika dibiarkan null atau kosong, widget teks beserta margin spasi tidak akan dirender demi efisiensi layout."
                 },
                 {
                     "name": "builder",
@@ -2691,7 +2691,7 @@
                     "name": "widget",
                     "type": "static Widget",
                     "default": "",
-                    "desc": "Fungsi statis utama untuk Mode Deklaratif (Super Premium). Mengembalikan widget yang membungkus proses async secara mandiri. Menerima pesan awal, fungsi builder, parameter size, dan theme. Mengelola transisi loading ke widget target secara otomatis."
+                    "desc": "Fungsi statis utama untuk Mode Deklaratif (Super Premium). Mengembalikan widget yang membungkus proses async secara mandiri. Menerima named parameter wajib 'builder', serta named parameter opsional 'message', 'size', dan 'theme'. Mengelola transisi loading ke widget target secara otomatis."
                 },
                 {
                     "name": "show",
@@ -2754,6 +2754,12 @@
                     "type": "UI Composition",
                     "default": "",
                     "desc": "Pada metode .widget(), komponen dirender tanpa container, background, margin, maupun padding. Hal ini membebaskan developer untuk meletakkan indikator di dalam tombol, kartu, atau app bar tanpa masalah bentrokan desain."
+                },
+                {
+                    "name": "Conditional Layout Optimization",
+                    "type": "Memory & Performance",
+                    "default": "",
+                    "desc": "Node teks dan spasi jarak (SizedBox) pada Mode Deklaratif bersifat kondisional. Jika parameter message bernilai null atau string kosong, widget tree dipangkas menggunakan spread operator untuk mencegah konsumsi memori tak terpakai."
                 }
             ],
             "specialNotes": [
@@ -2762,7 +2768,7 @@
                 "Limitation: Metode .show() akan diabaikan jika .close() sudah pernah dieksekusi sebelumnya.",
                 "Design Detail (Imperative): Khusus Mode Overlay, Box loading masih menggunakan margin horizontal 40px, padding 32x24px, radius 20px, blur shadow 20px, serta spinner berwarna Colors.deepOrange."
             ],
-            "code": "// --- CONTOH 1: MODE IMPERATIF (OVERLAY PENUH) ---\nFuture prosesDataOverlay(BuildContext context) async {\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    loader.message('Mengunduh aset dari server...');\n    await Future.delayed(const Duration(seconds: 2));\n  } catch (e) {\n    print('Error: $e');\n  } finally {\n    loader.close();\n  }\n}\n\n// --- CONTOH 2: MODE DEKLARATIF (INLINE SMART WIDGET) ---\n@override\nWidget build(BuildContext context) {\n  return Container(\n    padding: const EdgeInsets.all(16),\n    color: Colors.grey[200], // Background diurus oleh parent\n    child: LoadingWidget.widget(\n      'Menganalisis sistem...',\n      size: LoadingSize.sm, // Spinner lebih kecil\n      theme: LoadingTheme.horizontal, // Sebaris kiri-kanan\n      builder: (contro) async {\n        // 1. Teks loading otomatis berubah tanpa rebuild parent!\n        await Future.delayed(const Duration(seconds: 2));\n        contro.updateMessage('Membuat widget antarmuka...');\n        await Future.delayed(const Duration(seconds: 2));\n        \n        // 2. Loading otomatis fade-out dan terganti widget di bawah ini\n        return const Text(\n          'Sukses! Data telah dimuat.',\n          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n        );\n      },\n    ),\n  );\n}"
+            "code": "// --- CONTOH 1: MODE IMPERATIF (OVERLAY PENUH) ---\nFuture prosesDataOverlay(BuildContext context) async {\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    loader.message('Mengunduh aset dari server...');\n    await Future.delayed(const Duration(seconds: 2));\n  } catch (e) {\n    print('Error: $e');\n  } finally {\n    loader.close();\n  }\n}\n\n// --- CONTOH 2: MODE DEKLARATIF (INLINE SMART WIDGET) ---\n@override\nWidget build(BuildContext context) {\n  return Container(\n    padding: const EdgeInsets.all(16),\n    color: Colors.grey[200],\n    child: LoadingWidget.widget(\n      message: 'Menganalisis sistem...', // Opsional: Bisa dihapus jika hanya ingin spinner\n      size: LoadingSize.sm,\n      theme: LoadingTheme.horizontal,\n      builder: (contro) async {\n        await Future.delayed(const Duration(seconds: 2));\n        contro.updateMessage('Membuat widget antarmuka...');\n        await Future.delayed(const Duration(seconds: 2));\n        \n        return const Text(\n          'Sukses! Data telah dimuat.',\n          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n        );\n      },\n    ),\n  );\n}"
         },
         {
             "id": "datetime-formatting",
