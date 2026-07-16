@@ -2641,7 +2641,7 @@
             "group": "Alert",
             "name": "Loading Widget",
             "icon": "fa-solid fa-spinner",
-            "description": "Helper class utilitas (Super Premium) untuk menangani indikator pemuatan (loading). Komponen ini memiliki dua mode operasi: 1. Mode Imperatif (Overlay), memblokir layar penuh secara programmatic dengan method chaining. 2. Mode Deklaratif (Inline), menempel langsung ke dalam widget tree dan mengelola siklus async/await otomatis. Keduanya mendukung pembaruan pesan secara real-time dan otomatis beradaptasi dengan mode gelap (Dark Mode).",
+            "description": "Helper class utilitas (Super Premium) untuk menangani indikator pemuatan (loading). Komponen ini memiliki dua mode operasi: 1. Mode Imperatif (Overlay), memblokir layar penuh secara programmatic dengan method chaining. 2. Mode Deklaratif (Inline), menempel langsung ke dalam widget tree, mengelola siklus async/await otomatis, ukurannya dapat disesuaikan (xs-xl), mendukug tata letak vertikal/horizontal, serta tampil 'telanjang' (tanpa background) untuk kebebasan desain eksternal. Keduanya mendukung pembaruan pesan secara real-time dan otomatis beradaptasi dengan mode gelap (Dark Mode).",
             "mandatoryProps": [
                 {
                     "name": "context",
@@ -2655,13 +2655,25 @@
                     "name": "message",
                     "type": "String",
                     "default": "'Loading...'",
-                    "desc": "Teks pesan awal yang ditampilkan di bawah indikator putar (spinner)."
+                    "desc": "Teks pesan awal yang ditampilkan bersama indikator putar (spinner)."
                 },
                 {
                     "name": "builder",
                     "type": "Future<Widget> Function(LoadingController)",
                     "default": "",
                     "desc": "Fungsi callback asynchronous yang diwajibkan (required) khusus untuk pemanggilan metode statis .widget(). Menyediakan LoadingController untuk mengontrol pesan di tengah proses await."
+                },
+                {
+                    "name": "size",
+                    "type": "LoadingSize",
+                    "default": "LoadingSize.md",
+                    "desc": "Pilihan ukuran proporsional (xs, sm, md, lg, xl) yang otomatis mengatur dimensi spinner, ukuran font, ketebalan garis, dan jarak antar elemen (khusus Mode Deklaratif / .widget())."
+                },
+                {
+                    "name": "theme",
+                    "type": "LoadingTheme",
+                    "default": "LoadingTheme.vertical",
+                    "desc": "Pilihan tata letak untuk elemen loading (khusus Mode Deklaratif / .widget()). 'vertical' menampilkan spinner di atas teks, 'horizontal' menampilkan spinner dan teks sebaris."
                 }
             ],
             "additionalInfo": {
@@ -2679,7 +2691,7 @@
                     "name": "widget",
                     "type": "static Widget",
                     "default": "",
-                    "desc": "Fungsi statis utama untuk Mode Deklaratif (Super Premium). Mengembalikan widget yang membungkus proses async secara mandiri. Menerima pesan awal dan fungsi builder asynchronous. Mengelola transisi loading ke widget target secara otomatis."
+                    "desc": "Fungsi statis utama untuk Mode Deklaratif (Super Premium). Mengembalikan widget yang membungkus proses async secara mandiri. Menerima pesan awal, fungsi builder, parameter size, dan theme. Mengelola transisi loading ke widget target secara otomatis."
                 },
                 {
                     "name": "show",
@@ -2735,16 +2747,22 @@
                     "name": "Theme Auto-Adaptation",
                     "type": "UI Responsive",
                     "default": "",
-                    "desc": "Membaca Brightness perangkat. Pada Dark Mode menggunakan kotak warna 0xFF1E1E1E dan teks putih, sementara pada Light Mode menggunakan putih dan teks hitam."
+                    "desc": "Membaca Brightness perangkat. Pada Dark Mode menggunakan warna dasar kotak 0xFF1E1E1E dan teks putih, sementara pada Light Mode menggunakan latar putih dan teks hitam pekat."
+                },
+                {
+                    "name": "Flexible Naked Layout (Declarative Mode)",
+                    "type": "UI Composition",
+                    "default": "",
+                    "desc": "Pada metode .widget(), komponen dirender tanpa container, background, margin, maupun padding. Hal ini membebaskan developer untuk meletakkan indikator di dalam tombol, kartu, atau app bar tanpa masalah bentrokan desain."
                 }
             ],
             "specialNotes": [
                 "Best Practice (Imperative): Selalu panggil metode .close() di dalam blok try-finally pada operasi asynchronous untuk menjamin overlay hilang meskipun terjadi exception.",
                 "Best Practice (Declarative): Gunakan fungsi contro.updateMessage('Teks Baru') di dalam builder .widget() untuk memberikan feedback proses berlapis kepada user.",
                 "Limitation: Metode .show() akan diabaikan jika .close() sudah pernah dieksekusi sebelumnya.",
-                "Design Detail: Box loading menggunakan margin horizontal 40px, padding 32x24px, radius 20px, blur shadow 20px, serta spinner berwarna Colors.deepOrange."
+                "Design Detail (Imperative): Khusus Mode Overlay, Box loading masih menggunakan margin horizontal 40px, padding 32x24px, radius 20px, blur shadow 20px, serta spinner berwarna Colors.deepOrange."
             ],
-            "code": "// --- CONTOH 1: MODE IMPERATIF (OVERLAY PENUH) ---\nFuture prosesDataOverlay(BuildContext context) async {\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    loader.message('Mengunduh aset dari server...');\n    await Future.delayed(const Duration(seconds: 2));\n  } catch (e) {\n    print('Error: $e');\n  } finally {\n    loader.close();\n  }\n}\n\n// --- CONTOH 2: MODE DEKLARATIF (INLINE SMART WIDGET) ---\n@override\nWidget build(BuildContext context) {\n  return LoadingWidget.widget(\n    'Menganalisis sistem...',\n    builder: (contro) async {\n      // 1. Loading box tampil di tengah layar\n      await Future.delayed(const Duration(seconds: 2));\n      \n      // 2. Teks loading otomatis berubah tanpa rebuild parent!\n      contro.updateMessage('Membuat widget antarmuka...');\n      await Future.delayed(const Duration(seconds: 2));\n      \n      // 3. Loading otomatis fade-out dan terganti widget di bawah ini\n      return const Text(\n        'Sukses! Data telah dimuat.',\n        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n      );\n    },\n  );\n}"
+            "code": "// --- CONTOH 1: MODE IMPERATIF (OVERLAY PENUH) ---\nFuture prosesDataOverlay(BuildContext context) async {\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    loader.message('Mengunduh aset dari server...');\n    await Future.delayed(const Duration(seconds: 2));\n  } catch (e) {\n    print('Error: $e');\n  } finally {\n    loader.close();\n  }\n}\n\n// --- CONTOH 2: MODE DEKLARATIF (INLINE SMART WIDGET) ---\n@override\nWidget build(BuildContext context) {\n  return Container(\n    padding: const EdgeInsets.all(16),\n    color: Colors.grey[200], // Background diurus oleh parent\n    child: LoadingWidget.widget(\n      'Menganalisis sistem...',\n      size: LoadingSize.sm, // Spinner lebih kecil\n      theme: LoadingTheme.horizontal, // Sebaris kiri-kanan\n      builder: (contro) async {\n        // 1. Teks loading otomatis berubah tanpa rebuild parent!\n        await Future.delayed(const Duration(seconds: 2));\n        contro.updateMessage('Membuat widget antarmuka...');\n        await Future.delayed(const Duration(seconds: 2));\n        \n        // 2. Loading otomatis fade-out dan terganti widget di bawah ini\n        return const Text(\n          'Sukses! Data telah dimuat.',\n          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n        );\n      },\n    ),\n  );\n}"
         },
         {
             "id": "datetime-formatting",
