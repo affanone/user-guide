@@ -857,6 +857,12 @@
                     "desc": "Batasan lebar maksimum (max width) dari jendela modal ketika ditampilkan pada mode layar desktop."
                 },
                 {
+                    "name": "modalDismissible",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah modal dapat ditutup dengan menekan area luar (overlay/barrier). Hanya berlaku pada mode desktop."
+                },
+                {
                     "name": "modalMaxHeight",
                     "type": "double?",
                     "default": "null",
