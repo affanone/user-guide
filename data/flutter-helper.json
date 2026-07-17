@@ -2664,6 +2664,12 @@
                     "desc": "Teks pesan. Pada metode statis .widget(), parameter ini bertindak sebagai named parameter opsional. Jika dibiarkan null atau kosong, widget teks beserta margin spasi tidak akan dirender demi efisiensi layout."
                 },
                 {
+                    "name": "watch",
+                    "type": "Object?",
+                    "default": "null",
+                    "desc": "Saklar pendeteksi perubahan (dependency watcher) dari luar. Widget hanya akan memicu siklus loading ulang dan mengeksekusi kembali fungsi builder jika nilai atau referensi memori objek yang dipantau berubah (khusus Mode Deklaratif / .widget())."
+                },
+                {
                     "name": "builder",
                     "type": "Future<Widget> Function(LoadingController)",
                     "default": "",
