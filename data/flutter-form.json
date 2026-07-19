@@ -232,15 +232,15 @@
         {
             "id": "formnode",
             "group": "Core",
-            "name": "FormNode Accessor",
+            "name": "FormNode (Reactive Leaf Accessor)",
             "icon": "fa-solid fa-circle-nodes",
-            "description": "Accessor utama untuk mengambil atau membuat instance FormNode dari FormHelperController. Seluruh widget FormHelperWidget direkomendasikan menggunakan controller.node(path) agar seluruh state form tersentralisasi, reaktif, dan mudah diserialisasi.",
+            "description": "Accessor fundamental (leaf) untuk merepresentasikan state tunggal di dalam FormHelperController. Bertindak sebagai simpul reaktif yang mengikat UI dengan state data secara tersentralisasi. Dilengkapi Smart Event Registry untuk mencegah duplikasi listener dan memory leak.",
             "mandatoryProps": [
                 {
                     "name": "path",
                     "type": "String",
                     "default": "",
-                    "desc": "Path unik untuk identitas node di dalam FormHelperController."
+                    "desc": "Identitas absolut dan unik untuk melacak node di dalam hirarki FormHelperController."
                 }
             ],
             "optionalProps": [
@@ -248,190 +248,189 @@
                     "name": "initialValue",
                     "type": "String",
                     "default": "''",
-                    "desc": "Nilai awal node jika node belum memiliki value."
+                    "desc": "Injeksi nilai awal saat node diregistrasi ke dalam memori."
                 },
                 {
                     "name": "isEnabled",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Status inisialisasi apakah node dapat diinteraksi (aktif) atau tidak."
+                    "desc": "Status awal interaktivitas node."
                 },
                 {
                     "name": "isVisible",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Status inisialisasi apakah node terlihat di UI atau disembunyikan."
+                    "desc": "Status awal visibilitas node di layer UI."
                 },
                 {
                     "name": "shakeOnError",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Jika aktif, node akan secara otomatis bergetar (shake) ketika validasi gagal/error."
+                    "desc": "Integrasi otomatis ke engine animasi getar (shake) saat terdeteksi kegagalan validasi."
                 },
                 {
                     "name": "theme",
                     "type": "FormElementTheme?",
                     "default": "null",
-                    "desc": "Konfigurasi tema spesifik yang dapat disematkan ke dalam node."
+                    "desc": "Injeksi tema spesifik tingkat node yang akan menimpa tema global."
                 },
                 {
                     "name": "size",
                     "type": "FormElementSize?",
                     "default": "null",
-                    "desc": "Konfigurasi ukuran (size) spesifik untuk widget yang terhubung ke node."
+                    "desc": "Kalibrasi ukuran presisi spesifik untuk widget yang terikat."
                 },
                 {
                     "name": "scale",
                     "type": "double?",
                     "default": "null",
-                    "desc": "Faktor skala (scale) spesifik untuk elemen form."
+                    "desc": "Faktor penskalaan ukuran (scale) individual elemen."
                 },
                 {
                     "name": "onValidate",
                     "type": "String? Function(String? value)?",
                     "default": "null",
-                    "desc": "Fungsi callback untuk melakukan validasi input. Mengembalikan String pesan error jika tidak valid, atau null jika valid."
+                    "desc": "Fungsi callback validasi mutlak. Mengembalikan pesan error (String) jika gagal, atau null jika lolos."
                 }
             ],
             "additionalInfo": {
                 "katalogPresetCerdas": [
-                    ".text -> Value utama FormNode dalam bentuk String. Dapat digunakan untuk get maupun set nilai. [Tipe: String, Default: \"\"]",
-                    ".hasFocus -> Mengecek apakah widget/node tersebut sedang dalam posisi fokus atau tidak. [Tipe: bool, Default: \"false\"]",
-                    ".controller -> Controller internal bawaan FormNode. [Tipe: TextEditingController, Default: \"\"]",
-                    ".focusNode -> FocusNode internal bawaan FormNode. [Tipe: FocusNode, Default: \"\"]",
-                    ".enabled -> State enabled reactive bawaan node. [Tipe: ValueNotifier<bool>, Default: \"true\"]",
-                    ".visible -> State visible reactive bawaan node. [Tipe: ValueNotifier<bool>, Default: \"true\"]",
-                    ".isValid -> Mengecek apakah isi text saat ini lulus validasi berdasarkan fungsi onValidate. [Tipe: bool, Default: \"true\"]",
-                    ".errorMessage -> Mengembalikan pesan error dari fungsi onValidate, atau string kosong jika valid / onValidate belum diatur. [Tipe: String, Default: \"''\"]"
+                    ".text -> Mutator dan accessor nilai murni (String). [Tipe: String, Default: \"\"]",
+                    ".hasFocus -> Evaluator state fokus secara real-time. [Tipe: bool, Default: \"false\"]",
+                    ".controller -> Akses tingkat rendah ke TextEditingController internal. [Tipe: TextEditingController]",
+                    ".focusNode -> Akses tingkat rendah ke FocusNode internal. [Tipe: FocusNode]",
+                    ".enabled -> Notifier reaktif untuk status aktif/nonaktif. [Tipe: ValueNotifier<bool>]",
+                    ".visible -> Notifier reaktif untuk status visibilitas. [Tipe: ValueNotifier<bool>]",
+                    ".isValid -> Pengecekan status validasi tanpa memicu efek UI sampingan (silent check). [Tipe: bool]",
+                    ".errorMessage -> Ekstraksi pesan error terakhir dari siklus validasi. [Tipe: String, Default: \"''\"]"
                 ]
             },
-            "properties": [],
             "methods": [
                 {
                     "name": ".getString({bool trim = true, String fallback = ''})",
                     "type": "String",
                     "default": "",
-                    "desc": "Mengambil value node sebagai String. Memiliki opsi untuk auto-trim (default true) dan fallback nilai."
+                    "desc": "Ekstraksi nilai aman. Default memotong (trim) spasi berlebih dengan sistem fallback."
                 },
                 {
                     "name": ".getInt({int fallback = 0})",
                     "type": "int",
                     "default": "",
-                    "desc": "Mengambil value node lalu di-parse secara aman ke int. Mengembalikan fallback jika parse gagal."
+                    "desc": "Ekstraksi parsing numerik bulat (integer) dengan proteksi gagal parse (fallback)."
                 },
                 {
                     "name": ".getDouble({double fallback = 0.0})",
                     "type": "double",
                     "default": "",
-                    "desc": "Mengambil value node lalu di-parse secara aman ke double. Mengembalikan fallback jika parse gagal."
+                    "desc": "Ekstraksi parsing presisi desimal (double) dengan proteksi gagal parse (fallback)."
                 },
                 {
                     "name": ".getNumber({num fallback = 0})",
                     "type": "num",
                     "default": "",
-                    "desc": "Mengambil value node lalu di-parse secara aman ke num. Mengembalikan fallback jika parse gagal."
+                    "desc": "Ekstraksi numerik dinamis (int/double) dengan proteksi gagal parse (fallback)."
                 },
                 {
                     "name": ".getBool({bool fallback = false})",
                     "type": "bool",
                     "default": "",
-                    "desc": "Mengambil value node lalu di-parse ke boolean (mendukung: 'true', '1', 'yes' -> true, dan 'false', '0', 'no' -> false)."
+                    "desc": "Ekstraksi boolean cerdas. Mendukung konversi dari 'true', '1', 'yes' -> true."
                 },
                 {
                     "name": ".focus()",
                     "type": "void",
                     "default": "",
-                    "desc": "Memberikan fokus ke widget terkait."
+                    "desc": "Injeksi fokus secara paksa ke elemen UI terkait."
                 },
                 {
                     "name": ".unfocus()",
                     "type": "void",
                     "default": "",
-                    "desc": "Melepas fokus widget."
+                    "desc": "Pencabutan fokus dari elemen UI terkait."
                 },
                 {
                     "name": ".clear()",
                     "type": "void",
                     "default": "",
-                    "desc": "Menghapus seluruh isi value (text) pada node."
+                    "desc": "Pembersihan total nilai node (text) menjadi string kosong."
                 },
                 {
                     "name": ".enable()",
                     "type": "void",
                     "default": "",
-                    "desc": "Mengaktifkan interaksi pada node/widget."
+                    "desc": "Aktivasi interaksi node."
                 },
                 {
                     "name": ".disable()",
                     "type": "void",
                     "default": "",
-                    "desc": "Menonaktifkan interaksi pada node/widget."
+                    "desc": "Penonaktifan interaksi node."
                 },
                 {
                     "name": ".toggleEnabled()",
                     "type": "void",
                     "default": "",
-                    "desc": "Toggle status enabled (membalik kondisi dari aktif ke nonaktif atau sebaliknya)."
+                    "desc": "Pembalikan state boolean dari status interaktivitas (enabled)."
                 },
                 {
                     "name": ".show()",
                     "type": "void",
                     "default": "",
-                    "desc": "Menampilkan widget terkait node di UI."
+                    "desc": "Aktivasi visibilitas UI."
                 },
                 {
                     "name": ".hide()",
                     "type": "void",
                     "default": "",
-                    "desc": "Menyembunyikan widget terkait node dari UI."
+                    "desc": "Penonaktifan visibilitas UI."
                 },
                 {
                     "name": ".toggleVisible()",
                     "type": "void",
                     "default": "",
-                    "desc": "Toggle status visible (membalik kondisi visibilitas)."
+                    "desc": "Pembalikan state boolean dari status visibilitas (visible)."
                 },
                 {
                     "name": ".serialize({bool includeDisabled = false, bool includeHidden = false})",
                     "type": "Object?",
                     "default": "",
-                    "desc": "Mengambil value node untuk disubmit/export. Secara default akan mengabaikan (return null) node yang disabled atau hidden, kecuali argumen diset true."
+                    "desc": "Pengumpulan nilai akhir untuk export. Secara cerdas mengabaikan node nonaktif/tersembunyi untuk menjaga kebersihan payload, kecuali diinstruksikan sebaliknya."
                 },
                 {
                     "name": ".shake([bool fromValidator = false])",
                     "type": "void",
                     "default": "",
-                    "desc": "Memicu animasi getar dengan dukungan debounce (400ms). Parameter fromValidator menentukan asal pemicu; jika dipicu validator, ia akan memeriksa rules `shakeOnError` sebelum mengeksekusi."
+                    "desc": "Eksekusi animasi getar UI dengan debounce otomatis (400ms). Parameter fromValidator membatasi pemicuan hanya jika shakeOnError aktif."
                 },
                 {
                     "name": ".addListener(void Function(FormNode node) listener)",
                     "type": "void",
                     "default": "",
-                    "desc": "Suntikan cerdas memantau event fokus node. Mengirim seluruh context instance FormNode ke callback, serta mencegah pendaftaran duplikat."
+                    "desc": "Registrasi event listener fokus. Menggunakan Smart Registry untuk mencegah pemanggilan ganda dan kebocoran memori."
                 },
                 {
                     "name": ".removeListener(void Function(FormNode node) listener)",
                     "type": "void",
                     "default": "",
-                    "desc": "Menghapus event listener fokus secara spesifik dari registry internal."
+                    "desc": "Pencabutan event listener fokus spesifik dari memori internal."
                 },
                 {
                     "name": ".addTextListener(void Function(String text) listener)",
                     "type": "void",
                     "default": "",
-                    "desc": "Suntikan cerdas memantau perubahan teks realtime dengan sistem anti-duplikasi otomatis."
+                    "desc": "Registrasi event listener mutasi teks secara real-time dengan perlindungan anti-duplikasi."
                 },
                 {
                     "name": ".removeTextListener(void Function(String text) listener)",
                     "type": "void",
                     "default": "",
-                    "desc": "Menghapus event listener teks secara spesifik dari registry internal."
+                    "desc": "Pencabutan event listener teks spesifik dari memori internal."
                 },
                 {
                     "name": ".dispose()",
                     "type": "void",
                     "default": "",
-                    "desc": "Membersihkan seluruh Focus Listener & Text Listener dari registry, membatalkan timer debounce shake, serta menghancurkan seluruh core object (Controller, FocusNode, Notifier) demi mencegah memory leak."
+                    "desc": "Pemusnahan total node. Menghapus registry listener, membatalkan timer, dan membebaskan memory Controller/FocusNode."
                 }
             ],
             "behaviors": [
@@ -439,238 +438,231 @@
                     "name": "shakeOnError",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Jika aktif, maka shake(true) yang umumnya dipanggil dari proses validator/error akan mengeksekusi animasi getar."
+                    "desc": "Regulasi otomatis: eksekusi shake(true) hanya jika diizinkan oleh flag ini."
                 },
                 {
                     "name": "_suppressShake",
                     "type": "bool",
                     "default": "false",
-                    "desc": "(Internal Behavior) Mekanisme aman untuk meredam pemanggilan shake tak sengaja saat getter `.isValid` sedang melakukan validasi teks."
+                    "desc": "(Internal) Mekanisme proteksi sirkuit: meredam animasi getar saat evaluasi validasi `.isValid` berjalan di background."
                 }
             ],
             "specialNotes": [
-                "Method node() dari FormHelperController akan otomatis membuat FormNode jika path belum ada.",
-                "Path bersifat unik dan menjadi identitas state field di dalam FormHelperController.",
-                "Jika FormNode sudah ada sebelumnya, node() akan mengembalikan instance yang sama.",
-                "initialValue, isEnabled, isVisible, dsb, di dalam parameter konstruktor hanya akan diterapkan ketika node dibuat pertama kali.",
-                "Seluruh widget FormHelperWidget direkomendasikan menggunakan node() dibanding membuat FormNode manual.",
-                "Perubahan value pada widget akan otomatis sinkron ke FormNode secara reaktif karena terikat langsung dengan Controller.",
-                "Method addListener dan addTextListener dilengkapi Smart Event Registry. Sistem mem-wrapper fungsi Anda untuk mendeteksi leak dan dapat dihapus seketika saat dispose().",
-                "Pemanggilan getter `.isValid` bersifat 'silent'. Ini tidak akan pernah secara tidak sengaja memicu UI getar berkat mekanisme `_suppressShake = true` sebelum mengeksekusi `onValidate`.",
-                "Pemanggilan fungsi get tipe data (getInt, getBool, dsb) sepenuhnya aman dan tidak menyebabkan runtime error berkat implementasi `tryParse` serta `fallback` default."
+                "Method node() dari FormHelperController bertindak sebagai factory: otomatis menginstansiasi FormNode jika path tidak ditemukan.",
+                "Setiap path bersifat absolut dan unik.",
+                "Atribut konfigurasi (initialValue, isEnabled, dll) hanya dieksekusi pada fase inisialisasi awal pembuatan node.",
+                "Dilarang keras melakukan instansiasi FormNode manual di luar FormHelperController. Selalu gunakan controller.node().",
+                "Smart Event Registry terintegrasi memastikan pembersihan memori absolut saat dispose() dipanggil.",
+                "Validasi pasif (getter `.isValid`) digaransi aman dari efek samping UI (getar tak disengaja)."
             ],
-            "code": "final form = FormHelperController();\n\n@override\nvoid initState() {\n  super.initState();\n  \n  // Inisialisasi node dengan parameter komplit\n  final amountNode = form.node(\n    'amount',\n    initialValue: '10000',\n    isEnabled: true,\n    isVisible: true,\n    shakeOnError: true,\n  );\n\n  // Menetapkan rule validasi ke dalam node\n  amountNode.onValidate = (value) {\n    if (value == null || value.isEmpty) return 'Harga wajib diisi';\n    if (int.tryParse(value) == null) return 'Harus berupa angka';\n    if (int.parse(value) < 1000) return 'Minimal harga 1000';\n    return null; // Valid\n  };\n\n  // Smart Event Listener: Memantau event dengan context passing\n  amountNode.addListener((node) {\n    if (!node.hasFocus) {\n      // Pengecekan saat kehilangan fokus\n      if (!node.isValid) {\n        print('Error terdeteksi: ${node.errorMessage}');\n        node.shake(); // getarkan jika input salah\n      }\n    }\n  });\n\n  // Smart Event Listener: Memantau perubahan teks realtime\n  amountNode.addTextListener((text) {\n    print('Nilai amount berubah menjadi: $text');\n    print('Angka murni: ${amountNode.getInt(fallback: 0)}');\n  });\n}\n\n@override\nvoid dispose() {\n  // Memanggil form.dispose() akan memicu amountNode.dispose() di dalamnya.\n  // Seluruh registry Listener (Smart Event Registry), Timer, ValueNotifier,\n  // TextEditingController, dan FocusNode akan dibersihkan dari memori secara sempurna.\n  form.dispose();\n  super.dispose();\n}"
+            "code": "final form = FormHelperController();\n\n@override\nvoid initState() {\n  super.initState();\n  \n  final amountNode = form.node(\n    'amount',\n    initialValue: '10000',\n    isEnabled: true,\n    isVisible: true,\n    shakeOnError: true,\n  );\n\n  amountNode.onValidate = (value) {\n    if (value == null || value.isEmpty) return 'Harga wajib diisi';\n    if (int.tryParse(value) == null) return 'Harus berupa angka';\n    if (int.parse(value) < 1000) return 'Minimal harga 1000';\n    return null;\n  };\n\n  amountNode.addListener((node) {\n    if (!node.hasFocus) {\n      if (!node.isValid) {\n        print('Error terdeteksi: \\${node.errorMessage}');\n        node.shake();\n      }\n    }\n  });\n\n  amountNode.addTextListener((text) {\n    print('Nilai amount berubah menjadi: $text');\n    print('Angka murni: \\${amountNode.getInt(fallback: 0)}');\n  });\n}\n\n@override\nvoid dispose() {\n  form.dispose();\n  super.dispose();\n}"
         },
         {
             "id": "controller",
             "group": "Core",
-            "name": "FormHelper Controller",
+            "name": "FormHelper Controller (Tree Engine)",
             "icon": "fa-solid fa-microchip",
-            "description": "Mesin Form Reaktif Universal berbasis Tree Architecture + Memoization Cache Pointer. Seluruh field disimpan sebagai Reactive Node (FormNode) di dalam struktur hirarkis yang mendukung Single Value, Nested Object (Map), Array/List, dan Array of Objects (ListMap). Menggunakan sistem path resolver dinamis seperti 'user.name', 'tiers.0.min', atau 'company.divisions.2.manager.email'. Dilengkapi Smart Serialization, O(1) Cached Node Lookup, Deep Injection, Structural Mutation Engine, Recursive Cleanup, Auto Array Scaling, dan Global Error Registry.",
+            "description": "Otak utama manajemen state reaktif berbasis Tree Architecture. Memanfaatkan algoritma Memoization Cache Pointer untuk akses node dengan kompleksitas O(1). Mampu meresolusikan path dinamis yang kompleks ('company.divisions.2.manager.email') serta menangani mutasi struktural rekursif, auto-scaling array, dan injeksi data mendalam secara presisi.",
             "mandatoryProps": [],
             "optionalProps": [
                 {
                     "name": "shakeOnError",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Mengaktifkan sistem shake otomatis ketika validasi error terjadi pada FormNode yang mendukung animasi shake."
-                },
+                    "desc": "Injeksi aturan global ke seluruh FormNode turunan untuk mengaktifkan animasi getar (shake) otomatis saat validasi gagal."
+                }
+            ],
+            "methods": [
                 {
                     "name": "node(path, {initialValue})",
                     "type": "FormNode",
                     "default": "",
-                    "desc": "Mengambil atau membuat Reactive Node berdasarkan path. Mendukung nested object dan array otomatis. Node memiliki kemampuan remote-control seperti focus(), disable(), hide(), shake(), dll."
+                    "desc": "Resolusi atau fabrikasi node reaktif. Mendukung konstruksi struktur nested dan array secara otomatis berdasarkan notasi path."
                 },
                 {
                     "name": "get(path)",
                     "type": "dynamic",
                     "default": "",
-                    "desc": "Mengambil data mentah berdasarkan struktur aslinya. Return bisa berupa String, List, Map, atau List<Map> tergantung bentuk data."
+                    "desc": "Ekstraksi data primitif berdasarkan arsitektur aslinya (String, List, Map, ListMap)."
                 },
                 {
                     "name": "getAndExtractNumber(path)",
                     "type": "num",
                     "default": "",
-                    "desc": "Mengambil data mentah berdasarkan struktur aslinya,lalu mengembalikan nilai numerik dari value tersebut."
+                    "desc": "Ekstraksi nilai langsung yang dikalibrasi menjadi tipe numerik."
                 },
                 {
                     "name": "getString(path)",
                     "type": "String",
                     "default": "",
-                    "desc": "Mengambil value sebagai String aman. Otomatis konversi null dan tipe lain."
+                    "desc": "Ekstraksi nilai absolut sebagai String dengan konversi null-safety."
                 },
                 {
                     "name": "getInt(path)",
                     "type": "int",
                     "default": "",
-                    "desc": "Mengambil value sebagai integer. Jika null atau tidak valid akan return 0 secara default."
+                    "desc": "Ekstraksi nilai ke bentuk integer. Gagal parse akan mengembalikan 0."
                 },
                 {
                     "name": "getDouble(path)",
                     "type": "double",
                     "default": "",
-                    "desc": "Mengambil value sebagai double. Jika null atau tidak valid akan return 0.0 secara default."
+                    "desc": "Ekstraksi nilai ke bentuk presisi ganda (double). Gagal parse mengembalikan 0.0."
                 },
                 {
                     "name": "getNumber(path)",
                     "type": "num",
                     "default": "",
-                    "desc": "Mengambil value sebagai number (int atau double). Jika null atau tidak valid akan return 0."
+                    "desc": "Ekstraksi fleksibel numerik bulat/desimal (num). Gagal parse mengembalikan 0."
                 },
                 {
                     "name": "getBool(path)",
                     "type": "bool",
                     "default": "",
-                    "desc": "Mengambil value sebagai boolean. Mendukung parsing string seperti 'true', 'false', '1', '0'."
+                    "desc": "Ekstraksi ke boolean dengan kemampuan parser text ('true', '1' -> true)."
                 },
                 {
                     "name": "getList(path)",
                     "type": "List<String>",
                     "default": "",
-                    "desc": "Mengambil seluruh array/list sebagai List<String>."
+                    "desc": "Ekstraksi struktur array rata sebagai List<String>."
                 },
                 {
                     "name": "getMap(path)",
                     "type": "Map<String, String>",
                     "default": "",
-                    "desc": "Mengambil object/map sebagai Map<String, String>."
+                    "desc": "Ekstraksi struktur objek satu lapis sebagai Map<String, String>."
                 },
                 {
                     "name": "getListMap(path)",
                     "type": "List<Map<String, String>>",
                     "default": "",
-                    "desc": "Mengambil Array of Objects/ListMap sebagai List<Map<String, String>>."
+                    "desc": "Ekstraksi hierarki Array of Objects sebagai List<Map<String, String>>."
                 },
                 {
                     "name": "set(path, value)",
                     "type": "void",
                     "default": "",
-                    "desc": "Mengganti total struktur data pada path tertentu. Node lama akan dihapus, dispose, cache dibersihkan, lalu dibangun ulang."
+                    "desc": "Mutasi destruktif total. Menghancurkan hirarki node/path lama, membersihkan cache, lalu membangun ulang struktur berdasar value baru."
                 },
                 {
                     "name": "patch(path, value)",
                     "type": "void",
                     "default": "",
-                    "desc": "Menggabungkan/memperbarui data tanpa menghancurkan struktur node existing. Cocok untuk update parsial."
+                    "desc": "Mutasi non-destruktif. Memperbarui dan menyisipkan state tanpa memusnahkan cache node yang sudah ada. Optimal untuk update parsial API."
                 },
                 {
                     "name": "append(path, value)",
                     "type": "void",
                     "default": "",
-                    "desc": "Menambahkan item baru ke ujung FormArray/List."
+                    "desc": "Injeksi elemen baru di ekor struktur FormArray/List."
                 },
                 {
                     "name": "insert(path, index, value)",
                     "type": "void",
                     "default": "",
-                    "desc": "Menyisipkan item pada index tertentu. Seluruh index setelahnya otomatis bergeser."
+                    "desc": "Injeksi elemen array pada indeks spesifik dengan auto-shifting index selanjutnya."
                 },
                 {
                     "name": "remove(path)",
                     "type": "void",
                     "default": "",
-                    "desc": "Menghapus node/path tertentu secara rekursif beserta cache dan error registry-nya."
+                    "desc": "Pemusnahan rekursif pada spesifik path/node beserta child cache dan error registry."
                 },
                 {
                     "name": "removeAt(path, index)",
                     "type": "void",
                     "default": "",
-                    "desc": "Alias cepat untuk menghapus item array berdasarkan index."
+                    "desc": "Eksekusi pemusnahan cepat pada elemen array berdasarkan indeks."
                 },
                 {
                     "name": "move(path, fromIndex, toIndex)",
                     "type": "void",
                     "default": "",
-                    "desc": "Memindahkan posisi item array tanpa menghancurkan state node."
+                    "desc": "Relokasi posisi elemen di dalam array secara efisien tanpa merekonstruksi node internal."
                 },
                 {
                     "name": "exists(path)",
                     "type": "bool",
                     "default": "",
-                    "desc": "Mengecek apakah path/node benar-benar ada tanpa membuat node baru."
+                    "desc": "Evaluasi pencarian eksistensi path/node di dalam cache tanpa memicu instansiasi baru."
                 },
                 {
                     "name": "validate(path, validator)",
                     "type": "String?",
                     "default": "",
-                    "desc": "Validasi manual pada node/object/list tertentu. Return pesan error jika gagal."
+                    "desc": "Eksekusi validasi manual terisolasi pada area/node spesifik."
                 },
                 {
                     "name": "getAllValues({includeDisabled, includeHidden})",
                     "type": "FormHelperResult",
                     "default": "",
-                    "desc": "Melakukan Smart Serialization seluruh tree form menjadi data map final siap kirim API/backend."
+                    "desc": "Eksekusi Smart Serialization untuk memanen seluruh data tree menjadi representasi JSON/Map yang siap didistribusikan ke API."
                 },
                 {
                     "name": "error(path)",
                     "type": "String?",
                     "default": "",
-                    "desc": "Mengambil error dari registry berdasarkan path."
+                    "desc": "Akses ke Global Error Registry untuk path terkait."
                 },
                 {
                     "name": "setError(path, message)",
                     "type": "void",
                     "default": "",
-                    "desc": "Menginjeksi error manual ke field tertentu."
+                    "desc": "Injeksi error sintetik secara manual ke area tertentu."
                 },
                 {
                     "name": "validateAll()",
                     "type": "Future<bool>",
                     "default": "",
-                    "desc": "Menjalankan validasi global seluruh FormState + interceptor async."
+                    "desc": "Eksekusi inspeksi validasi global asinkron yang melintasi setiap node dalam arsitektur form."
                 },
                 {
                     "name": "softValidate()",
                     "type": "void",
                     "default": "",
-                    "desc": "Menjalankan validasi ringan asynchronous tanpa memaksa rebuild besar."
+                    "desc": "Inspeksi asinkron mode pasif tanpa memicu mutasi render ulang berat di UI."
                 },
                 {
                     "name": "clear([path])",
                     "type": "void",
                     "default": "",
-                    "desc": "Membersihkan value tanpa menghancurkan struktur node. Cache tetap dipertahankan."
+                    "desc": "Penghapusan nilai data tanpa menghancurkan tulang punggung struktur node dan cache pointer."
                 },
                 {
                     "name": "isEmpty(path)",
                     "type": "bool",
                     "default": "",
-                    "desc": "Mengecek apakah node/path memiliki value kosong."
+                    "desc": "Inspeksi kebenaran jika node/path tidak berisikan data/nilai."
                 },
                 {
                     "name": "isNotEmpty(path)",
                     "type": "bool",
                     "default": "",
-                    "desc": "Mengecek apakah node/path memiliki value tidak kosong."
+                    "desc": "Inspeksi kebenaran jika node/path berisi sebuah entitas data/nilai."
                 },
                 {
                     "name": "dispose()",
                     "type": "void",
                     "default": "",
-                    "desc": "Menghancurkan seluruh tree node, cache pointer, validator, dan registry error."
+                    "desc": "Operasi pemusnahan total (recursive cleanup). Membunuh seluruh pointer, tree nodes, validasi asinkron, dan membersihkan error registry."
                 }
             ],
             "additionalInfo": {
-                "architecture": "Menggunakan Tree Architecture berbasis FormGroup, FormArray, dan FormNode.",
-                "cacheSystem": "Menggunakan Memoization Cache Pointer untuk akses node O(1) super cepat.",
-                "serialization": "Mendukung Smart Serialization untuk nested object, array, dan array of object.",
-                "autoScaling": "FormArray mendukung auto scaling index dan recursive node generation.",
-                "shakeSystem": "Terintegrasi dengan sistem shake animation melalui FormNode.shake() dan constructor shakeOnError."
+                "architecture": "Membangun sistem hirarki independen berbasis abstraksi FormGroup, FormArray, dan FormNode.",
+                "cacheSystem": "Infrastruktur Memoization Cache Pointer menjamin operasi pembacaan berulang (lookup) pada kompleksitas kecepatan konstan O(1).",
+                "serialization": "Mesin Smart Serialization menangani ekspor data multi-level secara elegan.",
+                "autoScaling": "FormArray memilki kecerdasan untuk merentangkan limit ukuran (scaling) index dan melakukan regenerasi rekursif secara mandiri.",
+                "shakeSystem": "Sirkuit terintegrasi secara mendalam dengan FormNode untuk eksekusi trigger interaksi shake."
             },
             "specialNotes": [
-                "Path bersifat dinamis dan mendukung nested path seperti 'user.profile.name'.",
-                "Path array didukung penuh menggunakan format seperti 'tiers.0.min'.",
-                "node() akan otomatis membuat struktur parent jika belum ada.",
-                "Semua node tersimpan di dalam cache pointer untuk akses O(1).",
-                "remove() otomatis membersihkan cache child dan registry error.",
-                "insert() dan move() otomatis melakukan invalidasi cache array.",
-                "clear() tidak menghancurkan struktur node maupun cache.",
-                "getAllValues() menghasilkan payload final siap kirim API/backend.",
-                "validateAll() mendukung async interceptor validation.",
-                "shakeOnError memungkinkan seluruh node otomatis memicu shake animation saat validasi gagal.",
-                "FormNode yang terhubung dapat dipanggil manual menggunakan node(path).shake()."
+                "Path resolver sangat fleksibel, mampu menjangkau rute kompleks layaknya notasi dot JSON ('user.profile.name' atau 'tiers.0.min').",
+                "Pemanggilan node() bertindak sebagai arsitek—membangun root, parent, hingga node secara linier jika terdeteksi belum ada.",
+                "Seluruh memori terikat di cache, meminimalisir lag pada sistem UI reaktif.",
+                "Operasi struktural array (insert, move) secara internal merestrukturisasi dan meng-invalidasi cache parsial demi keutuhan data.",
+                "Metode clear() adalah operasi 'aman' (tidak merusak tree), sedangkan remove() adalah eksekusi 'amputasi' tree secara permanen."
             ],
-            "code": "final _formCtrl = FormHelperController(\n shakeOnError: true,\n);\n\n/// set nested object\n_formCtrl.set('profile', {\n 'name': 'Affan',\n 'email': 'affan@gmail.com',\n});\n\n/// append list item\n_formCtrl.append('tags', 'Flutter');\n\n/// append object into array\n_formCtrl.append('tiers', {\n 'min': '10000',\n 'disc': '5',\n});\n\n/// access node\nfinal emailNode = _formCtrl.node('profile.email');\n\n/// trigger shake animation manually\nemailNode.shake();\n\n/// focus node\nemailNode.focus();\n\n/// serialize payload\nfinal payload = _formCtrl.getAllValues().toMap();"
+            "code": "final _formCtrl = FormHelperController(\n  shakeOnError: true,\n);\n\n// Operasi penugasan (set) berstruktur otomatis\n_formCtrl.set('profile', {\n  'name': 'Affan',\n  'email': 'affan@gmail.com',\n});\n\n// Operasi relasional array otomatis\n_formCtrl.append('tags', 'Flutter');\n_formCtrl.append('tiers', {\n  'min': '10000',\n  'disc': '5',\n});\n\n// Operasi isolasi lookup O(1) ke leaf spesifik\nfinal emailNode = _formCtrl.node('profile.email');\n\n// Pemicu Remote (Remote Control UI)\nemailNode.shake();\nemailNode.focus();\n\n// Ekstraksi Payload (Smart Serialization)\nfinal payload = _formCtrl.getAllValues().toMap();"
         },
         {
             "id": "status",
@@ -6761,6 +6753,48 @@
                 "Secara ajaib memangkas boilerplate karena ValueListenableBuilder dibungkus secara internal ke Controller."
             ],
             "code": "FormHelperWidget.Listen(\n  node: _formCtrl.node('qty'),\n  builder: (node) {\n    if (node.text.isEmpty) return null;\n    int qty = int.tryParse(node.text) ?? 0;\n    return 'Total: Rp ${qty * 5000}'; // String otomatis jadi Text widget\n  }\n)"
+        },
+        {
+            "id": "listen-path",
+            "group": "Lainnya",
+            "name": "ListenPath (Reactive Tree Engine)",
+            "icon": "fa-solid fa-tower-broadcast",
+            "description": "Mesin reaktif tingkat lanjut (Tree Notifier) yang mendengarkan perubahan pada level grup atau path tertentu secara hierarkis (misalnya: 'profil'). Setiap mutasi data pada sub-node di dalamnya akan memicu render ulang yang efisien. Mengembalikan ScopedFormHelper (controller bayangan) pada builder untuk meneruskan akses sub-path secara langsung tanpa menulis path penuh.",
+            "mandatoryProps": [
+                {
+                    "name": "controller",
+                    "type": "FormHelperController",
+                    "default": "",
+                    "desc": "Instansiasi utama dari FormHelperController sebagai pusat state management form."
+                },
+                {
+                    "name": "path",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Target base path atau root grup yang akan diobservasi, misalnya 'profil' atau 'transaksi.items'."
+                },
+                {
+                    "name": "builder",
+                    "type": "Function(ScopedFormHelper node)",
+                    "default": "",
+                    "desc": "Mesin perender visual yang menyediakan parameter ScopedFormHelper. Mendukung return dinamis berupa String, num, Widget tunggal, atau List<Widget> (otomatis menjadi Column)."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "key",
+                    "type": "Key?",
+                    "default": "null",
+                    "desc": "Kunci widget."
+                }
+            ],
+            "additionalInfo": {
+                "scopedArchitecture": "Memangkas redundansi kode. Pemanggilan node.getString('biodata.nama') di dalam builder secara otomatis diterjemahkan menjadi 'profil.biodata.nama' jika parameter path adalah 'profil'."
+            },
+            "specialNotes": [
+                "Sangat optimal untuk observasi state pada form kompleks, objek bersarang, atau FormArray tanpa perlu memasang listener individual di masing-masing FormNode ujung (leaf)."
+            ],
+            "code": "FormHelperWidget.ListenPath(\n  controller: _formCtrl,\n  path: 'profil',\n  builder: (node) {\n    String nama = node.getString('biodata.nama');\n    bool isAktif = node.getBool('status_aktif');\n\n    if (nama.isEmpty) return const SizedBox.shrink();\n\n    return [\n      Text('Nama: $nama'),\n      Text('Status: ${isAktif ? 'Aktif' : 'Nonaktif'}')\n    ]; // List otomatis dirender sebagai Column\n  }\n)"
         }
     ]
 }
