@@ -2505,23 +2505,23 @@
             "code": "final io.File? croppedFile = await CropWidget.crop(\n  context,\n  image: originalFile,\n  title: 'Edit Foto Profil',\n  circleCrop: true,\n  quality: 0.85,\n  format: CropImageFormat.jpg,\n  primaryColor: Colors.blueAccent,\n  beforeSave: (file) async {\n    // Contoh: Tambahkan pengecekan ukuran maksimal atau upload\n    return true;\n  },\n);\n\nif (croppedFile != null) {\n  print('Berhasil crop: ${croppedFile.path}');\n}"
         },
         {
-            "id": "DriftListView",
+            "id": "DriftListViewWidget",
             "group": "Layout",
             "name": "Drift List View",
             "icon": "fa-solid fa-list",
-            "description": "Widget pembungkus (wrapper) untuk menampilkan daftar data reaktif berbasis Stream dengan fitur infinite scrolling otomatis. Widget ini dirancang untuk bekerja secara harmonis dengan database reaktif (seperti Drift) dengan memuat data tambahan (pagination) secara dinamis saat pengguna mencapai batas bawah scroll. Memberikan kontrol penuh kepada pengguna melalui 'builder' untuk menentukan struktur UI (ListView, Grid, atau Custom Layout).",
+            "description": "Widget pembungkus (wrapper) untuk menampilkan daftar data reaktif berbasis Stream dengan fitur infinite scrolling otomatis. Widget ini secara khusus dirancang untuk bekerja secara harmonis dengan database reaktif (seperti Drift) dengan memuat data tambahan (pagination) secara dinamis berdasarkan parameter limit saat pengguna melakukan scroll ke bagian bawah layar. Mendukung tampilan List standar dan Grid responsif.",
             "mandatoryProps": [
                 {
                     "name": "streamFactory",
                     "type": "Stream<List> Function(int limit)",
                     "default": "",
-                    "desc": "Fungsi utama untuk mendapatkan aliran data (Stream). Wajib menerima parameter 'limit' yang diperbarui otomatis oleh widget saat infinite scroll terjadi."
+                    "desc": "Fungsi utama yang dipanggil oleh widget untuk mendapatkan aliran data (Stream). Fungsi ini wajib menerima parameter 'limit' yang akan diperbarui secara otomatis oleh widget saat terjadi infinite scroll."
                 },
                 {
-                    "name": "builder",
-                    "type": "Widget Function(BuildContext context, List<T> data, ScrollController scrollController)",
+                    "name": "itemBuilder",
+                    "type": "Widget Function(BuildContext context, T item)",
                     "default": "",
-                    "desc": "Fungsi callback yang memberikan data (list) dan ScrollController. Anda bertanggung jawab menentukan widget UI (seperti ListView, GridView) dan menghubungkan 'scrollController' yang diterima ke widget tersebut agar infinite scroll berfungsi."
+                    "desc": "Fungsi callback untuk membangun UI (Widget) pada setiap item di dalam list/grid. Menerima context dan satu instance objek data bertipe generic ."
                 }
             ],
             "optionalProps": [
@@ -2529,36 +2529,42 @@
                     "name": "emptyWidget",
                     "type": "Widget?",
                     "default": "null",
-                    "desc": "Tampilan khusus jika stream tidak menghasilkan data atau array kosong. Jika null, menampilkan teks default 'Data tidak ditemukan'."
+                    "desc": "Tampilan khusus yang akan dirender jika stream tidak menghasilkan data atau array kosong. Jika tidak diisi, akan menampilkan teks 'Data tidak ditemukan' di tengah layar."
                 },
                 {
                     "name": "padding",
                     "type": "EdgeInsetsGeometry?",
-                    "default": "null",
-                    "desc": "Jarak bantalan yang akan diterapkan di dalam ListView/Scrollable widget jika Anda tidak mendefinisikannya sendiri di dalam builder."
+                    "default": "EdgeInsets.fromLTRB(12, 18, 12, 120)",
+                    "desc": "Jarak bantalan di sekeliling daftar/grid. Jika isResponsive false, defaultnya menjadi EdgeInsets.fromLTRB(0, 18, 0, 120)."
                 },
                 {
                     "name": "loading",
                     "type": "Widget",
                     "default": "Center(child: CircularProgressIndicator())",
-                    "desc": "Indikator pemuatan yang muncul saat status stream adalah 'waiting' dan data belum tersedia."
+                    "desc": "Tampilan indikator pemuatan yang dirender pada saat stream berada pada status 'waiting' dan belum memiliki data awal."
                 },
                 {
                     "name": "initialLimit",
                     "type": "int",
                     "default": "20",
-                    "desc": "Jumlah batas data (limit) awal yang diminta saat inisialisasi."
+                    "desc": "Jumlah batas data (limit) pertama yang akan diminta kepada streamFactory saat widget diinisialisasi."
+                },
+                {
+                    "name": "isResponsive",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan struktur tata letak. Jika true, merender data sebagai Grid menggunakan ResponsiveGridRow. Jika false, menggunakan ListView.builder vertikal standar."
                 },
                 {
                     "name": "increment",
                     "type": "int",
                     "default": "20",
-                    "desc": "Jumlah penambahan limit data setiap kali pengguna mencapai batas scroll (infinite scroll)."
+                    "desc": "Jumlah penambahan limit data setiap kali pengguna mencapai bagian akhir scroll."
                 }
             ],
             "additionalInfo": {
-                "dependencies": "Tidak ada (khusus responsive_grid tidak lagi wajib)",
-                "use_case": "Menampilkan daftar item dari database lokal (Drift/SQLite) secara efisien dengan manajemen scroll dan pagination yang fleksibel sesuai kebutuhan layout kustom."
+                "dependencies": "responsive_grid",
+                "use_case": "Menampilkan daftar item dari database lokal (Drift/SQLite) yang berjumlah ribuan tanpa menyebabkan lag, dengan mengambil sekian item di awal dan menambahkannya ketika discroll."
             },
             "methods": [],
             "behaviors": [
@@ -2566,21 +2572,128 @@
                     "name": "Infinite Scrolling Trigger",
                     "type": "Scroll Detection",
                     "default": "",
-                    "desc": "ScrollController mendengarkan posisi scroll. Saat posisi mendekati 200 poin dari batas bawah (_scrollController.position.maxScrollExtent - 200), widget memperbarui _currentLimit dan memicu pengambilan data baru."
+                    "desc": "ScrollController mendengarkan posisi scroll. Ketika posisi piksel mencapai 200 poin dari batas maksimal bawah (_scrollController.position.maxScrollExtent - 200), widget akan menambahkan nilai _currentLimit sebesar nilai increment dan memicu setState untuk mengambil stream baru."
                 },
                 {
                     "name": "Memory Management",
-                    "type": "Lifecycle",
+                    "type": "Lifecycle Lifecycle",
                     "default": "",
-                    "desc": "ScrollController dikelola secara otomatis: didaftarkan pada initState dan dilepas (dispose) saat widget dihancurkan untuk mencegah memory leak."
+                    "desc": "ScrollController didaftarkan pada initState dan dilepas (dispose) secara aman di method dispose() agar tidak meninggalkan event listener menggantung yang memicu memory leak."
+                },
+                {
+                    "name": "Responsive Grid Layout",
+                    "type": "UI Render",
+                    "default": "",
+                    "desc": "Bila isResponsive bernilai true, setiap item secara otomatis dikemas menggunakan ResponsiveGridCol dengan komposisi: xs: 12 (layar kecil 1 kolom), md: 6 (layar sedang 2 kolom), lg: 4 (layar besar 3 kolom)."
                 }
             ],
             "specialNotes": [
-                "Fleksibilitas UI: Karena tidak lagi menggunakan komponen grid internal, Anda bebas menggunakan ListView.builder, GridView.builder, atau Sliver list di dalam callback 'builder'.",
-                "Penting: Pastikan untuk menghubungkan 'scrollController' yang diterima dari callback 'builder' ke widget list/grid Anda, jika tidak, infinite scroll tidak akan terpicu.",
-                "Integration Notes: Pastikan query 'streamFactory' di database Anda efisien dalam menangani parameter LIMIT."
+                "Widget ini bergantung pada package pihak ketiga 'responsive_grid' untuk menyusun struktur kotak responsif.",
+                "Best Practice: Selalu definisikan generic type `<T>` saat memanggil widget ini, misalnya `DriftListViewWidget<UserModel>(...)` agar parameter `item` dalam `itemBuilder` dikenali dengan tipe yang tepat.",
+                "Integration Notes: Karena `streamFactory` dipanggil ulang dan mereturn Stream baru setiap kali batas (limit) tercapai, pastikan data source backend/database Anda benar-benar mengimplementasikan query berbasis LIMIT secara ringan."
             ],
-            "code": "DriftListView<User>(\n  initialLimit: 15,\n  increment: 10,\n  streamFactory: (limit) {\n    return database.userDao.watchAllUsersWithLimit(limit);\n  },\n  builder: (context, users, scrollController) {\n    return ListView.builder(\n      controller: scrollController, // Wajib dihubungkan\n      itemCount: users.length,\n      itemBuilder: (context, index) {\n        return ListTile(\n          title: Text(users[index].name),\n          subtitle: Text(users[index].email),\n        );\n      },\n    );\n  },\n  emptyWidget: const Center(\n    child: Text('Belum ada pengguna terdaftar.'),\n  ),\n)"
+            "code": "DriftListViewWidget(\n  initialLimit: 15,\n  increment: 10,\n  isResponsive: true,\n  streamFactory: (limit) {\n    // Mengambil stream data dari Drift database\n    return database.userDao.watchAllUsersWithLimit(limit);\n  },\n  itemBuilder: (context, user) {\n    return Card(\n      child: ListTile(\n        title: Text(user.name),\n        subtitle: Text(user.email),\n      ),\n    );\n  },\n  emptyWidget: const Center(\n    child: Text('Belum ada pengguna terdaftar.'),\n  ),\n)"
+        },
+        {
+            "id": "DriftPaginationWidget",
+            "group": "Widget",
+            "name": "Drift Pagination Widget",
+            "icon": "fa-solid fa-pager",
+            "description": "Widget pembungkus (wrapper) dan state management terintegrasi yang dirancang presisi untuk menangani paginasi data reaktif dari database (seperti Drift) menggunakan metode offset dan limit. Menggunakan ListenableBuilder untuk efisiensi memori tingkat tinggi, widget ini memisahkan logika kueri data dari antarmuka, memberikan kontrol penuh atas navigasi halaman melalui DriftPaginationController.",
+            "mandatoryProps": [
+                {
+                    "name": "totalData",
+                    "type": "int",
+                    "default": "",
+                    "desc": "Jumlah total keseluruhan baris data dari kueri terkait. Nilai ini sangat wajib diinjeksi dari luar (parent) untuk menentukan presisi perhitungan jumlah halaman (pageCount) dan mencegah navigasi index out of bounds."
+                },
+                {
+                    "name": "streamFactory",
+                    "type": "Stream<List<T>> Function(int offset, int limit)",
+                    "default": "",
+                    "desc": "Fungsi utama yang memproduksi aliran data (Stream). Wajib menerima parameter 'offset' dan 'limit' yang dikalkulasi secara otomatis oleh internal controller."
+                },
+                {
+                    "name": "builder",
+                    "type": "Widget Function(BuildContext context, DriftPaginationController<T> control, List<T> data)",
+                    "default": "",
+                    "desc": "Fungsi callback untuk membangun UI. Menyediakan akses langsung ke instance 'control' (untuk mengeksekusi navigasi dan membaca status) beserta array 'data' yang siap dirender."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "initialLimit",
+                    "type": "int",
+                    "default": "15",
+                    "desc": "Batas jumlah item per halaman saat controller pertama kali diinisialisasi."
+                },
+                {
+                    "name": "initialPage",
+                    "type": "int",
+                    "default": "1",
+                    "desc": "Indeks halaman awal saat widget pertama kali dimuat ke dalam memory."
+                }
+            ],
+            "additionalInfo": {
+                "dependencies": "Flutter (ChangeNotifier, ListenableBuilder)",
+                "use_case": "Membangun tabel administratif atau daftar data yang berlapis halaman (paginated) dari SQLite/Drift, dengan indikator pemuatan bawaan dan kontrol navigasi eksplisit (next, prev, goToPage)."
+            },
+            "methods": [
+                {
+                    "name": "next()",
+                    "desc": "Berpindah ke halaman selanjutnya secara aman dengan memvalidasi ketersediaan data melalui getter hasMore."
+                },
+                {
+                    "name": "prev()",
+                    "desc": "Berpindah mundur ke halaman sebelumnya jika nilai _page saat ini lebih besar dari 1."
+                },
+                {
+                    "name": "goToPage(int p)",
+                    "desc": "Melompat langsung ke halaman spesifik 'p', dilengkapi validasi yang memblokir eksekusi jika 'p' melebihi batas pageCount maksimal."
+                },
+                {
+                    "name": "refresh()",
+                    "desc": "Membatalkan stream lama dan memuat ulang kueri data pada posisi halaman dan limit yang sedang aktif saat ini."
+                },
+                {
+                    "name": "reset()",
+                    "desc": "Mengembalikan state _page ke posisi 1 dan segera memuat ulang koneksi aliran data."
+                },
+                {
+                    "name": "changeLimit(int newLimit)",
+                    "desc": "Mengubah kapasitas batas data (_limit), otomatis melakukan reset halaman ke 1 untuk mencegah anomali offset, lalu memicu _fetchData()."
+                },
+                {
+                    "name": "updateTotalData(int newTotal)",
+                    "desc": "Memperbarui properti totalData secara reaktif tanpa perlu membongkar (dispose) stream utama jika ada perubahan jumlah baris di level database."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Otomatisasi Offset",
+                    "type": "Logic Evaluation",
+                    "default": "",
+                    "desc": "Kalkulasi titik mulai baca data: (_page - 1) * _limit dijalankan otomatis secara terpusat di dalam _fetchData(), membebaskan parent dari perhitungan manual yang rentan salah."
+                },
+                {
+                    "name": "Pembersihan Memori Otomatis (Memory Leak Prevention)",
+                    "type": "Lifecycle Management",
+                    "default": "",
+                    "desc": "Setiap terjadi transisi perpindahan halaman atau pembaruan limit, _dataSubscription lama dibatalkan (cancel) terlebih dahulu sebelum membuat listen stream baru. Controller ini juga otomatis men-dispose semua langganan aktif saat widget dihancurkan."
+                },
+                {
+                    "name": "Reaktivitas Terpusat",
+                    "type": "State Management",
+                    "default": "",
+                    "desc": "Semua transisi status seperti _isLoading, _error, dan pemuatan array data diproses melalui notifyListeners(), sehingga meminimalisir penggunaan setState konvensional dan menjaga UI tetap efisien."
+                }
+            ],
+            "specialNotes": [
+                "Anda wajib menyuntikkan (inject) nilai totalData dari sumber kueri agregasi (seperti COUNT) yang berada di luar hierarki komponen ini agar mekanisme pageCount dapat bekerja presisi.",
+                "Gunakan tipe generik secara eksplisit (contoh: DriftPaginationWidget<UserModel>) untuk menghindari kesalahan casting tipe (dynamic) pada parameter callback builder.",
+                "Terdapat file konfigurasi standar acuan yang dapat diperiksa bernama prompt.txt. Refer to this file by its name verbatim jika ada instruksi arsitektur tambahan yang perlu disinkronisasi."
+            ],
+            "code": "DriftPaginationWidget<StaffModel>(\n  initialLimit: 10,\n  initialPage: 1,\n  totalData: totalRowsFromParent, // Wajib diisi\n  streamFactory: (offset, limit) => database.staffDao.watchStaff(limit: limit, offset: offset),\n  builder: (context, control, data) {\n    if (control.isLoading && data.isEmpty) return const Center(child: CircularProgressIndicator());\n    if (control.isEmpty) return const Center(child: Text('Data tidak ditemukan'));\n\n    return Column(\n      children: [\n        Expanded(\n          child: ListView.builder(\n            itemCount: data.length,\n            itemBuilder: (_, index) => ListTile(title: Text(data[index].name)),\n          ),\n        ),\n        Row(\n          mainAxisAlignment: MainAxisAlignment.center,\n          children: [\n            IconButton(\n              icon: const Icon(Icons.arrow_back),\n              onPressed: control.page > 1 ? control.prev : null,\n            ),\n            Text('Hal ${control.page} dari ${control.pageCount}'),\n            IconButton(\n              icon: const Icon(Icons.arrow_forward),\n              onPressed: control.hasMore ? control.next : null,\n            ),\n          ],\n        )\n      ],\n    );\n  },\n)"
         },
         {
             "id": "buildEmptyWidget",
