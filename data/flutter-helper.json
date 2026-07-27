@@ -1234,6 +1234,108 @@
             "code": "Column(\n  children: [\n    NoteWidget.info('Silakan lengkapi data profil Anda sebelum melanjutkan.'),\n    NoteWidget.warning('Password yang Anda masukkan kurang kuat.', showIcon: true),\n    NoteWidget.danger('Gagal terhubung ke server database.'),\n    NoteWidget.success('Data berhasil disimpan secara permanen.'),\n    \n    // Penggunaan constructor manual (custom)\n    NoteWidget(\n      message: 'Pesan dengan warna custom',\n      color: Colors.purple,\n      icon: Icons.lightbulb_outline,\n    ),\n  ],\n)"
         },
         {
+            "id": "PaperWidget",
+            "group": "Widget",
+            "name": "Paper Widget",
+            "icon": "fa-solid fa-note-sticky",
+            "description": "Widget wadah (container) fleksibel berkonsep lembaran kertas nyata dengan efek lipatan sudut kanan atas (dog-ear fold) dan bayangan miring 3D (elevation shadow). Dirancang sebagai wrapper serbaguna untuk membungkus berbagai elemen UI (seperti teks, form, atau layout kompleks) dengan tampilan bergaya kertas menempel di dasar canvas.",
+            "mandatoryProps": [
+                {
+                    "name": "child",
+                    "type": "Widget",
+                    "default": "",
+                    "desc": "Widget konten internal yang ditempatkan dan dibungkus di dalam area lembaran kertas."
+                },
+                {
+                    "name": "color",
+                    "type": "Color",
+                    "default": "",
+                    "desc": "Warna dasar kertas. Warna ini diolah secara internal untuk menghasilkan warna latar belakang (dengan opacity), warna segitiga lipatan sudut, dan garis border."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "padding",
+                    "type": "EdgeInsetsGeometry",
+                    "default": "EdgeInsets.all(16.0)",
+                    "desc": "Mengatur jarak ruang dalam (inner spacing) antara tepi garis batas kertas dengan widget child di dalamnya."
+                },
+                {
+                    "name": "foldSize",
+                    "type": "double",
+                    "default": "24.0",
+                    "desc": "Ukuran rasio panjang dan tinggi potongan lipatan kertas (dog-ear fold) di pojok kanan atas."
+                },
+                {
+                    "name": "elevation",
+                    "type": "double",
+                    "default": "4.0",
+                    "desc": "Mengatur tingkat ketebalan bayangan (shadow) 3D di bawah kertas untuk memberikan efek visual melayang atau menempel di dasar."
+                }
+            ],
+            "additionalInfo": {
+                "dependencies": "CustomPaint, FormStyle (dari form_helper_widget.dart)"
+            },
+            "methods": [
+                {
+                    "name": "primary",
+                    "type": "static Widget",
+                    "default": "",
+                    "desc": "Method helper untuk membuat PaperWidget berkarakter tema utama (diambil dari FormStyle.cyan / primary)."
+                },
+                {
+                    "name": "warning",
+                    "type": "static Widget",
+                    "default": "",
+                    "desc": "Method helper untuk membuat PaperWidget berkarakter tema peringatan (warna oranye 0xFFFF9100)."
+                },
+                {
+                    "name": "info",
+                    "type": "static Widget",
+                    "default": "",
+                    "desc": "Method helper untuk membuat PaperWidget berkarakter tema informasi (warna biru 0xFF00B0FF)."
+                },
+                {
+                    "name": "danger",
+                    "type": "static Widget",
+                    "default": "",
+                    "desc": "Method helper untuk membuat PaperWidget berkarakter tema bahaya/error (diambil dari FormStyle.error)."
+                },
+                {
+                    "name": "success",
+                    "type": "static Widget",
+                    "default": "",
+                    "desc": "Method helper untuk membuat PaperWidget berkarakter tema sukses (warna hijau 0xFF00E676)."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "CustomPaint Canvas Rendering",
+                    "type": "UI Render",
+                    "default": "",
+                    "desc": "Menggunakan CustomPainter murni untuk memotong koordinat path kertas dan menggambar efek bayangan fisik (canvas.drawShadow) dengan opsi transparentOccluder agar bayangan tetap presisi tanpa membuat area transparan menjadi gelap."
+                },
+                {
+                    "name": "Dog-Ear Corner Fold Geometry",
+                    "type": "Geometry Calculation",
+                    "default": "",
+                    "desc": "Mengkalkulasi potongan jalur miring di sudut kanan atas dan menimpanya dengan segitiga lipatan khusus yang memiliki gradasi warna lebih pekat untuk menciptakan ilusi optik kedalaman kertas berlapis dua."
+                },
+                {
+                    "name": "Dynamic Theme Opacity Adaptation",
+                    "type": "Styling",
+                    "default": "",
+                    "desc": "Warna background (6% Light / 12% Dark), lipatan (15% Light / 25% Dark), dan border (15% Light / 20% Dark) secara otomatis menyesuaikan tingkat transparansi berdasarkan kecerahan tema perangkat."
+                }
+            ],
+            "specialNotes": [
+                "Best Practice: Gunakan static method helper seperti PaperWidget.info atau PaperWidget.warning daripada menggunakan constructor langsung agar konsistensi warna tema di seluruh aplikasi tetap terjaga.",
+                "Design Note: Berbeda dengan NoteWidget yang bersifat flat, PaperWidget didesain sebagai container utama bertingkat (elevated wrapper) yang menonjolkan estetika fisik lembaran kertas.",
+                "Flexibility Note: Karena menerima parameter `child` berupa Widget, Anda dapat memasukkan layout kompleks di dalamnya, seperti Column, Row, Form Input, hingga gambar."
+            ],
+            "code": "PaperWidget.warning(\n  child: Column(\n    crossAxisAlignment: CrossAxisAlignment.start,\n    children: [\n      Text('Pemberitahuan Penting', style: TextStyle(fontWeight: FontWeight.bold)),\n      SizedBox(height: 4),\n      Text('Harap periksa kembali berkas pendaftaran Anda sebelum dikirim.'),\n    ],\n  ),\n),\n\n// Penggunaan kustom menggunakan constructor\nPaperWidget(\n  color: Colors.indigo,\n  elevation: 6.0,\n  foldSize: 30.0,\n  child: Text('Konten dengan gaya kertas kustom'),\n)"
+        },
+        {
             "id": "SmartTipWidget",
             "group": "Widget",
             "name": "Smart Tip Widget",
