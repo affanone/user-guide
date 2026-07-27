@@ -2816,11 +2816,11 @@
             "code": "DriftPaginationWidget<StaffModel>(\n  initialLimit: 10,\n  initialPage: 1,\n  totalData: totalRowsFromParent, // Wajib diisi\n  streamFactory: (offset, limit) => database.staffDao.watchStaff(limit: limit, offset: offset),\n  builder: (context, control, data) {\n    if (control.isLoading && data.isEmpty) return const Center(child: CircularProgressIndicator());\n    if (control.isEmpty) return const Center(child: Text('Data tidak ditemukan'));\n\n    return Column(\n      children: [\n        Expanded(\n          child: ListView.builder(\n            itemCount: data.length,\n            itemBuilder: (_, index) => ListTile(title: Text(data[index].name)),\n          ),\n        ),\n        Row(\n          mainAxisAlignment: MainAxisAlignment.center,\n          children: [\n            IconButton(\n              icon: const Icon(Icons.arrow_back),\n              onPressed: control.page > 1 ? control.prev : null,\n            ),\n            Text('Hal ${control.page} dari ${control.pageCount}'),\n            IconButton(\n              icon: const Icon(Icons.arrow_forward),\n              onPressed: control.hasMore ? control.next : null,\n            ),\n          ],\n        )\n      ],\n    );\n  },\n)"
         },
         {
-            "id": "buildEmptyWidget",
+            "id": "EmptyWidget",
             "group": "Widget",
-            "name": "Build Empty",
+            "name": "Empty Widget",
             "icon": "fa-solid fa-folder-open",
-            "description": "Fungsi helper global untuk membangun tampilan status kosong (empty state) yang konsisten dan elegan di seluruh modul aplikasi. Menampilkan tata letak terpusat yang terdiri dari ikon melingkar semi-transparan dan pesan deskriptif teks yang dapat disesuaikan.",
+            "description": "StatelessWidget global untuk membangun tampilan status kosong (empty state) yang konsisten dan elegan di seluruh modul aplikasi. Menampilkan tata letak terpusat yang terdiri dari ikon melingkar semi-transparan dan pesan deskriptif teks yang dapat disesuaikan. Menggunakan pendekatan Class untuk mendukung optimasi const constructor dan performa rebuild yang lebih baik.",
             "mandatoryProps": [],
             "optionalProps": [
                 {
@@ -2837,31 +2837,30 @@
                 }
             ],
             "additionalInfo": {
-                "dependencies": "google_fonts, flutter/material.dart",
-                "methods": [],
-                "behaviors": [
-                    {
-                        "name": "Centering Alignment",
-                        "type": "UI Layout",
-                        "default": "",
-                        "desc": "Seluruh komponen secara otomatis diposisikan tepat di tengah-tengah kontainer induknya menggunakan widget Center dan Column dengan MainAxisAlignment.center."
-                    },
-                    {
-                        "name": "Font Branding Integration",
-                        "type": "Typography",
-                        "default": "",
-                        "desc": "Teks pesan secara otomatis menggunakan kustomisasi dari GoogleFonts.poppins dengan spesifikasi font size 14, warna abu-abu, dan font weight w500."
-                    }
-                ]
+                "dependencies": "google_fonts, flutter/material.dart"
             },
             "methods": [],
-            "behaviors": [],
+            "behaviors": [
+                {
+                    "name": "Centering Alignment",
+                    "type": "UI Layout",
+                    "default": "",
+                    "desc": "Seluruh komponen secara otomatis diposisikan tepat di tengah-tengah kontainer induknya menggunakan widget Center dan Column dengan MainAxisAlignment.center."
+                },
+                {
+                    "name": "Font Branding Integration",
+                    "type": "Typography",
+                    "default": "",
+                    "desc": "Teks pesan secara otomatis menggunakan kustomisasi dari GoogleFonts.poppins dengan spesifikasi font size 14, warna abu-abu, dan font weight w500."
+                }
+            ],
             "specialNotes": [
-                "Fungsi ini mengembalikan komponen Widget murni sehingga sangat fleksibel untuk disisipkan langsung sebagai parameter nilai emptyState/emptyWidget pada komponen list view atau kontainer kustom lainnya.",
+                "Best Practice: Selalu panggil widget ini menggunakan keyword 'const' (contoh: const EmptyWidget(...)) agar Flutter tidak melakukan proses render ulang (rebuild) saat parent widget-nya berubah, sehingga menghemat memori perangkat.",
+                "Sangat fleksibel untuk disisipkan langsung sebagai parameter nilai fallback (seperti emptyState) pada komponen ListView, GridView, atau kontainer kustom lainnya.",
                 "Memiliki ketergantungan wajib pada package 'google_fonts'. Pastikan package tersebut sudah terdaftar di pubspec.yaml proyek Anda.",
                 "Desain latar belakang lingkaran ikon menggunakan warna dasar abu-abu dengan opacity rendah (0.05) untuk memberikan kesan UI modern yang minimalis."
             ],
-            "code": "buildEmptyWidget(\n  message: 'Belum ada pemberitahuan baru untuk Anda.',\n  icon: Icons.notifications_none_rounded,\n)"
+            "code": "// Penggunaan dengan nilai custom\nconst EmptyWidget(\n  message: 'Belum ada pemberitahuan baru untuk Anda.',\n  icon: Icons.notifications_none_rounded,\n),\n\n// Penggunaan default murni\nconst EmptyWidget()"
         },
         {
             "id": "LoadingWidget",
