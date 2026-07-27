@@ -3022,78 +3022,98 @@
             "code": "// --- CONTOH 1: MODE IMPERATIF (OVERLAY PENUH) ---\nFuture prosesDataOverlay(BuildContext context) async {\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    loader.message('Mengunduh aset dari server...');\n    await Future.delayed(const Duration(seconds: 2));\n  } catch (e) {\n    print('Error: $e');\n  } finally {\n    loader.close();\n  }\n}\n\n// --- CONTOH 2: MODE DEKLARATIF (LOADING ABADI / KONTROL EKSTERNAL) ---\nWidget buildStaticLoading(bool isLoading) {\n  if (isLoading) {\n    return LoadingWidget.widget(\n      message: 'Memuat data...',\n      size: LoadingSize.sm,\n      theme: LoadingTheme.horizontal,\n    );\n  }\n  return const Text('Data Berhasil Dimuat dari Luar!');\n}\n\n// --- CONTOH 3: MODE DEKLARATIF (AUTOMATIC ASYNC BUILDER) ---\n@override\nWidget build(BuildContext context) {\n  return Container(\n    padding: const EdgeInsets.all(16),\n    color: Colors.grey[200],\n    child: LoadingWidget.widget(\n      message: 'Menganalisis sistem...',\n      size: LoadingSize.sm,\n      theme: LoadingTheme.horizontal,\n      loadingWrapper: (child) => Card(\n        elevation: 4,\n        child: Padding(\n          padding: const EdgeInsets.all(24.0),\n          child: child,\n        ),\n      ),\n      builder: (control) async {\n        await Future.delayed(const Duration(seconds: 2));\n        control.updateMessage('Membuat widget antarmuka...');\n        await Future.delayed(const Duration(seconds: 2));\n        \n        return const Text(\n          'Sukses! Data telah dimuat.',\n          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n        );\n      },\n    ),\n  );\n}"
         },
         {
-            "id": "datetime-formatting",
+            "id": "datetime-formatting-extensions",
             "group": "Helper",
-            "name": "Date & Time Formatting",
+            "name": "Date & Time Extensions",
             "icon": "fa-solid fa-calendar-days",
-            "description": "Kumpulan fungsi utilitas untuk memformat objek DateTime dan Timestamp Firestore menjadi string tanggal yang ramah pengguna dengan pelokalan Indonesia (id_ID), serta konversi bolak-balik dari format angka absolut.",
+            "description": "Kumpulan Dart Extensions modern untuk memformat objek DateTime, Timestamp Firestore, dan Integer menjadi string tanggal yang ramah pengguna dengan pelokalan Indonesia (id_ID). Mendukung null-safety mutlak dan pemanggilan langsung dari variabel tanpa membungkus fungsi.",
             "mandatoryProps": [],
             "optionalProps": [],
             "additionalInfo": {
-                "dependencies": "intl, cloud_firestore"
+                "dependencies": "intl, cloud_firestore",
+                "architecture": "Dart Extensions"
             },
             "methods": [
                 {
-                    "name": "formatTanggalV1",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Menerjemahkan Timestamp menjadi format relatif pintar. Menampilkan 'HH:mm' untuk hari ini, 'Kemarin, HH:mm' untuk H-1, nama hari untuk dalam seminggu, dan tanggal penuh untuk tahun lampau."
+                    "name": "toSmartTime",
+                    "type": "String Extension Method",
+                    "default": "'-'",
+                    "desc": "Menerjemahkan Timestamp atau DateTime menjadi format relatif pintar. Menampilkan 'HH:mm' (hari ini), 'Kemarin, HH:mm' (H-1), nama hari (dalam seminggu), atau tanggal penuh untuk tahun lampau."
                 },
                 {
-                    "name": "formatTanggalV2",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Mengonversi Timestamp ke format panjang (contoh: 12 Januari 2024, 15:30)."
+                    "name": "toTimeAgo",
+                    "type": "String Extension Method",
+                    "default": "'-'",
+                    "desc": "Mengonversi Timestamp atau DateTime menjadi format waktu relatif ala sosial media (contoh: 'Baru saja', '5 menit yang lalu', '2 hari yang lalu')."
                 },
                 {
-                    "name": "formatTanggalV3",
-                    "type": "String Function",
-                    "default": "",
+                    "name": "toFullDateTime",
+                    "type": "String Extension Method",
+                    "default": "'-'",
+                    "desc": "Mengonversi Timestamp ke format panjang dengan jam (contoh: 12 Januari 2024, 15:30)."
+                },
+                {
+                    "name": "toShortDate",
+                    "type": "String Extension Method",
+                    "default": "'-'",
                     "desc": "Mengonversi Timestamp ke format pendek tanpa jam (contoh: 12 Jan 2024)."
                 },
                 {
-                    "name": "formatDataTime",
-                    "type": "String Function",
+                    "name": "getGreeting",
+                    "type": "String Extension Method",
                     "default": "",
-                    "desc": "Memformat objek DateTime bawaan Dart menggunakan custom format string. Default format adalah 'yyyy-MM-dd HH:mm:ss'."
+                    "desc": "Menghasilkan sapaan otomatis berdasarkan jam pada objek DateTime (contoh: 'Selamat Pagi', 'Selamat Siang', 'Selamat Malam')."
                 },
                 {
-                    "name": "intToDate",
-                    "type": "DateTime Function",
-                    "default": "",
-                    "desc": "Mengonversi angka berformat YYYYMMDD menjadi objek DateTime."
+                    "name": "format",
+                    "type": "String Extension Method",
+                    "default": "'yyyy-MM-dd HH:mm:ss'",
+                    "desc": "Memformat objek DateTime bawaan Dart menggunakan custom format string sesuai kebutuhan."
                 },
                 {
-                    "name": "intToDay",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Menerjemahkan integer (1-7) menjadi nama hari dalam bahasa Indonesia (Senin-Minggu)."
+                    "name": "toDateFromYMD",
+                    "type": "DateTime? Extension Method",
+                    "default": "null",
+                    "desc": "Mengonversi angka absolut berformat YYYYMMDD menjadi objek DateTime secara aman (Null-safe)."
                 },
                 {
-                    "name": "intToMonth",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Menerjemahkan integer (1-12) menjadi nama bulan dalam bahasa Indonesia."
+                    "name": "toTimeOfDayFromHM",
+                    "type": "TimeOfDay? Extension Method",
+                    "default": "null",
+                    "desc": "Mengonversi angka absolut berformat HHMM menjadi objek TimeOfDay secara aman (Null-safe)."
                 },
                 {
-                    "name": "intToTime",
-                    "type": "TimeOfDay Function",
-                    "default": "",
-                    "desc": "Mengonversi angka berformat HHMM menjadi objek TimeOfDay."
+                    "name": "toIndonesianDay",
+                    "type": "String Extension Method",
+                    "default": "''",
+                    "desc": "Menerjemahkan integer (1-7) menjadi nama hari dalam bahasa Indonesia dengan engine intl (Senin-Minggu)."
+                },
+                {
+                    "name": "toIndonesianMonth",
+                    "type": "String Extension Method",
+                    "default": "''",
+                    "desc": "Menerjemahkan integer (1-12) menjadi nama bulan dalam bahasa Indonesia dengan engine intl."
                 }
             ],
             "behaviors": [
                 {
-                    "name": "Null Fallback",
+                    "name": "Absolute Null-Safety",
                     "type": "Safety Handling",
+                    "default": "'-'",
+                    "desc": "Ekstensi diterapkan pada nullable Timestamp (Timestamp?). Jika variabel bernilai null, fungsi otomatis mengembalikan string '-' tanpa memicu red screen (NullPointerException)."
+                },
+                {
+                    "name": "Direct Invocation (Intellisense)",
+                    "type": "Developer Experience",
                     "default": "",
-                    "desc": "Fungsi pemformatan tanggal akan mengembalikan string '-' secara aman jika parameter Timestamp bernilai null."
+                    "desc": "Karena menggunakan Extension, metode dipanggil secara berantai langsung dari objeknya, memicu autocomplete di IDE tanpa perlu mengimpor fungsi spesifik satu per satu."
                 }
             ],
             "specialNotes": [
-                "Pastikan initializeDateFormatting('id_ID', null) sudah dipanggil di level main aplikasi Anda agar DateFormat dapat memproses pelokalan Indonesia tanpa error."
+                "Pastikan initializeDateFormatting('id_ID', null) sudah dipanggil di level main() aplikasi Anda agar DateFormat dapat memproses pelokalan Indonesia tanpa error.",
+                "Untuk menggunakannya di file UI, cukup import file utilitas waktu tempat extension ini didefinisikan."
             ],
-            "code": "String displayDate = formatTanggalV1(firestoreDoc['createdAt']); // Contoh output: 'Hari ini, 14:00'"
+            "code": "String displayDate = firestoreDoc['createdAt'].toSmartTime();\nString timeAgo = firestoreDoc['createdAt'].toTimeAgo();\nString greeting = DateTime.now().getGreeting();"
         },
         {
             "id": "text-transformation",
