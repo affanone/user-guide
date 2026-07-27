@@ -1814,6 +1814,20 @@
                     "default": "null",
                     "desc": "Menentukan lebar pasti untuk label pada layout horizontal. Sangat berguna agar titik dua (:) atau jarak value terlihat rata dan sejajar pada banyak baris data."
                 },
+                [
+                    {
+                        "name": "splitColumn",
+                        "type": "int",
+                        "default": "1",
+                        "desc": "Mengatur jumlah kolom untuk membagi tampilan data secara vertikal (minimal 1, maksimal 12). Jika jumlah data tidak terbagi rata, sisa item akan diutamakan masuk ke kolom sebelah kiri."
+                    },
+                    {
+                        "name": "columnSpacing",
+                        "type": "double",
+                        "default": "16.0",
+                        "desc": "Mengatur jarak horizontal antar kolom ketika splitColumn lebih dari 1. Jarak ini akan dikalikan otomatis dengan parameter scale."
+                    }
+                ],
                 {
                     "name": "spacing",
                     "type": "double",
