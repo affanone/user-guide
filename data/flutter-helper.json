@@ -3026,7 +3026,7 @@
             "group": "Helper",
             "name": "Date, Time & Conversion Extensions",
             "icon": "fa-solid fa-calendar-days",
-            "description": "Kumpulan Dart Extensions modern yang kaya fitur untuk memformat dan mengonversi dua arah secara presisi antara objek DateTime, Timestamp Firestore, dan Integer (YYYYMMDD & Unix Epoch). Mendukung null-safety mutlak, pelokalan Indonesia (id_ID), dan pemanggilan langsung dari variabel tanpa membungkus fungsi.",
+            "description": "Kumpulan Dart Extensions modern yang kaya fitur untuk memformat dan mengonversi dua arah secara presisi antara objek DateTime, Timestamp Firestore, Integer (YYYYMMDD & Unix Epoch), dan String. Mendukung null-safety mutlak, pelokalan Indonesia (id_ID), dan pemanggilan langsung dari variabel tanpa membungkus fungsi.",
             "mandatoryProps": [],
             "optionalProps": [],
             "additionalInfo": {
@@ -3080,7 +3080,7 @@
                     "name": "format",
                     "type": "String Extension Method",
                     "default": "'yyyy-MM-dd HH:mm:ss'",
-                    "desc": "Memformat objek DateTime bawaan Dart menggunakan custom format string sesuai kebutuhan."
+                    "desc": "Memformat objek DateTime atau Timestamp bawaan menggunakan custom format string secara dinamis dan aman."
                 },
                 {
                     "name": "toDateFromYMD",
@@ -3123,6 +3123,18 @@
                     "type": "String Extension Method",
                     "default": "''",
                     "desc": "Menerjemahkan integer (1-12) menjadi nama bulan dalam bahasa Indonesia dengan engine intl."
+                },
+                {
+                    "name": "toDateTime",
+                    "type": "DateTime? Extension Method",
+                    "default": "null",
+                    "desc": "[KONVERSI] Mem-parsing string waktu standar (contoh: YYYY-MM-DD HH:mm:ss) menjadi objek DateTime murni secara aman dan efisien."
+                },
+                {
+                    "name": "toTimestamp",
+                    "type": "Timestamp? Extension Method",
+                    "default": "null",
+                    "desc": "[KONVERSI] Mem-parsing string waktu standar langsung menjadi objek Firestore Timestamp (memanfaatkan StringTimeX)."
                 }
             ],
             "behaviors": [
@@ -3130,7 +3142,7 @@
                     "name": "Absolute Null-Safety",
                     "type": "Safety Handling",
                     "default": "'-'",
-                    "desc": "Ekstensi diterapkan pada nullable Timestamp (Timestamp?). Jika variabel bernilai null, fungsi otomatis mengembalikan string '-' atau null tanpa memicu red screen (NullPointerException)."
+                    "desc": "Ekstensi diterapkan pada nullable Timestamp (Timestamp?) dan validasi data string/integer. Jika variabel bernilai null atau parsing gagal, fungsi otomatis mengembalikan string fallback atau null tanpa memicu eksekusi fatal (NullPointerException)."
                 },
                 {
                     "name": "Direct Invocation (Intellisense)",
@@ -3143,7 +3155,7 @@
                 "Pastikan initializeDateFormatting('id_ID', null) sudah dipanggil di level main() aplikasi Anda agar DateFormat dapat memproses pelokalan Indonesia tanpa error.",
                 "Untuk menggunakannya di file UI, cukup import file utilitas waktu tempat extension ini didefinisikan."
             ],
-            "code": "Timestamp stamp = DateTime.now().toTimestamp();\nDateTime? safeDate = firestoreDoc['createdAt'].toDateTimeSafe();\nTimestamp? stampFromInt = 20240112.toTimestampFromYMD();\nString displayDate = firestoreDoc['createdAt'].toSmartTime();"
+            "code": "Timestamp stamp = DateTime.now().toTimestamp();\nDateTime? safeDate = firestoreDoc['createdAt'].toDateTimeSafe();\nTimestamp? stampFromInt = 20240112.toTimestampFromYMD();\nString displayDate = firestoreDoc['createdAt'].toSmartTime();\nTimestamp? stampFromStr = '2024-01-12 15:30:00'.toTimestamp();"
         },
         {
             "id": "text-transformation",
