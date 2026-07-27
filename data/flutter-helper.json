@@ -1814,20 +1814,24 @@
                     "default": "null",
                     "desc": "Menentukan lebar pasti untuk label pada layout horizontal. Sangat berguna agar titik dua (:) atau jarak value terlihat rata dan sejajar pada banyak baris data."
                 },
-                [
-                    {
-                        "name": "splitColumn",
-                        "type": "int",
-                        "default": "1",
-                        "desc": "Mengatur jumlah kolom untuk membagi tampilan data secara vertikal (minimal 1, maksimal 12). Jika jumlah data tidak terbagi rata, sisa item akan diutamakan masuk ke kolom sebelah kiri."
-                    },
-                    {
-                        "name": "columnSpacing",
-                        "type": "double",
-                        "default": "16.0",
-                        "desc": "Mengatur jarak horizontal antar kolom ketika splitColumn lebih dari 1. Jarak ini akan dikalikan otomatis dengan parameter scale."
-                    }
-                ],
+                {
+                    "name": "splitColumn",
+                    "type": "int",
+                    "default": "1",
+                    "desc": "Mengatur jumlah kolom untuk membagi tampilan data secara vertikal (minimal 1, maksimal 12). Jika jumlah data tidak terbagi rata, sisa item akan diutamakan masuk ke kolom sebelah kiri."
+                },
+                {
+                    "name": "columnSpacing",
+                    "type": "double",
+                    "default": "16.0",
+                    "desc": "Mengatur jarak horizontal antar kolom ketika splitColumn lebih dari 1. Jarak ini akan dikalikan otomatis dengan parameter scale."
+                },
+                {
+                    "name": "customColumnWidths",
+                    "type": "Map<int, double>?",
+                    "default": "null",
+                    "desc": "Konfigurasi khusus untuk merombak proporsi lebar pada spesifik kolom (berbasis Index mulai dari 0). Misalnya pada splitColumn 4, jika Anda mengisi {1: 1.2, 2: 1.5} (Kolom ke-2 dan ke-3), sistem otomatis menghitung sisa rasio (4.0 - 2.7 = 1.3) dan membaginya rata ke sisa kolom (Kolom ke-1 dan ke-4 mendapat porsi masing-masing 0.65). Kalkulasi ini memperhitungkan columnSpacing dengan presisi mutlak."
+                },
                 {
                     "name": "spacing",
                     "type": "double",
