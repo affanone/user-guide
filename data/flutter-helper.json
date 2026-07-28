@@ -3075,6 +3075,138 @@
             "code": "String title = 'selamat datang di sistem'.textToCapitalizeEachWord();\n// Output: 'Selamat Datang Di Sistem'\n\nString toggle = 'HeLlO'.textToToggleCase();\n// Output: 'hElLo'"
         },
         {
+            "id": "string-security",
+            "group": "Extension",
+            "name": "String Security",
+            "icon": "fa-solid fa-shield-halved",
+            "description": "Ekstensi String (StringSecurityExt) untuk melakukan enkripsi ringan dan masking data sensitif (nomor telepon, alamat) secara langsung dari objek teks.",
+            "mandatoryProps": [],
+            "additionalInfo": {},
+            "optionalProps": [],
+            "methods": [
+                {
+                    "name": "maskPhoneNumber",
+                    "type": "String Extension",
+                    "default": "",
+                    "desc": "Menyensor karakter tengah nomor telepon dengan asterisk (*). Menyisakan 3 digit awal dan 3 digit akhir. Mengembalikan teks asli jika panjang kurang dari 8 karakter."
+                },
+                {
+                    "name": "maskAddress",
+                    "type": "String Extension",
+                    "default": "",
+                    "desc": "Menyensor teks alamat dengan menyembunyikan sisa teks menggunakan asterisk (*). Hanya menampilkan 8 karakter pertama. Mengembalikan teks asli jika panjang kurang dari 10 karakter."
+                },
+                {
+                    "name": "toMd5",
+                    "type": "String Extension",
+                    "default": "",
+                    "desc": "Mengeksekusi konversi string menjadi hash MD5 secara satu arah."
+                }
+            ],
+            "behaviors": [],
+            "specialNotes": [
+                "Gunakan operator safe-call (?.) saat memanggil metode ini pada variabel yang berpotensi null untuk mencegah null pointer exception.",
+                "Metode toMd5 membutuhkan import 'dart:convert' dan 'package:crypto/crypto.dart' di level file."
+            ],
+            "code": "String phone = '081234567890'.maskPhoneNumber();\n// Output: '081******890'\n\nString addr = 'Jl. Sudirman No 10'.maskAddress();\n// Output: 'Jl. Sudi********'\n\nString hash = 'password123'.toMd5();"
+        },
+        {
+            "id": "num-currency",
+            "group": "Extension",
+            "name": "Number Currency",
+            "icon": "fa-solid fa-money-bill-wave",
+            "description": "Ekstensi angka (NumCurrencyExt) untuk memformat objek num (int/double) menjadi representasi string mata uang Rupiah standar lokal Indonesia.",
+            "mandatoryProps": [],
+            "additionalInfo": {},
+            "optionalProps": [],
+            "methods": [
+                {
+                    "name": "toRupiah",
+                    "type": "num Extension",
+                    "default": "",
+                    "desc": "Mengonversi angka menjadi format mata uang Rupiah. Menerima parameter opsional showPrefix (bool, bawaan: true) untuk mengatur visibilitas simbol, dan prefix (String, bawaan: 'Rp') untuk mengubah simbol depan."
+                }
+            ],
+            "behaviors": [],
+            "specialNotes": [
+                "Metode toRupiah mewajibkan import 'package:intl/intl.dart' di level file untuk memanggil class NumberFormat.",
+                "Pemanggilan ekstensi ini bersifat strict type, hanya bisa dieksekusi dari tipe data turunan num (int, double). Jika data dari API berupa String, lakukan parsing menggunakan SafeParsingExt terlebih dahulu."
+            ],
+            "code": "int price = 50000;\nString defaultFormat = price.toRupiah();\n// Output: 'Rp 50.000'\n\nString customFormat = price.toRupiah(showPrefix: false);\n// Output: '50.000'\n\nString customSymbol = 15000.toRupiah(prefix: 'IDR');\n// Output: 'IDR 15.000'"
+        },
+        {
+            "id": "safe-parsing",
+            "group": "Extension",
+            "name": "Safe Parsing",
+            "icon": "fa-solid fa-filter",
+            "description": "Ekstensi nullable Object (SafeParsingExt) untuk mengeksekusi parsing dan konversi angka secara aman dari tipe data kotor atau tidak pasti (seperti respon JSON/API) guna mencegah bentrok tipe (type mismatch) dan null exception.",
+            "mandatoryProps": [],
+            "additionalInfo": {},
+            "optionalProps": [],
+            "methods": [
+                {
+                    "name": "toIntSafe",
+                    "type": "Object? Extension",
+                    "default": "0",
+                    "desc": "Memaksa konversi berbagai tipe data (int, double, String) menjadi integer murni. Mengembalikan 0 jika data null atau gagal di-parse."
+                },
+                {
+                    "name": "toDoubleSafe",
+                    "type": "Object? Extension",
+                    "default": "0.0",
+                    "desc": "Memaksa konversi tipe data menjadi double. Secara otomatis memperbaiki format koma (,) menjadi titik (.) jika data mentah berupa String."
+                },
+                {
+                    "name": "normalizeNumber",
+                    "type": "Object? Extension",
+                    "default": "0",
+                    "desc": "Mem-parsing angka kotor dan mengembalikan tipe turunan num yang paling presisi secara otomatis (int jika angka bulat sempurna, double jika memiliki desimal)."
+                },
+                {
+                    "name": "extractNumber",
+                    "type": "Object? Extension",
+                    "default": "fallback (0)",
+                    "desc": "Mengekstrak paksa nilai numerik dari string kotor yang mengandung karakter alfabet, simbol, atau format penulisan nominal yang salah. Mendukung parameter opsional {fallback} jika data rusak total."
+                }
+            ],
+            "behaviors": [],
+            "specialNotes": [
+                "Karena di-bind langsung ke Object?, semua metode ini bisa dipanggil dari variabel mana saja, termasuk pada variabel yang sedang bernilai null.",
+                "Peringatan performa: Jangan panggil fungsi ini pada variabel yang tipe datanya sudah pasti (strongly typed) karena membuang komputasi (overhead). Gunakan eksklusif di layer DTO, mapping model JSON, atau input form yang kotor."
+            ],
+            "code": "Object? dirtyApiData = 'Rp 1.500.250,50';\nnum extracted = dirtyApiData.extractNumber();\n// Output: 1500250.5\n\nObject? stringVal = '250';\nint safeInt = stringVal.toIntSafe();\n// Output: 250\n\nObject? nullData = null;\ndouble safeDouble = nullData.toDoubleSafe();\n// Output: 0.0"
+        },
+        {
+            "id": "num-formatting",
+            "group": "Extension",
+            "name": "Number Formatting Clean",
+            "icon": "fa-solid fa-eraser",
+            "description": "Ekstensi turunan num (NumFormattingExt) untuk merapikan format angka desimal. Berguna untuk membuang angka nol yang tidak memiliki nilai (trailing zeros) dan titik desimal kosong agar data yang ditampilkan di antarmuka (UI) lebih bersih.",
+            "mandatoryProps": [],
+            "additionalInfo": {},
+            "optionalProps": [],
+            "methods": [
+                {
+                    "name": "formatNumberClean",
+                    "type": "num Extension",
+                    "default": "",
+                    "desc": "Merapikan angka desimal dengan presisi maksimal 4 digit. Otomatis membuang nol berlebih di akhir (contoh: 12.5000 menjadi 12.5) dan mengubahnya menjadi string bulat sempurna jika desimalnya kosong."
+                },
+                {
+                    "name": "doubleClean",
+                    "type": "num Extension",
+                    "default": "",
+                    "desc": "Sama seperti formatNumberClean, namun membatasi presisi secara ketat maksimal 2 digit di belakang koma. Cocok untuk persentase atau angka pecahan ringan."
+                }
+            ],
+            "behaviors": [],
+            "specialNotes": [
+                "Gunakan ekstensi ini secara eksklusif untuk kebutuhan presentasi UI (View). Jangan digunakan di tengah proses perhitungan matematis berantai karena fungsi ini mengembalikan tipe String, bukan num.",
+                "Kedua metode ini otomatis menangani kondisi angka NaN (Not-a-Number) dengan mengembalikan '0'."
+            ],
+            "code": "double value = 12.5000;\nString format4 = value.formatNumberClean();\n// Output: '12.5'\n\ndouble discount = 15.00;\nString cleanDiscount = discount.doubleClean();\n// Output: '15'\n\ndouble preciseValue = 10.12345;\nString format2 = preciseValue.doubleClean();\n// Output: '10.12'"
+        },
+        {
             "id": "datetime-formatting",
             "group": "Extension",
             "name": "Date & Time Formatting",
@@ -3211,102 +3343,6 @@
             "code": "Timestamp stamp = DateTime.now().toTimestamp();\nDateTime? safeDate = firestoreDoc['createdAt'].toDateTimeSafe();\nTimestamp? stampFromInt = 20240112.toTimestampFromYMD();\nString displayDate = firestoreDoc['createdAt'].toSmartTime();\nTimestamp? stampFromStr = '2024-01-12 15:30:00'.toTimestamp();"
         },
         {
-            "id": "number-utilities",
-            "group": "Helper",
-            "name": "Number Utilities",
-            "icon": "fa-solid fa-calculator",
-            "description": "Kumpulan fungsi untuk melakukan parsing tipe data angka dengan mekanisme perlindungan (safe parsing) untuk mencegah null-pointer atau format exception, serta kemampuan membersihkan teks angka kotor menjadi format valid.",
-            "mandatoryProps": [],
-            "optionalProps": [],
-            "additionalInfo": {},
-            "methods": [
-                {
-                    "name": "toIntSafe",
-                    "type": "int Function",
-                    "default": "",
-                    "desc": "Mengeksekusi konversi ke integer dari tipe dinamis. Mengembalikan 0 jika gagal diparse atau bernilai null."
-                },
-                {
-                    "name": "toDoubleSafe",
-                    "type": "double Function",
-                    "default": "",
-                    "desc": "Mengeksekusi konversi ke double dari tipe dinamis secara aman. Mengonversi separator desimal ',' menjadi '.' secara otomatis."
-                },
-                {
-                    "name": "normalizeNumber",
-                    "type": "num Function",
-                    "default": "",
-                    "desc": "Mengubah value dinamis menjadi int jika nilai desimalnya murni bulat (.0), atau membiarkannya sebagai double."
-                },
-                {
-                    "name": "extractNumber",
-                    "type": "num Function",
-                    "default": "",
-                    "desc": "Mengekstrak angka mentah dari teks kotor (yang bercampur karakter atau mata uang), mengenali pola koma dan titik berdasarkan logika penulisan angka Indonesia atau US."
-                },
-                {
-                    "name": "formatNumberClean",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Mencetak angka num menjadi String hingga 4 desimal dengan membuang angka nol trailing (0 berlebih di belakang) dan titik tak berguna."
-                },
-                {
-                    "name": "doubleClean",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Format angka desimal 2 digit dengan menghapus tailing zero, menghasilkan string rapi (misal: 12.50 menjadi 12.5)."
-                }
-            ],
-            "behaviors": [
-                {
-                    "name": "Crash-Free Extraction",
-                    "type": "Data Manipulation",
-                    "default": "",
-                    "desc": "Semua metode didesain dengan nilai fallback sehingga sistem tidak akan crash jika disuplai dengan format null, string teks huruf murni, atau tipe lain."
-                }
-            ],
-            "specialNotes": [
-                "Fungsi extractNumber menggunakan pola Regex dan perbandingan indexOf untuk menebak secara logis mana pemisah ribuan dan mana pemisah desimal dari format teks yang ambigu."
-            ],
-            "code": "int stok = toIntSafe(json['stock']); // Jika null, menjadi 0\nnum harga = extractNumber('Rp 1.500.000,50'); // Output: 1500000.5"
-        },
-        {
-            "id": "currency-formatting",
-            "group": "Helper",
-            "name": "Currency Formatting",
-            "icon": "fa-solid fa-money-bill-wave",
-            "description": "Utilitas formatting angka menjadi standar format mata uang dan penyediaan input formatter global untuk penggunaan langsung di TextFormField.",
-            "mandatoryProps": [],
-            "additionalInfo": {
-                "dependencies": "flutter_multi_formatter, intl"
-            },
-            "optionalProps": [
-                {
-                    "name": "currencyInputFormatter",
-                    "type": "CurrencyInputFormatter",
-                    "default": "Leading 'Rp ', separator titik",
-                    "desc": "Objek input formatter untuk TextFormField yang menyisipkan prefix 'Rp ' otomatis beserta titik pemisah ribuan saat pengguna mengetik."
-                },
-                {
-                    "name": "currencyInputFormatterSimple",
-                    "type": "CurrencyInputFormatter",
-                    "default": "Separator titik tanpa prefix",
-                    "desc": "Objek input formatter yang sama dengan di atas, namun murni hanya memformat ribuan tanpa teks awalan mata uang."
-                }
-            ],
-            "methods": [
-                {
-                    "name": "formatRupiah",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Memformat nilai nominal num menjadi format mata uang Indonesia. Mendukung penonaktifan imbuhan 'Rp' lewat flag opsional leading dan kustomisasi prefix."
-                }
-            ],
-            "behaviors": [],
-            "specialNotes": [],
-            "code": "String textHarga = formatRupiah(250000); // Output: 'Rp 250.000'\n// Penggunaan TextField:\nTextField(inputFormatters: [currencyInputFormatter]);"
-        },
-        {
             "id": "timezone-synchronizer",
             "group": "Helper",
             "name": "Timezone & NTP",
@@ -3363,65 +3399,6 @@
                 "Wajib jalankan TimezoneHelper.init() di void main() sebelum aplikasi di-build untuk mengaktifkan dictionary zona waktu lokal dart."
             ],
             "code": "await TimezoneHelper.init();\nTimeZoneData accurateTime = await TimezoneHelper.now('Asia/Jakarta');\nprint(accurateTime.now);"
-        },
-        {
-            "id": "security-hash",
-            "group": "Helper",
-            "name": "Security & Hash",
-            "icon": "fa-solid fa-shield-halved",
-            "description": "Fungsi kriptografi minor untuk proses hashing dasar pada aplikasi.",
-            "mandatoryProps": [],
-            "optionalProps": [],
-            "additionalInfo": {
-                "dependencies": "crypto"
-            },
-            "methods": [
-                {
-                    "name": "toMd5",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Menerima String mentah, mengubahnya ke UTF-8, dan memprosesnya dengan konverter md5 untuk mengembalikan hash hexadeciminal. Lazim untuk checksum lokal atau avatar gravatar."
-                }
-            ],
-            "behaviors": [],
-            "specialNotes": [
-                "Perhatian: Jangan pernah menggunakan MD5 untuk menyimpan kata sandi (passwords) tingkat tinggi karena sangat rentan terhadap serangan collision dan rainbow table. Gunakan bcrypt, scrypt, atau argon2 untuk keamanan auth."
-            ],
-            "code": "String hashed = toMd5('password123');"
-        },
-        {
-            "id": "privacy-masking",
-            "group": "Helper",
-            "name": "Privacy Masking",
-            "icon": "fa-solid fa-user-secret",
-            "description": "Utilitas pemformatan UI untuk menyensor atau menutupi karakter sebagian dari informasi sensitif milik pengguna seperti nomor ponsel atau alamat jalan.",
-            "mandatoryProps": [],
-            "optionalProps": [],
-            "additionalInfo": {},
-            "methods": [
-                {
-                    "name": "maskPhoneNumber",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Menyensor nomor telepon di area tengah. Misalnya 081234567890 menjadi 081******890 (menjaga 3 angka awal dan 3 angka akhir)."
-                },
-                {
-                    "name": "maskAddress",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Mengekspos 8 karakter pertama dari alamat string, lalu menimpa sisanya dengan bintang."
-                }
-            ],
-            "behaviors": [
-                {
-                    "name": "Length Guard",
-                    "type": "Safety Mechanism",
-                    "default": "",
-                    "desc": "Apabila panjang parameter kurang dari threshold (misal nomor telepon < 8 karakter, alamat < 10 karakter), fungsi akan mengembalikan parameter tersebut dalam keadaan utuh untuk menghindari String Index Out Of Bound error."
-                }
-            ],
-            "specialNotes": [],
-            "code": "String securePhone = maskPhoneNumber('+6281987654321');"
         },
         {
             "id": "image-compression",
