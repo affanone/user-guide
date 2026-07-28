@@ -3343,6 +3343,48 @@
             "code": "Timestamp stamp = DateTime.now().toTimestamp();\nDateTime? safeDate = firestoreDoc['createdAt'].toDateTimeSafe();\nTimestamp? stampFromInt = 20240112.toTimestampFromYMD();\nString displayDate = firestoreDoc['createdAt'].toSmartTime();\nTimestamp? stampFromStr = '2024-01-12 15:30:00'.toTimestamp();"
         },
         {
+            "id": "safe-fallback",
+            "group": "Extension",
+            "name": "Safe Fallback",
+            "icon": "fa-solid fa-life-ring",
+            "description": "Kumpulan ekstensi nullable (T?) untuk menangani nilai kosong atau null secara elegan. Dibangun dengan pendekatan spesifik per tipe data (Static Dispatch) untuk memastikan 0% beban pengecekan tipe di CPU saat runtime.",
+            "mandatoryProps": [],
+            "additionalInfo": {},
+            "optionalProps": [],
+            "methods": [
+                {
+                    "name": "ifEmpty (String)",
+                    "type": "String? Extension",
+                    "default": "fallback",
+                    "desc": "Mengembalikan nilai cadangan (fallback) jika string bernilai null, string kosong (''), atau hanya berisi spasi acak ('   ')."
+                },
+                {
+                    "name": "ifEmpty (List/Iterable)",
+                    "type": "List<E>? / Iterable<E>? Extension",
+                    "default": "fallback",
+                    "desc": "Mengembalikan nilai cadangan (fallback) berupa list/koleksi bawaan jika data bernilai null atau panjang itemnya 0."
+                },
+                {
+                    "name": "ifEmpty (Map)",
+                    "type": "Map<K, V>? Extension",
+                    "default": "fallback",
+                    "desc": "Mengembalikan nilai cadangan (fallback) berupa map bawaan jika data bernilai null atau tidak memiliki key-value sama sekali."
+                },
+                {
+                    "name": "ifNull",
+                    "type": "Object? (T?) Extension",
+                    "default": "fallback",
+                    "desc": "Menyediakan nilai cadangan murni hanya jika data bernilai null. Digunakan secara eksklusif untuk tipe data yang tidak memiliki konsep 'kosong' (seperti int, double, atau bool)."
+                }
+            ],
+            "behaviors": [],
+            "specialNotes": [
+                "Keuntungan Performa: Karena tidak menggunakan Generic Type checking universal, Dart compiler akan melakukan inlining langsung ke alamat memori. Sangat aman dipanggil ribuan kali di dalam fungsi render UI (seperti ListView.builder).",
+                "Angka 0 dan boolean false BUKAN nilai kosong. Jangan gunakan ifEmpty untuk angka, gunakan ifNull."
+            ],
+            "code": "String? name = '   ';\nString safeName = name.ifEmpty('Tanpa Nama');\n// Output: 'Tanpa Nama'\n\nList<String>? tags = [];\nList<String> safeTags = tags.ifEmpty(['Umum']);\n// Output: ['Umum']\n\nint? count = 0;\nint safeCount = count.ifNull(10);\n// Output: 0 (Karena 0 tidak dianggap null/kosong)"
+        },
+        {
             "id": "timezone-synchronizer",
             "group": "Helper",
             "name": "Timezone & NTP",
