@@ -1234,6 +1234,108 @@
             "code": "Column(\n  children: [\n    NoteWidget.info('Silakan lengkapi data profil Anda sebelum melanjutkan.'),\n    NoteWidget.warning('Password yang Anda masukkan kurang kuat.', showIcon: true),\n    NoteWidget.danger('Gagal terhubung ke server database.'),\n    NoteWidget.success('Data berhasil disimpan secara permanen.'),\n    \n    // Penggunaan constructor manual (custom)\n    NoteWidget(\n      message: 'Pesan dengan warna custom',\n      color: Colors.purple,\n      icon: Icons.lightbulb_outline,\n    ),\n  ],\n)"
         },
         {
+            "id": "PaperWidget",
+            "group": "Widget",
+            "name": "Paper Widget",
+            "icon": "fa-solid fa-note-sticky",
+            "description": "Widget wadah (container) fleksibel berkonsep lembaran kertas nyata dengan efek lipatan sudut kanan atas (dog-ear fold) dan bayangan miring 3D (elevation shadow). Dirancang sebagai wrapper serbaguna untuk membungkus berbagai elemen UI (seperti teks, form, atau layout kompleks) dengan tampilan bergaya kertas menempel di dasar canvas.",
+            "mandatoryProps": [
+                {
+                    "name": "child",
+                    "type": "Widget",
+                    "default": "",
+                    "desc": "Widget konten internal yang ditempatkan dan dibungkus di dalam area lembaran kertas."
+                },
+                {
+                    "name": "color",
+                    "type": "Color",
+                    "default": "",
+                    "desc": "Warna dasar kertas. Warna ini diolah secara internal untuk menghasilkan warna latar belakang (dengan opacity), warna segitiga lipatan sudut, dan garis border."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "padding",
+                    "type": "EdgeInsetsGeometry",
+                    "default": "EdgeInsets.all(16.0)",
+                    "desc": "Mengatur jarak ruang dalam (inner spacing) antara tepi garis batas kertas dengan widget child di dalamnya."
+                },
+                {
+                    "name": "foldSize",
+                    "type": "double",
+                    "default": "24.0",
+                    "desc": "Ukuran rasio panjang dan tinggi potongan lipatan kertas (dog-ear fold) di pojok kanan atas."
+                },
+                {
+                    "name": "elevation",
+                    "type": "double",
+                    "default": "4.0",
+                    "desc": "Mengatur tingkat ketebalan bayangan (shadow) 3D di bawah kertas untuk memberikan efek visual melayang atau menempel di dasar."
+                }
+            ],
+            "additionalInfo": {
+                "dependencies": "CustomPaint, FormStyle (dari form_helper_widget.dart)"
+            },
+            "methods": [
+                {
+                    "name": "primary",
+                    "type": "static Widget",
+                    "default": "",
+                    "desc": "Method helper untuk membuat PaperWidget berkarakter tema utama (diambil dari FormStyle.cyan / primary)."
+                },
+                {
+                    "name": "warning",
+                    "type": "static Widget",
+                    "default": "",
+                    "desc": "Method helper untuk membuat PaperWidget berkarakter tema peringatan (warna oranye 0xFFFF9100)."
+                },
+                {
+                    "name": "info",
+                    "type": "static Widget",
+                    "default": "",
+                    "desc": "Method helper untuk membuat PaperWidget berkarakter tema informasi (warna biru 0xFF00B0FF)."
+                },
+                {
+                    "name": "danger",
+                    "type": "static Widget",
+                    "default": "",
+                    "desc": "Method helper untuk membuat PaperWidget berkarakter tema bahaya/error (diambil dari FormStyle.error)."
+                },
+                {
+                    "name": "success",
+                    "type": "static Widget",
+                    "default": "",
+                    "desc": "Method helper untuk membuat PaperWidget berkarakter tema sukses (warna hijau 0xFF00E676)."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "CustomPaint Canvas Rendering",
+                    "type": "UI Render",
+                    "default": "",
+                    "desc": "Menggunakan CustomPainter murni untuk memotong koordinat path kertas dan menggambar efek bayangan fisik (canvas.drawShadow) dengan opsi transparentOccluder agar bayangan tetap presisi tanpa membuat area transparan menjadi gelap."
+                },
+                {
+                    "name": "Dog-Ear Corner Fold Geometry",
+                    "type": "Geometry Calculation",
+                    "default": "",
+                    "desc": "Mengkalkulasi potongan jalur miring di sudut kanan atas dan menimpanya dengan segitiga lipatan khusus yang memiliki gradasi warna lebih pekat untuk menciptakan ilusi optik kedalaman kertas berlapis dua."
+                },
+                {
+                    "name": "Dynamic Theme Opacity Adaptation",
+                    "type": "Styling",
+                    "default": "",
+                    "desc": "Warna background (6% Light / 12% Dark), lipatan (15% Light / 25% Dark), dan border (15% Light / 20% Dark) secara otomatis menyesuaikan tingkat transparansi berdasarkan kecerahan tema perangkat."
+                }
+            ],
+            "specialNotes": [
+                "Best Practice: Gunakan static method helper seperti PaperWidget.info atau PaperWidget.warning daripada menggunakan constructor langsung agar konsistensi warna tema di seluruh aplikasi tetap terjaga.",
+                "Design Note: Berbeda dengan NoteWidget yang bersifat flat, PaperWidget didesain sebagai container utama bertingkat (elevated wrapper) yang menonjolkan estetika fisik lembaran kertas.",
+                "Flexibility Note: Karena menerima parameter `child` berupa Widget, Anda dapat memasukkan layout kompleks di dalamnya, seperti Column, Row, Form Input, hingga gambar."
+            ],
+            "code": "PaperWidget.warning(\n  child: Column(\n    crossAxisAlignment: CrossAxisAlignment.start,\n    children: [\n      Text('Pemberitahuan Penting', style: TextStyle(fontWeight: FontWeight.bold)),\n      SizedBox(height: 4),\n      Text('Harap periksa kembali berkas pendaftaran Anda sebelum dikirim.'),\n    ],\n  ),\n),\n\n// Penggunaan kustom menggunakan constructor\nPaperWidget(\n  color: Colors.indigo,\n  elevation: 6.0,\n  foldSize: 30.0,\n  child: Text('Konten dengan gaya kertas kustom'),\n)"
+        },
+        {
             "id": "SmartTipWidget",
             "group": "Widget",
             "name": "Smart Tip Widget",
@@ -1813,6 +1915,24 @@
                     "type": "double?",
                     "default": "null",
                     "desc": "Menentukan lebar pasti untuk label pada layout horizontal. Sangat berguna agar titik dua (:) atau jarak value terlihat rata dan sejajar pada banyak baris data."
+                },
+                {
+                    "name": "splitColumn",
+                    "type": "int",
+                    "default": "1",
+                    "desc": "Mengatur jumlah kolom untuk membagi tampilan data secara vertikal (minimal 1, maksimal 12). Jika jumlah data tidak terbagi rata, sisa item akan diutamakan masuk ke kolom sebelah kiri."
+                },
+                {
+                    "name": "columnSpacing",
+                    "type": "double",
+                    "default": "16.0",
+                    "desc": "Mengatur jarak horizontal antar kolom ketika splitColumn lebih dari 1. Jarak ini akan dikalikan otomatis dengan parameter scale."
+                },
+                {
+                    "name": "customColumnWidths",
+                    "type": "Map<int, double>?",
+                    "default": "null",
+                    "desc": "Konfigurasi khusus untuk merombak proporsi lebar pada spesifik kolom (berbasis Index mulai dari 0). Misalnya pada splitColumn 4, jika Anda mengisi {1: 1.2, 2: 1.5} (Kolom ke-2 dan ke-3), sistem otomatis menghitung sisa rasio (4.0 - 2.7 = 1.3) dan membaginya rata ke sisa kolom (Kolom ke-1 dan ke-4 mendapat porsi masing-masing 0.65). Kalkulasi ini memperhitungkan columnSpacing dengan presisi mutlak."
                 },
                 {
                     "name": "spacing",
@@ -2696,11 +2816,11 @@
             "code": "DriftPaginationWidget<StaffModel>(\n  initialLimit: 10,\n  initialPage: 1,\n  totalData: totalRowsFromParent, // Wajib diisi\n  streamFactory: (offset, limit) => database.staffDao.watchStaff(limit: limit, offset: offset),\n  builder: (context, control, data) {\n    if (control.isLoading && data.isEmpty) return const Center(child: CircularProgressIndicator());\n    if (control.isEmpty) return const Center(child: Text('Data tidak ditemukan'));\n\n    return Column(\n      children: [\n        Expanded(\n          child: ListView.builder(\n            itemCount: data.length,\n            itemBuilder: (_, index) => ListTile(title: Text(data[index].name)),\n          ),\n        ),\n        Row(\n          mainAxisAlignment: MainAxisAlignment.center,\n          children: [\n            IconButton(\n              icon: const Icon(Icons.arrow_back),\n              onPressed: control.page > 1 ? control.prev : null,\n            ),\n            Text('Hal ${control.page} dari ${control.pageCount}'),\n            IconButton(\n              icon: const Icon(Icons.arrow_forward),\n              onPressed: control.hasMore ? control.next : null,\n            ),\n          ],\n        )\n      ],\n    );\n  },\n)"
         },
         {
-            "id": "buildEmptyWidget",
+            "id": "EmptyWidget",
             "group": "Widget",
-            "name": "Build Empty",
+            "name": "Empty Widget",
             "icon": "fa-solid fa-folder-open",
-            "description": "Fungsi helper global untuk membangun tampilan status kosong (empty state) yang konsisten dan elegan di seluruh modul aplikasi. Menampilkan tata letak terpusat yang terdiri dari ikon melingkar semi-transparan dan pesan deskriptif teks yang dapat disesuaikan.",
+            "description": "StatelessWidget global untuk membangun tampilan status kosong (empty state) yang konsisten dan elegan di seluruh modul aplikasi. Menampilkan tata letak terpusat yang terdiri dari ikon melingkar semi-transparan dan pesan deskriptif teks yang dapat disesuaikan. Menggunakan pendekatan Class untuk mendukung optimasi const constructor dan performa rebuild yang lebih baik.",
             "mandatoryProps": [],
             "optionalProps": [
                 {
@@ -2717,31 +2837,30 @@
                 }
             ],
             "additionalInfo": {
-                "dependencies": "google_fonts, flutter/material.dart",
-                "methods": [],
-                "behaviors": [
-                    {
-                        "name": "Centering Alignment",
-                        "type": "UI Layout",
-                        "default": "",
-                        "desc": "Seluruh komponen secara otomatis diposisikan tepat di tengah-tengah kontainer induknya menggunakan widget Center dan Column dengan MainAxisAlignment.center."
-                    },
-                    {
-                        "name": "Font Branding Integration",
-                        "type": "Typography",
-                        "default": "",
-                        "desc": "Teks pesan secara otomatis menggunakan kustomisasi dari GoogleFonts.poppins dengan spesifikasi font size 14, warna abu-abu, dan font weight w500."
-                    }
-                ]
+                "dependencies": "google_fonts, flutter/material.dart"
             },
             "methods": [],
-            "behaviors": [],
+            "behaviors": [
+                {
+                    "name": "Centering Alignment",
+                    "type": "UI Layout",
+                    "default": "",
+                    "desc": "Seluruh komponen secara otomatis diposisikan tepat di tengah-tengah kontainer induknya menggunakan widget Center dan Column dengan MainAxisAlignment.center."
+                },
+                {
+                    "name": "Font Branding Integration",
+                    "type": "Typography",
+                    "default": "",
+                    "desc": "Teks pesan secara otomatis menggunakan kustomisasi dari GoogleFonts.poppins dengan spesifikasi font size 14, warna abu-abu, dan font weight w500."
+                }
+            ],
             "specialNotes": [
-                "Fungsi ini mengembalikan komponen Widget murni sehingga sangat fleksibel untuk disisipkan langsung sebagai parameter nilai emptyState/emptyWidget pada komponen list view atau kontainer kustom lainnya.",
+                "Best Practice: Selalu panggil widget ini menggunakan keyword 'const' (contoh: const EmptyWidget(...)) agar Flutter tidak melakukan proses render ulang (rebuild) saat parent widget-nya berubah, sehingga menghemat memori perangkat.",
+                "Sangat fleksibel untuk disisipkan langsung sebagai parameter nilai fallback (seperti emptyState) pada komponen ListView, GridView, atau kontainer kustom lainnya.",
                 "Memiliki ketergantungan wajib pada package 'google_fonts'. Pastikan package tersebut sudah terdaftar di pubspec.yaml proyek Anda.",
                 "Desain latar belakang lingkaran ikon menggunakan warna dasar abu-abu dengan opacity rendah (0.05) untuk memberikan kesan UI modern yang minimalis."
             ],
-            "code": "buildEmptyWidget(\n  message: 'Belum ada pemberitahuan baru untuk Anda.',\n  icon: Icons.notifications_none_rounded,\n)"
+            "code": "// Penggunaan dengan nilai custom\nconst EmptyWidget(\n  message: 'Belum ada pemberitahuan baru untuk Anda.',\n  icon: Icons.notifications_none_rounded,\n),\n\n// Penggunaan default murni\nconst EmptyWidget()"
         },
         {
             "id": "LoadingWidget",
@@ -2960,74 +3079,136 @@
             "group": "Extension",
             "name": "Date & Time Formatting",
             "icon": "fa-solid fa-calendar-days",
-            "description": "Kumpulan fungsi utilitas untuk memformat objek DateTime dan Timestamp Firestore menjadi string tanggal yang ramah pengguna dengan pelokalan Indonesia (id_ID), serta konversi bolak-balik dari format angka absolut.",
+            "description": "Kumpulan Dart Extensions modern yang kaya fitur untuk memformat dan mengonversi dua arah secara presisi antara objek DateTime, Timestamp Firestore, Integer (YYYYMMDD & Unix Epoch), dan String. Mendukung null-safety mutlak, pelokalan Indonesia (id_ID), dan pemanggilan langsung dari variabel tanpa membungkus fungsi.",
             "mandatoryProps": [],
             "optionalProps": [],
             "additionalInfo": {
-                "dependencies": "intl, cloud_firestore"
+                "dependencies": "intl, cloud_firestore",
+                "architecture": "Dart Extensions"
             },
             "methods": [
                 {
-                    "name": "formatTanggalV1",
-                    "type": "String Function",
+                    "name": "toTimestamp",
+                    "type": "Timestamp Extension Method",
                     "default": "",
-                    "desc": "Menerjemahkan Timestamp menjadi format relatif pintar. Menampilkan 'HH:mm' untuk hari ini, 'Kemarin, HH:mm' untuk H-1, nama hari untuk dalam seminggu, dan tanggal penuh untuk tahun lampau."
+                    "desc": "[KONVERSI] Mengubah objek DateTime murni menjadi Firestore Timestamp secara langsung (ideal untuk pra-penyimpanan ke database)."
                 },
                 {
-                    "name": "formatTanggalV2",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Mengonversi Timestamp ke format panjang (contoh: 12 Januari 2024, 15:30)."
+                    "name": "toDateTimeSafe",
+                    "type": "DateTime? Extension Method",
+                    "default": "null",
+                    "desc": "[KONVERSI] Mengonversi Timestamp menjadi DateTime dengan aman (Null-Safe). Menghindari error bawaan '.toDate()' jika data dari Firestore bernilai null."
                 },
                 {
-                    "name": "formatTanggalV3",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Mengonversi Timestamp ke format pendek tanpa jam (contoh: 12 Jan 2024)."
+                    "name": "toSmartTime",
+                    "type": "String Extension Method",
+                    "default": "'-'",
+                    "desc": "Menerjemahkan Timestamp atau DateTime menjadi format relatif pintar. Menampilkan 'HH:mm' (hari ini), 'Kemarin, HH:mm' (H-1), nama hari (dalam seminggu), atau tanggal penuh untuk tahun lampau."
                 },
                 {
-                    "name": "formatDataTime",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Memformat objek DateTime bawaan Dart menggunakan custom format string. Default format adalah 'yyyy-MM-dd HH:mm:ss'."
+                    "name": "toTimeAgo",
+                    "type": "String Extension Method",
+                    "default": "'-'",
+                    "desc": "Mengonversi Timestamp atau DateTime menjadi format waktu relatif ala sosial media (contoh: 'Baru saja', '5 menit yang lalu', '2 hari yang lalu')."
                 },
                 {
-                    "name": "intToDate",
-                    "type": "DateTime Function",
-                    "default": "",
-                    "desc": "Mengonversi angka berformat YYYYMMDD menjadi objek DateTime."
+                    "name": "toFullDateTime",
+                    "type": "String Extension Method",
+                    "default": "'-'",
+                    "desc": "Mengonversi Timestamp atau DateTime ke format panjang dengan jam (contoh: 12 Januari 2024, 15:30)."
                 },
                 {
-                    "name": "intToDay",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Menerjemahkan integer (1-7) menjadi nama hari dalam bahasa Indonesia (Senin-Minggu)."
+                    "name": "toShortDate",
+                    "type": "String Extension Method",
+                    "default": "'-'",
+                    "desc": "Mengonversi Timestamp atau DateTime ke format pendek tanpa jam (contoh: 12 Jan 2024)."
                 },
                 {
-                    "name": "intToMonth",
-                    "type": "String Function",
+                    "name": "getGreeting",
+                    "type": "String Extension Method",
                     "default": "",
-                    "desc": "Menerjemahkan integer (1-12) menjadi nama bulan dalam bahasa Indonesia."
+                    "desc": "Menghasilkan sapaan otomatis berdasarkan jam pada objek DateTime (contoh: 'Selamat Pagi', 'Selamat Siang', 'Selamat Malam')."
                 },
                 {
-                    "name": "intToTime",
-                    "type": "TimeOfDay Function",
+                    "name": "format",
+                    "type": "String Extension Method",
+                    "default": "'yyyy-MM-dd HH:mm:ss'",
+                    "desc": "Memformat objek DateTime atau Timestamp bawaan menggunakan custom format string secara dinamis dan aman."
+                },
+                {
+                    "name": "toDateFromYMD",
+                    "type": "DateTime? Extension Method",
+                    "default": "null",
+                    "desc": "[KONVERSI] Mengonversi angka absolut berformat YYYYMMDD (contoh: 20240112) menjadi objek DateTime secara aman."
+                },
+                {
+                    "name": "toTimestampFromYMD",
+                    "type": "Timestamp? Extension Method",
+                    "default": "null",
+                    "desc": "[KONVERSI] Mengonversi angka absolut berformat YYYYMMDD langsung menjadi objek Firestore Timestamp."
+                },
+                {
+                    "name": "toDateTimeFromEpoch",
+                    "type": "DateTime Extension Method",
                     "default": "",
-                    "desc": "Mengonversi angka berformat HHMM menjadi objek TimeOfDay."
+                    "desc": "[KONVERSI] Mengonversi nilai integer Unix Epoch Milliseconds ke objek DateTime murni."
+                },
+                {
+                    "name": "toTimestampFromEpoch",
+                    "type": "Timestamp Extension Method",
+                    "default": "",
+                    "desc": "[KONVERSI] Mengonversi nilai integer Unix Epoch Milliseconds langsung ke objek Firestore Timestamp."
+                },
+                {
+                    "name": "toTimeOfDayFromHM",
+                    "type": "TimeOfDay? Extension Method",
+                    "default": "null",
+                    "desc": "Mengonversi angka absolut berformat HHMM menjadi objek TimeOfDay secara aman."
+                },
+                {
+                    "name": "toIndonesianDay",
+                    "type": "String Extension Method",
+                    "default": "''",
+                    "desc": "Menerjemahkan integer (1-7) menjadi nama hari dalam bahasa Indonesia dengan engine intl (Senin-Minggu)."
+                },
+                {
+                    "name": "toIndonesianMonth",
+                    "type": "String Extension Method",
+                    "default": "''",
+                    "desc": "Menerjemahkan integer (1-12) menjadi nama bulan dalam bahasa Indonesia dengan engine intl."
+                },
+                {
+                    "name": "toDateTime",
+                    "type": "DateTime? Extension Method",
+                    "default": "null",
+                    "desc": "[KONVERSI] Mem-parsing string waktu standar (contoh: YYYY-MM-DD HH:mm:ss) menjadi objek DateTime murni secara aman dan efisien."
+                },
+                {
+                    "name": "toTimestamp",
+                    "type": "Timestamp? Extension Method",
+                    "default": "null",
+                    "desc": "[KONVERSI] Mem-parsing string waktu standar langsung menjadi objek Firestore Timestamp (memanfaatkan StringTimeX)."
                 }
             ],
             "behaviors": [
                 {
-                    "name": "Null Fallback",
+                    "name": "Absolute Null-Safety",
                     "type": "Safety Handling",
+                    "default": "'-'",
+                    "desc": "Ekstensi diterapkan pada nullable Timestamp (Timestamp?) dan validasi data string/integer. Jika variabel bernilai null atau parsing gagal, fungsi otomatis mengembalikan string fallback atau null tanpa memicu eksekusi fatal (NullPointerException)."
+                },
+                {
+                    "name": "Direct Invocation (Intellisense)",
+                    "type": "Developer Experience",
                     "default": "",
-                    "desc": "Fungsi pemformatan tanggal akan mengembalikan string '-' secara aman jika parameter Timestamp bernilai null."
+                    "desc": "Karena menggunakan Extension, metode dipanggil secara berantai langsung dari objeknya, memicu autocomplete di IDE tanpa perlu mengimpor fungsi spesifik satu per satu."
                 }
             ],
             "specialNotes": [
-                "Pastikan initializeDateFormatting('id_ID', null) sudah dipanggil di level main aplikasi Anda agar DateFormat dapat memproses pelokalan Indonesia tanpa error."
+                "Pastikan initializeDateFormatting('id_ID', null) sudah dipanggil di level main() aplikasi Anda agar DateFormat dapat memproses pelokalan Indonesia tanpa error.",
+                "Untuk menggunakannya di file UI, cukup import file utilitas waktu tempat extension ini didefinisikan."
             ],
-            "code": "String displayDate = formatTanggalV1(firestoreDoc['createdAt']); // Contoh output: 'Hari ini, 14:00'"
+            "code": "Timestamp stamp = DateTime.now().toTimestamp();\nDateTime? safeDate = firestoreDoc['createdAt'].toDateTimeSafe();\nTimestamp? stampFromInt = 20240112.toTimestampFromYMD();\nString displayDate = firestoreDoc['createdAt'].toSmartTime();\nTimestamp? stampFromStr = '2024-01-12 15:30:00'.toTimestamp();"
         },
         {
             "id": "number-utilities",
