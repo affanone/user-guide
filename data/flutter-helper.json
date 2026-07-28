@@ -2903,8 +2903,61 @@
             "code": "// --- CONTOH 1: MODE IMPERATIF (OVERLAY PENUH) ---\nFuture prosesDataOverlay(BuildContext context) async {\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    loader.message('Mengunduh aset dari server...');\n    await Future.delayed(const Duration(seconds: 2));\n  } catch (e) {\n    print('Error: $e');\n  } finally {\n    loader.close();\n  }\n}\n\n// --- CONTOH 2: MODE DEKLARATIF (LOADING ABADI / KONTROL EKSTERNAL) ---\nWidget buildStaticLoading(bool isLoading) {\n  if (isLoading) {\n    return LoadingWidget.widget(\n      message: 'Memuat data...',\n      size: LoadingSize.sm,\n      theme: LoadingTheme.horizontal,\n    );\n  }\n  return const Text('Data Berhasil Dimuat dari Luar!');\n}\n\n// --- CONTOH 3: MODE DEKLARATIF (AUTOMATIC ASYNC BUILDER) ---\n@override\nWidget build(BuildContext context) {\n  return Container(\n    padding: const EdgeInsets.all(16),\n    color: Colors.grey[200],\n    child: LoadingWidget.widget(\n      message: 'Menganalisis sistem...',\n      size: LoadingSize.sm,\n      theme: LoadingTheme.horizontal,\n      loadingWrapper: (child) => Card(\n        elevation: 4,\n        child: Padding(\n          padding: const EdgeInsets.all(24.0),\n          child: child,\n        ),\n      ),\n      builder: (control) async {\n        await Future.delayed(const Duration(seconds: 2));\n        control.updateMessage('Membuat widget antarmuka...');\n        await Future.delayed(const Duration(seconds: 2));\n        \n        return const Text(\n          'Sukses! Data telah dimuat.',\n          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n        );\n      },\n    ),\n  );\n}"
         },
         {
+            "id": "text-transformation",
+            "group": "Extension",
+            "name": "String Transformation",
+            "icon": "fa-solid fa-font",
+            "description": "Ekstensi String (StringTransformExt) untuk memanipulasi ukuran huruf (case transformation) secara langsung dari objek teks dan memetakan kunci sistem menjadi label yang lazim dibaca (human-readable).",
+            "mandatoryProps": [],
+            "additionalInfo": {},
+            "optionalProps": [],
+            "methods": [
+                {
+                    "name": "textToSentenceCase",
+                    "type": "String Extension",
+                    "default": "",
+                    "desc": "Mengubah huruf pertama dari string menjadi kapital dan sisanya menjadi huruf kecil."
+                },
+                {
+                    "name": "textToLowercase",
+                    "type": "String Extension",
+                    "default": "",
+                    "desc": "Mengubah seluruh karakter teks menjadi huruf kecil (wrapper bawaan Dart)."
+                },
+                {
+                    "name": "textToUppercase",
+                    "type": "String Extension",
+                    "default": "",
+                    "desc": "Mengubah seluruh karakter teks menjadi huruf kapital (wrapper bawaan Dart)."
+                },
+                {
+                    "name": "textToCapitalizeEachWord",
+                    "type": "String Extension",
+                    "default": "",
+                    "desc": "Mengubah huruf pertama pada setiap kata (yang dipisah spasi) menjadi huruf kapital."
+                },
+                {
+                    "name": "textToToggleCase",
+                    "type": "String Extension",
+                    "default": "",
+                    "desc": "Membalikkan kapitalisasi karakter (huruf besar menjadi kecil, huruf kecil menjadi besar)."
+                },
+                {
+                    "name": "staffFormalLabel",
+                    "type": "String Function",
+                    "default": "",
+                    "desc": "Mengonversi alias peran sistem bahasa Inggris ('waiter', 'kitchen', 'cashier') menjadi sebutan formal Indonesia ('Pelayan', 'Dapur', 'Kasir')."
+                }
+            ],
+            "behaviors": [],
+            "specialNotes": [
+                "Fitur transformasi tidak lagi menggunakan parameter Enum, melainkan dipanggil langsung dari objek string (misal: 'teks'.textToUppercase())."
+            ],
+            "code": "String title = 'selamat datang di sistem'.textToCapitalizeEachWord();\n// Output: 'Selamat Datang Di Sistem'\n\nString toggle = 'HeLlO'.textToToggleCase();\n// Output: 'hElLo'"
+        },
+        {
             "id": "datetime-formatting",
-            "group": "Helper",
+            "group": "Extension",
             "name": "Date & Time Formatting",
             "icon": "fa-solid fa-calendar-days",
             "description": "Kumpulan fungsi utilitas untuk memformat objek DateTime dan Timestamp Firestore menjadi string tanggal yang ramah pengguna dengan pelokalan Indonesia (id_ID), serta konversi bolak-balik dari format angka absolut.",
@@ -2975,40 +3028,6 @@
                 "Pastikan initializeDateFormatting('id_ID', null) sudah dipanggil di level main aplikasi Anda agar DateFormat dapat memproses pelokalan Indonesia tanpa error."
             ],
             "code": "String displayDate = formatTanggalV1(firestoreDoc['createdAt']); // Contoh output: 'Hari ini, 14:00'"
-        },
-        {
-            "id": "text-transformation",
-            "group": "Helper",
-            "name": "Text Transformation",
-            "icon": "fa-solid fa-font",
-            "description": "Modul utilitas untuk mengubah manipulasi ukuran huruf (case transformation) pada teks dan memetakan kunci sistem menjadi label yang lazim dibaca (human-readable).",
-            "mandatoryProps": [],
-            "additionalInfo": {},
-            "optionalProps": [
-                {
-                    "name": "TransformTextType",
-                    "type": "enum",
-                    "default": "uppercase",
-                    "desc": "Kumpulan opsi transformasi teks: sentence, lowercase, uppercase, capitalizeEachWord, dan toggleCase."
-                }
-            ],
-            "methods": [
-                {
-                    "name": "transformText",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Mengubah struktur kapitalisasi string berdasarkan tipe yang di-assign melalui TransformTextType."
-                },
-                {
-                    "name": "staffFormalLabel",
-                    "type": "String Function",
-                    "default": "",
-                    "desc": "Mengonversi alias peran sistem bahasa Inggris ('waiter', 'kitchen', 'cashier') menjadi sebutan formal Indonesia ('Pelayan', 'Dapur', 'Kasir')."
-                }
-            ],
-            "behaviors": [],
-            "specialNotes": [],
-            "code": "String title = transformText('selamat datang di sistem', type: TransformTextType.capitalizeEachWord);\n// Output: 'Selamat Datang Di Sistem'"
         },
         {
             "id": "number-utilities",
