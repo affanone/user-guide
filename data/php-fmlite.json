@@ -1,0 +1,658 @@
+{
+    "appInfo": {
+        "prefix": "PHP",
+        "title": "PPID UIN Madura Mini Framework",
+        "description": "Custom framework PPID UIN Madura dibangun dengan PHP Native OOP, Tailwind CSS, Vanilla JS, dan MVC ringan tanpa library pihak ketiga.",
+        "version": "1.0.0"
+    },
+    "docsData": [
+        {
+            "id": "runApp",
+            "group": "Setup & Architecture",
+            "name": "Menjalankan Aplikasi",
+            "icon": "fa-solid fa-server",
+            "description": "Karena arsitektur yang aman memisahkan core aplikasi dan file publik, selalu jalankan server dari dalam folder public/.",
+            "mandatoryProps": [],
+            "optionalProps": [],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [
+                "Buka terminal di root project, lalu akses browser ke http://localhost:8000"
+            ],
+            "code": "php -S localhost:8000 -t public/"
+        },
+        {
+            "id": "folderStructure",
+            "group": "Setup & Architecture",
+            "name": "Struktur Folder",
+            "icon": "fa-solid fa-folder-tree",
+            "description": "Pemetaan struktur direktori utama pada framework.",
+            "mandatoryProps": [
+                {
+                    "name": "app/",
+                    "type": "Directory",
+                    "default": "-",
+                    "desc": "Inti aplikasi (Controller, Component, Core Engine, Layout, View, Helper)."
+                },
+                {
+                    "name": "data/",
+                    "type": "Directory",
+                    "default": "-",
+                    "desc": "Tempat menyimpan dummy JSON data sebelum ada integrasi API riil."
+                },
+                {
+                    "name": "languages/",
+                    "type": "Directory",
+                    "default": "-",
+                    "desc": "File dictionary untuk fitur Multi-bahasa (i18n)."
+                },
+                {
+                    "name": "public/",
+                    "type": "Directory",
+                    "default": "-",
+                    "desc": "Web root. Semua request masuk dari index.php di sini."
+                },
+                {
+                    "name": "routes/",
+                    "type": "Directory",
+                    "default": "-",
+                    "desc": "Tempat mendaftarkan routing URL (web.php)."
+                },
+                {
+                    "name": "storage/",
+                    "type": "Directory",
+                    "default": "-",
+                    "desc": "Tempat menyimpan file sementara (cache/log)."
+                }
+            ],
+            "optionalProps": [],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": ""
+        },
+        {
+            "id": "createPage",
+            "group": "Routing & Controller",
+            "name": "Membuat Halaman Baru",
+            "icon": "fa-solid fa-route",
+            "description": "Langkah-langkah membuat halaman web baru melalui tahapan Route, Controller, dan View.",
+            "mandatoryProps": [],
+            "optionalProps": [],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "1. Daftarkan Route",
+                    "type": "routes/web.php",
+                    "default": "-",
+                    "desc": "$router->get('/profil/sejarah', [ProfilController::class, 'sejarah']);"
+                },
+                {
+                    "name": "2. Buat Controller",
+                    "type": "app/Controllers/",
+                    "default": "-",
+                    "desc": "Buat ProfilController.php yang mereturn $this->view('profil/sejarah', $data);"
+                },
+                {
+                    "name": "3. Buat View",
+                    "type": "app/View/",
+                    "default": "-",
+                    "desc": "Buat file PHP yang berisi HTML untuk halaman tersebut."
+                }
+            ],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php\nnamespace App\\Controllers;\nuse App\\Core\\Controller;\n\nclass ProfilController extends Controller\n{\n    public function sejarah($request, $response)\n    {\n        $pageData = \\App\\Helpers\\JsonLoader::load('sejarah');\n        $data = [\n            'title' => 'Sejarah UIN Madura',\n            'contentData' => $pageData\n        ];\n        return $this->view('profil/sejarah', $data);\n    }\n}"
+        },
+        {
+            "id": "multiLanguage",
+            "group": "Features",
+            "name": "Multi-Bahasa (i18n)",
+            "icon": "fa-solid fa-language",
+            "description": "Mendukung dua bahasa secara langsung. Seluruh teks di UI tidak boleh di-hardcode.",
+            "mandatoryProps": [],
+            "optionalProps": [],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "__()",
+                    "type": "Global Helper",
+                    "default": "-",
+                    "desc": "Fungsi untuk menerjemahkan string berdasarkan kamus di languages/{lang}/umum.php"
+                }
+            ],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<!-- Di dalam view.php -->\n<h1><?= __('umum.selamat_datang') ?></h1>\n<button><?= __('umum.tombol_simpan') ?></button>"
+        },
+        {
+            "id": "jsonLoader",
+            "group": "Features",
+            "name": "Data JSON Dummy",
+            "icon": "fa-solid fa-file-code",
+            "description": "Mengambil data mock JSON dari folder data/ selama backend API belum siap.",
+            "mandatoryProps": [],
+            "optionalProps": [],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "$berita = \\App\\Helpers\\JsonLoader::load('berita');"
+        },
+        {
+            "id": "compHero",
+            "group": "UI Components",
+            "name": "Hero Section",
+            "icon": "fa-solid fa-image",
+            "description": "Menampilkan bagian atas halaman (Hero) dengan judul, deskripsi, gambar, dan CTA.",
+            "mandatoryProps": [
+                {
+                    "name": "title",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Judul Hero"
+                },
+                {
+                    "name": "subtitle",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Deskripsi panjang"
+                },
+                {
+                    "name": "image",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Link gambar background"
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "cta_text",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Teks tombol CTA"
+                },
+                {
+                    "name": "cta_link",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Link tujuan CTA"
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php \n\\App\\Components\\Hero::render([\n    'title' => 'Judul Hero',\n    'subtitle' => 'Deskripsi panjang',\n    'image' => 'https://link.com/gambar.jpg',\n    'cta_text' => 'Klik Disini',\n    'cta_link' => '/halaman-lain'\n]); \n?>"
+        },
+        {
+            "id": "compCard",
+            "group": "UI Components",
+            "name": "Card Box",
+            "icon": "fa-regular fa-square",
+            "description": "Menampilkan kotak informasi bergaya Card.",
+            "mandatoryProps": [
+                {
+                    "name": "title",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Judul Card"
+                },
+                {
+                    "name": "description",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Isi teks"
+                },
+                {
+                    "name": "icon",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "HTML Ikon"
+                },
+                {
+                    "name": "link",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Tautan tujuan selengkapnya"
+                }
+            ],
+            "optionalProps": [],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php \n\\App\\Components\\Card::render([\n    'title' => 'Berita Terkini',\n    'description' => 'Isi berita...',\n    'icon' => '<svg>...</svg>',\n    'link' => '/berita/1'\n]); \n?>"
+        },
+        {
+            "id": "compSectionHeader",
+            "group": "UI Components",
+            "name": "Section Header",
+            "icon": "fa-solid fa-heading",
+            "description": "Menampilkan judul bagian (Section Header) dengan sub-judul opsional.",
+            "mandatoryProps": [
+                {
+                    "name": "title",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Judul section"
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "subtitle",
+                    "type": "String",
+                    "default": "null",
+                    "desc": "Sub-judul deskriptif"
+                },
+                {
+                    "name": "align",
+                    "type": "String",
+                    "default": "'center'",
+                    "desc": "Alignment teks ('center', 'left', 'right')"
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php\n\\App\\Components\\SectionHeader::render(\n    'Layanan Informasi Publik', // Judul\n    'Deskripsi sub-judul di sini.', // Sub-judul\n    'center' // Alignment\n);\n?>"
+        },
+        {
+            "id": "compSquareCard",
+            "group": "UI Components",
+            "name": "Square Card",
+            "icon": "fa-regular fa-plus-square",
+            "description": "Kotak link berbentuk persegi sempurna dengan ikon di tengah.",
+            "mandatoryProps": [
+                {
+                    "name": "title",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Teks judul informasi"
+                },
+                {
+                    "name": "icon",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Nama ikon Lucide"
+                },
+                {
+                    "name": "route",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Link tujuan"
+                }
+            ],
+            "optionalProps": [],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php \n\\App\\Components\\SquareCard::render([\n    'title' => 'Informasi Berkala',\n    'icon' => 'calendar',\n    'route' => '/informasi/berkala'\n]);\n?>"
+        },
+        {
+            "id": "compIconList",
+            "group": "UI Components",
+            "name": "Icon List",
+            "icon": "fa-solid fa-list-ul",
+            "description": "Daftar susun dengan ikon dan deskripsi per item.",
+            "mandatoryProps": [
+                {
+                    "name": "items",
+                    "type": "Array",
+                    "default": "-",
+                    "desc": "Array berisi item dengan title, description, icon"
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "iconColorClass",
+                    "type": "String",
+                    "default": "text-primary-600",
+                    "desc": "Kelas warna Tailwind untuk ikon"
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php \n\\App\\Components\\IconList::render([\n    [\n        'title' => 'Undang-Undang',\n        'description' => 'Nomor 14 Tahun 2008',\n        'icon' => 'scale'\n    ],\n    [\n        'title' => 'Peraturan Pemerintah',\n        'description' => 'Nomor 61 Tahun 2010',\n        'icon' => 'check-circle'\n    ]\n], 'text-gold-500');\n?>"
+        },
+        {
+            "id": "compSimpleList",
+            "group": "UI Components",
+            "name": "Simple List",
+            "icon": "fa-solid fa-list",
+            "description": "Daftar teks biasa yang memiliki ikon kustom di sebelahnya.",
+            "mandatoryProps": [
+                {
+                    "name": "items",
+                    "type": "Array",
+                    "default": "-",
+                    "desc": "Array berisi string list item"
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "iconName",
+                    "type": "String",
+                    "default": "check-circle",
+                    "desc": "Nama ikon Lucide"
+                },
+                {
+                    "name": "iconClass",
+                    "type": "String",
+                    "default": "w-6 h-6",
+                    "desc": "Kelas styling Tailwind untuk ikon"
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php \n\\App\\Components\\SimpleList::render([\n    'Meningkatkan kualitas pelayanan',\n    'Membangun sistem informasi',\n    'Meningkatkan kapasitas SDM'\n], 'check-circle-2', 'text-primary-600');\n?>"
+        },
+        {
+            "id": "compInfoBox",
+            "group": "UI Components",
+            "name": "Info Box",
+            "icon": "fa-solid fa-info-circle",
+            "description": "Kotak informasi berukuran kecil dengan ikon di kiri dan deskripsi di kanan.",
+            "mandatoryProps": [
+                {
+                    "name": "title",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Judul info"
+                },
+                {
+                    "name": "description",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Deskripsi singkat"
+                },
+                {
+                    "name": "icon",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Nama ikon Lucide"
+                }
+            ],
+            "optionalProps": [],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php \n\\App\\Components\\InfoBox::render([\n    'title' => 'Cepat dan Tepat Waktu',\n    'description' => 'Sesuai batas waktu yang ditentukan.',\n    'icon' => 'zap'\n]);\n?>"
+        },
+        {
+            "id": "compGraph",
+            "group": "UI Components",
+            "name": "Graph Chart",
+            "icon": "fa-solid fa-chart-pie",
+            "description": "Komponen grafik cerdas yang otomatis merakit konfigurasi ApexCharts.",
+            "mandatoryProps": [
+                {
+                    "name": "id",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "ID unik HTML untuk chart"
+                },
+                {
+                    "name": "type",
+                    "type": "String",
+                    "default": "bar",
+                    "desc": "Tipe grafik: bar, line, area, pie, donut, radialBar"
+                },
+                {
+                    "name": "labels",
+                    "type": "Array",
+                    "default": "-",
+                    "desc": "Label sumbu-X atau label kategori"
+                },
+                {
+                    "name": "series",
+                    "type": "Array",
+                    "default": "-",
+                    "desc": "Data series, array datar untuk lingkaran, array objects untuk line/bar"
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "colors",
+                    "type": "Array",
+                    "default": "Default Palette",
+                    "desc": "Tema warna hex grafik"
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php \n\\App\\Components\\Graph::render([\n    'id' => 'statistik-pengunjung',\n    'type' => 'bar',\n    'labels' => ['Senin', 'Selasa', 'Rabu'],\n    'series' => [\n        ['name' => 'Pengunjung', 'data' => [30, 40, 35]],\n        ['name' => 'Pendaftar', 'data' => [10, 15, 12]]\n    ],\n    'colors' => ['#ca8a04', '#1d4ed8']\n]); \n?>"
+        },
+        {
+            "id": "compDatatable",
+            "group": "UI Components",
+            "name": "Datatable",
+            "icon": "fa-solid fa-table",
+            "description": "Tabel Dinamis menggunakan Simple-Datatables.",
+            "mandatoryProps": [
+                {
+                    "name": "id",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "ID elemen tabel"
+                },
+                {
+                    "name": "columns",
+                    "type": "Array",
+                    "default": "-",
+                    "desc": "Pengaturan kolom (title, data mapping)"
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "rows",
+                    "type": "Array",
+                    "default": "null",
+                    "desc": "Data baris lokal (Client-Side Mode)"
+                },
+                {
+                    "name": "serverSideUrl",
+                    "type": "String",
+                    "default": "null",
+                    "desc": "Endpoint URL API untuk fetching data (Server-Side Mode)"
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php\n// Server-Side Mode\n\\App\\Components\\Datatable::render([\n    'id' => 'tabel-dokumen',\n    'columns' => [\n        ['title' => 'No', 'data' => 'id'],\n        ['title' => 'Judul', 'data' => 'title']\n    ],\n    'serverSideUrl' => 'https://api.example.com/dokumen'\n]);\n?>"
+        },
+        {
+            "id": "compIframe",
+            "group": "UI Components",
+            "name": "Iframe Viewer",
+            "icon": "fa-solid fa-window-maximize",
+            "description": "Embed iframe responsif untuk PDF, Google Docs, YouTube, atau website.",
+            "mandatoryProps": [
+                {
+                    "name": "title",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Atribut title untuk iframe"
+                },
+                {
+                    "name": "url",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Link sumber embed"
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "height",
+                    "type": "String",
+                    "default": "500px",
+                    "desc": "Tinggi statis iframe (jika tidak menggunakan aspectRatio)"
+                },
+                {
+                    "name": "aspectRatio",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Ubah menjadi true untuk rasio video 16:9 yang otomatis responsif"
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php\n\\App\\Components\\Iframe::render([\n    'title' => 'Video Profil UIN',\n    'url' => 'https://www.youtube.com/embed/XXXXXX',\n    'aspectRatio' => true // Responsif 16:9\n]);\n?>"
+        },
+        {
+            "id": "dbSelect",
+            "group": "Database",
+            "name": "Pengambilan Data (SELECT)",
+            "icon": "fa-solid fa-database",
+            "description": "Sistem Database Manager dan Query Builder ringan (tanpa vendor) untuk membaca data.",
+            "mandatoryProps": [],
+            "optionalProps": [],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "get()",
+                    "type": "Array",
+                    "default": "-",
+                    "desc": "Mengeksekusi kueri SELECT dan me-return semua baris hasil."
+                },
+                {
+                    "name": "first()",
+                    "type": "Object/Array",
+                    "default": "-",
+                    "desc": "Me-return hanya baris pertama hasil kueri."
+                },
+                {
+                    "name": "where(col, op, val)",
+                    "type": "Builder",
+                    "default": "-",
+                    "desc": "Memberikan kondisi spesifik."
+                },
+                {
+                    "name": "orderBy(col, dir)",
+                    "type": "Builder",
+                    "default": "-",
+                    "desc": "Mengurutkan data."
+                },
+                {
+                    "name": "limit(n)",
+                    "type": "Builder",
+                    "default": "-",
+                    "desc": "Membatasi jumlah hasil."
+                }
+            ],
+            "behaviors": [],
+            "specialNotes": [
+                "Konfigurasi koneksi database berada di app/Config/database.php"
+            ],
+            "code": "<?php\nuse App\\Database\\DB;\n\n$activeUsers = DB::table('users')\n    ->select(['id', 'nama', 'email'])\n    ->where('status', 'aktif')\n    ->orderBy('created_at', 'desc')\n    ->limit(10)\n    ->get();\n?>"
+        },
+        {
+            "id": "dbDML",
+            "group": "Database",
+            "name": "Manipulasi Data",
+            "icon": "fa-solid fa-edit",
+            "description": "Fungsi untuk memanipulasi baris data, aman dari SQL Injection berkat prepared parameter bindings.",
+            "mandatoryProps": [],
+            "optionalProps": [],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "insert(array)",
+                    "type": "bool",
+                    "default": "-",
+                    "desc": "Menambah data baru. Menerima array key-value."
+                },
+                {
+                    "name": "update(array)",
+                    "type": "bool",
+                    "default": "-",
+                    "desc": "Mengupdate data berdasarkan kondisi where()."
+                },
+                {
+                    "name": "delete()",
+                    "type": "bool",
+                    "default": "-",
+                    "desc": "Menghapus data berdasarkan kondisi where()."
+                }
+            ],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php\nuse App\\Database\\DB;\n\n// INSERT\nDB::table('users')->insert([\n    'nama' => 'Budi',\n    'email' => 'budi@uin.ac.id'\n]);\n\n// UPDATE\nDB::table('users')\n    ->where('id', 1)\n    ->update(['status' => 'nonaktif']);\n\n// DELETE\nDB::table('users')\n    ->where('status', 'blokir')\n    ->delete();\n?>"
+        },
+        {
+            "id": "dbRaw",
+            "group": "Database",
+            "name": "Raw Query",
+            "icon": "fa-solid fa-terminal",
+            "description": "Mengeksekusi statement SQL mentah untuk kebutuhan JOIN tabel yang kompleks.",
+            "mandatoryProps": [],
+            "optionalProps": [],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "select(sql, binds)",
+                    "type": "Array",
+                    "default": "-",
+                    "desc": "Menjalankan kueri mentah SELECT."
+                },
+                {
+                    "name": "statement(sql, binds)",
+                    "type": "bool",
+                    "default": "-",
+                    "desc": "Menjalankan kueri mentah tipe manipulasi/struktur."
+                }
+            ],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php\nuse App\\Database\\DB;\n\n$results = DB::connection()->select(\n    \"SELECT u.*, r.name FROM users u JOIN roles r ON u.role_id = r.id WHERE u.status = ?\", \n    ['aktif']\n);\n?>"
+        },
+        {
+            "id": "goldenRules",
+            "group": "Principles",
+            "name": "Prinsip Utama (Golden Rules)",
+            "icon": "fa-solid fa-gavel",
+            "description": "Aturan-aturan emas dalam mengembangkan custom framework ini agar tidak melenceng dari arsitektur awalnya.",
+            "mandatoryProps": [],
+            "optionalProps": [],
+            "additionalInfo": {},
+            "methods": [
+                {
+                    "name": "CSS",
+                    "type": "Rule",
+                    "default": "-",
+                    "desc": "Jangan menulis file CSS terpisah kecuali terpaksa. Gunakan utility classes Tailwind."
+                },
+                {
+                    "name": "Build Process",
+                    "type": "Rule",
+                    "default": "-",
+                    "desc": "Tanpa Node.js. Tailwind diload via CDN script tag."
+                },
+                {
+                    "name": "OOP Murni",
+                    "type": "Rule",
+                    "default": "-",
+                    "desc": "Hindari procedural global function, selalu gunakan Object Oriented Programming dan class facade."
+                }
+            ],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": ""
+        }
+    ]
+}
