@@ -515,6 +515,36 @@
             "code": "<?php\n\\App\\Components\\Iframe::render([\n    'title' => 'Video Profil UIN',\n    'url' => 'https://www.youtube.com/embed/XXXXXX',\n    'aspectRatio' => true // Responsif 16:9\n]);\n?>"
         },
         {
+            "id": "compSafeHtml",
+            "group": "UI Components",
+            "name": "SafeHtml Renderer",
+            "icon": "fa-solid fa-code",
+            "description": "Merender raw HTML (dari WYSIWYG atau Database) dengan aman dan memastikan tampilannya tetap rapi dan tidak merusak layout menggunakan Tailwind Typography (prose).",
+            "mandatoryProps": [
+                {
+                    "name": "htmlContent",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "String HTML mentah yang akan dirender"
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "additionalClasses",
+                    "type": "String",
+                    "default": "''",
+                    "desc": "Kelas custom tambahan, misalnya 'prose-lg'"
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [
+                "Otomatis menerapkan class 'prose max-w-none dark:prose-invert prose-primary'"
+            ],
+            "code": "<?php\n\\App\\Components\\SafeHtml::render(\n    $page->content,\n    'prose-lg' // Opsional: ukuran teks lebih besar\n);\n?>"
+        },
+        {
             "id": "dbSelect",
             "group": "Database",
             "name": "Pengambilan Data (SELECT)",
