@@ -1,8 +1,8 @@
 {
     "appInfo": {
-        "prefix": "PHP",
-        "title": "PPID UIN Madura Mini Framework",
-        "description": "Custom framework PPID UIN Madura dibangun dengan PHP Native OOP, Tailwind CSS, Vanilla JS, dan MVC ringan tanpa library pihak ketiga.",
+        "prefix": "P",
+        "title": "Mini Framework",
+        "description": "Framework ini dibangun dengan PHP Native OOP, Tailwind CSS, Vanilla JS, dan MVC ringan tanpa library pihak ketiga.",
         "version": "1.0.0"
     },
     "docsData": [
