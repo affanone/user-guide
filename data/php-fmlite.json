@@ -545,6 +545,40 @@
             "code": "<?php\n\\App\\Components\\SafeHtml::render(\n    $page->content,\n    'prose-lg' // Opsional: ukuran teks lebih besar\n);\n?>"
         },
         {
+            "id": "compSlideBanner",
+            "group": "UI Components",
+            "name": "Slide Banner",
+            "icon": "fa-regular fa-images",
+            "description": "Slider/Carousel responsif berbasis Tailwind CSS. Mendukung konten HTML bebas untuk setiap slide (bukan hanya gambar).",
+            "mandatoryProps": [
+                {
+                    "name": "slides",
+                    "type": "Array",
+                    "default": "-",
+                    "desc": "Daftar slide. Setiap elemen adalah array yang memiliki kunci 'content' dengan nilai berupa raw HTML."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "height",
+                    "type": "String",
+                    "default": "h-[400px] md:h-[500px]",
+                    "desc": "Class utility Tailwind untuk menentukan tinggi kontainer banner."
+                },
+                {
+                    "name": "auto_play_delay",
+                    "type": "Integer",
+                    "default": "5000",
+                    "desc": "Kecepatan geser otomatis dalam milidetik. Set 0 untuk menonaktifkan auto-play."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php\n\\App\\Components\\SlideBanner::render([\n    'height' => 'h-[400px] md:h-[500px]',\n    'auto_play_delay' => 3000,\n    'slides' => [\n        [\n            'content' => '<div class=\"bg-blue-600 text-white w-full h-full flex items-center justify-center\"><h1 class=\"text-2xl font-bold\">Hello Slide 1</h1></div>'\n        ],\n        [\n            'content' => '<img src=\"https://link.com/gambar.jpg\" class=\"w-full h-full object-cover\">'\n        ]\n    ]\n]);\n?>"
+        },
+        {
             "id": "dbSelect",
             "group": "Database",
             "name": "Pengambilan Data (SELECT)",
