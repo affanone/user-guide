@@ -444,7 +444,7 @@
         {
             "id": "string-text-widget-ext",
             "group": "Widget",
-            "name": "Widget Text Color",
+            "name": "Text Color",
             "icon": "fa-solid fa-palette",
             "description": "Ekstensi untuk mengubah tipe data String secara langsung menjadi widget Text dengan pewarnaan semantik bawaan. Mengurangi boilerplate code saat membangun UI yang membutuhkan banyak teks berformat.",
             "mandatoryProps": [],
