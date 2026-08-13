@@ -1242,6 +1242,12 @@
             ],
             "optionalProps": [
                 {
+                    "name": "title",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Judul opsional. Jika diisi, message akan ditampilkan dengan ukuran yang jauh lebih besar (font size 20, bold) di bawah judul (font size 12, semi-bold), sangat cocok untuk menampilkan angka atau ringkasan penting."
+                },
+                {
                     "name": "icon",
                     "type": "IconData?",
                     "default": "null",
@@ -1314,7 +1320,7 @@
                 "Design Note: Widget ini sengaja tidak menggunakan BoxShadow untuk mempertahankan hierarki desain flat (Flat Design) agar tidak bertabrakan dengan bayangan dari Card atau Form Input.",
                 "Limitation: Teks di dalam widget ini diatur menggunakan fontWeight w500 (Medium) agar tidak terlihat terlalu mencolok (berteriak) jika disejajarkan dengan label form input."
             ],
-            "code": "Column(\n  children: [\n    NoteWidget.info('Silakan lengkapi data profil Anda sebelum melanjutkan.'),\n    NoteWidget.warning('Password yang Anda masukkan kurang kuat.', showIcon: true),\n    NoteWidget.danger('Gagal terhubung ke server database.'),\n    NoteWidget.success('Data berhasil disimpan secara permanen.'),\n    \n    // Penggunaan constructor manual (custom)\n    NoteWidget(\n      message: 'Pesan dengan warna custom',\n      color: Colors.purple,\n      icon: Icons.lightbulb_outline,\n    ),\n  ],\n)"
+            "code": "Column(\n  children: [\n    NoteWidget.warning('Rp 10.000.000', title: 'Sisa Pelunasan'),\n    NoteWidget.info('Silakan lengkapi data profil Anda sebelum melanjutkan.'),\n    NoteWidget.success('Data berhasil disimpan secara permanen.'),\n  ],\n)"
         },
         {
             "id": "PaperWidget",
