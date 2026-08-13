@@ -665,6 +665,25 @@
             "code": "final _formCtrl = FormHelperController(\n  shakeOnError: true,\n);\n\n// Operasi penugasan (set) berstruktur otomatis\n_formCtrl.set('profile', {\n  'name': 'Affan',\n  'email': 'affan@gmail.com',\n});\n\n// Operasi relasional array otomatis\n_formCtrl.append('tags', 'Flutter');\n_formCtrl.append('tiers', {\n  'min': '10000',\n  'disc': '5',\n});\n\n// Operasi isolasi lookup O(1) ke leaf spesifik\nfinal emailNode = _formCtrl.node('profile.email');\n\n// Pemicu Remote (Remote Control UI)\nemailNode.shake();\nemailNode.focus();\n\n// Ekstraksi Payload (Smart Serialization)\nfinal payload = _formCtrl.getAllValues().toMap();"
         },
         {
+            "id": "controller_array",
+            "group": "Core",
+            "name": "Bekerja dengan List of Maps (Array of Objects)",
+            "icon": "fa-solid fa-list-check",
+            "description": "Panduan penting tentang cara merepresentasikan dan bekerja dengan struktur data dinamis berulang (List of Maps / FormArray) pada FormHelperController.",
+            "mandatoryProps": [],
+            "optionalProps": [],
+            "additionalInfo": {
+                "konsepDasar": "FormHelperController secara otomatis menerjemahkan tipe data yang Anda berikan. Jika Anda memberikan String, ia akan menjadi Leaf (Node sederhana). Jika Anda memberikan Map/JSON, ia akan menjadi FormGroup bersarang.",
+                "mengapaError": "Jika Anda melakukan append('items', objek.toString()), maka controller akan menganggap Anda memasukkan Array of Strings. Saat Anda mencoba mengakses properti dari item tersebut ('items.0.nama'), controller akan kebingungan (Path Collision Error) karena ia tidak bisa menemukan properti 'nama' di dalam sebuah String mentah."
+            },
+            "specialNotes": [
+                "PENTING: Selalu masukkan tipe Map jika Anda ingin membuat struktur kolom bersarang di dalam array (FormGroup).",
+                "Gunakan getListMap('path') untuk mengambil kembali data array tersebut dalam bentuk List<Map<String, String>>.",
+                "Jangan gunakan fungsi getList('path') untuk List of Maps, karena itu akan me-return Array of Strings."
+            ],
+            "code": "// 1. CARA MENYISIPKAN DATA (Salah vs Benar)\n\n// ? SALAH (Menghasilkan List of Strings)\n_formCtrl.append('items', _MyModel().toString()); \n\n// ? BENAR (Menghasilkan List of Maps / FormGroup)\n_formCtrl.append('items', _MyModel().toJson()); \n\n\n// 2. CARA MEMBACA DATA (Mapping ke View Model)\n\n// Ambil data dalam bentuk Map\nfinal listMap = _formCtrl.getListMap('items');\n\n// Petakan kembali ke Model (Contoh: fromMap harus sudah Anda sediakan)\nfinal listItems = listMap.map((map) => _MyModel.fromMap(map)).toList();\n\n\n// 3. BINDING KE WIDGET UI\n...listItems.asMap().entries.map((entry) {\n  final index = entry.key;\n  return FormHelperWidget.Text(\n    label: 'Nama Barang',\n    // Gunakan dot notation untuk mengakses property di dalam index\n    node: _formCtrl.node('items.$index.namaBarang'), \n  );\n})\n"
+        },
+        {
             "id": "status",
             "group": "Core",
             "name": "Status Builder",

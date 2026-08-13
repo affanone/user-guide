@@ -980,6 +980,12 @@
                     "type": "Color?",
                     "default": "null",
                     "desc": "Warna latar belakang untuk Scaffold pada mode mobile. Jika null, akan menyesuaikan berdasarkan tema bawaan."
+                },
+                {
+                    "name": "withoutModal",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika disetel ke true, akan menonaktifkan deteksi modal/dialog desktop dan memaksa konten dirender sebagai halaman penuh (full-page route) terlepas dari seberapa besar resolusi layar yang digunakan."
                 }
             ],
             "additionalInfo": {
