@@ -1254,6 +1254,13 @@
                     "desc": "Judul opsional. Jika diisi, message akan ditampilkan dengan ukuran yang jauh lebih besar (font size 20, bold) di bawah judul (font size 12, semi-bold), sangat cocok untuk menampilkan angka atau ringkasan penting."
                 },
                 {
+                    "name": "isHeadline",
+                    "type": "bool",
+                    "required": false,
+                    "default": "false",
+                    "description": "Jika true, font message akan menjadi besar (ukuran 20, tebal) layaknya kartu statistik atau angka penting. Jika false, teks tetap proporsional (ukuran 13) meskipun memiliki title, cocok untuk pesan peringatan panjang."
+                },
+                {
                     "name": "icon",
                     "type": "IconData?",
                     "default": "null",
