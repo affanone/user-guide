@@ -1111,7 +1111,19 @@
                     "name": "mode",
                     "type": "SidebarMode?",
                     "default": "null",
-                    "desc": "Mengatur mode perilaku buka/tutup sidebar. Mendukung 4 opsi enum: OPEN_ALWAYS (terkunci terbuka), CLOSE_ALWAYS (terkunci tertutup), OPEN_INIT (terbuka di awal), dan CLOSE_INIT (tertutup di awal). Jika null, otomatis berperilaku layaknya CLOSE_INIT."
+                    "desc": "Mengatur mode perilaku buka/tutup sidebar. Mendukung 4 opsi enum: OPEN_ALWAYS (terkunci terbuka dan tidak bisa di-collapse), CLOSE_ALWAYS (terkunci tertutup dan tidak bisa di-expand), OPEN_INIT (terbuka di awal), dan CLOSE_INIT (tertutup di awal). Jika null, otomatis berperilaku layaknya CLOSE_INIT."
+                },
+                {
+                    "name": "headerTitle",
+                    "type": "String?",
+                    "default": "\"MENU\"",
+                    "desc": "Teks kustom opsional untuk menggantikan tulisan 'MENU' bawaan yang berada di bagian atas header sidebar (tepat di sebelah tombol toggle/hamburger). Jika tidak diisi, otomatis menampilkan kata 'MENU'."
+                },
+                {
+                    "name": "width",
+                    "type": "double",
+                    "default": "260.0",
+                    "desc": "Mengatur lebar proporsional (expanded width) dari bodi sidebar saat dalam kondisi terbuka penuh. Nilai bawaan (default) adalah 260.0 piksel."
                 },
                 {
                     "name": "orientation",
