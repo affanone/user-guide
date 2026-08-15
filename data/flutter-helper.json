@@ -1176,7 +1176,12 @@
             ],
             "additionalInfo": {
                 "dependencies": "flutter/material.dart, google_fonts, respo/app/theme/app_theme.dart, respo/src/widgets/animation_widget.dart",
-                "models": "SidebarGroup, SidebarItem, SidebarDecorator, MenuSidebarController, SidebarMode"
+                "models": "SidebarGroup, SidebarItem, SidebarDecorator, MenuSidebarController, SidebarMode",
+                "SidebarItem Properties": "title (String), icon (IconData?), route (String?), child (Widget?), submenus (List<SidebarItem>?), showIcon (bool, default: true).",
+                "SidebarGroup Properties": "title (String? - label pemisah grup), items (List<SidebarItem> - daftar menu wajib).",
+                "SidebarDecorator Properties": "backgroundColor, itemBackgroundColor, activeColor, hoverColor, inactiveColor (Color?), groupTitleStyle, itemTextStyle (TextStyle?), padding (EdgeInsetsGeometry).",
+                "SidebarMode Enum": "OPEN_ALWAYS (terkunci terbuka), CLOSE_ALWAYS (terkunci tertutup), OPEN_INIT (terbuka di awal), CLOSE_INIT (tertutup di awal).",
+                "Controller Methods": "isOpen (getter bool status drawer), show() (buka paksa), hide() (tutup paksa), toggle() (balikkan status saat ini)."
             },
             "methods": [
                 {
