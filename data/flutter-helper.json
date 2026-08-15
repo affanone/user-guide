@@ -187,7 +187,7 @@
             "group": "Alert",
             "name": "Modal Bottom Sheet",
             "icon": "fa-solid fa-window-maximize",
-            "description": "Widget utilitas statis untuk menampilkan bottom sheet (panel bawah) bergaya modern dengan sudut melengkung (rounded corners), indikator drag (drag handle), dukungan adaptasi tema otomatis (Dark/Light mode), serta efek transisi layar latar blur (frosted glass). Menggunakan pendekatan fungsi `builder` untuk injeksi context terisolasi dan pengunci lebar (maxWidth) agar tampil presisi di perangkat layar besar.",
+            "description": "Widget utilitas statis untuk menampilkan bottom sheet (panel bawah) bergaya modern dengan engine gestur interaktif (Bounce Back & Follow Finger). Dilengkapi dengan efek transisi layar latar blur (frosted glass), pembatas rasio desktop (maxWidth), dan arsitektur layout Agnostic yang menyerahkan kontrol UI sepenuhnya kepada developer.",
             "mandatoryProps": [
                 {
                     "name": "context",
@@ -207,7 +207,7 @@
                     "name": "isScrollControlled",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Jika bernilai true, modal diizinkan untuk meregang hingga maksimal 90% dari tinggi layar. Jika false, modal dibatasi ketat maksimal 56% tinggi layar. Sangat disarankan bernilai true untuk konten form agar tidak tumpang tindih dengan keyboard."
+                    "desc": "Jika bernilai true, modal diizinkan untuk meregang hingga maksimal 90% dari tinggi layar. Jika false, modal dibatasi ketat maksimal 56% tinggi layar. Sangat disarankan bernilai true untuk konten form agar tidak tertindih oleh keyboard."
                 },
                 {
                     "name": "isDismissible",
@@ -219,19 +219,13 @@
                     "name": "enableDrag",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Mengaktifkan kemampuan pengguna untuk menutup modal secara interaktif dengan gestur usap/tarik (swipe down) berkecepatan tinggi dari seluruh bodi modal."
+                    "desc": "Mengaktifkan pendeteksi interaksi usap/tarik ke bawah (swipe down). Jika diset ke false, modal akan terkunci di layar (berguna untuk modal formulir yang mewajibkan pengguna menekan tombol Submit/Cancel secara eksplisit)."
                 },
                 {
                     "name": "useSafeArea",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Menjamin agar bottom sheet tidak menabrak area perangkat keras sistem layar seperti notch, island, atau tombol navigasi OS di bagian bawah."
-                },
-                {
-                    "name": "isFlexibleContent",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Parameter layout cerdas. Jika diatur ke false, konten akan otomatis dibungkus SingleChildScrollView (untuk UI statis). Jika diatur ke true, konten dibungkus padding murni/Flexible (wajib jika builder Anda merender widget scrollable independen seperti ListView/GridView)."
+                    "desc": "Menjamin agar bodi konten bagian bawah tidak terpotong oleh notch, island, atau navigasi OS bawaan."
                 },
                 {
                     "name": "padding",
@@ -243,7 +237,7 @@
                     "name": "maxWidth",
                     "type": "double",
                     "default": "600.0",
-                    "desc": "Membatasi pelebaran bodi modal agar tidak memanjang secara ekstrem di layar beresolusi tinggi (Web, Windows, macOS, iPad). Modal akan otomatis merata-tengah (center) di layar besar."
+                    "desc": "Membatasi ukuran lebar bodi modal agar tidak memanjang/stretching secara ekstrem di layar tablet atau desktop. Modal akan otomatis berada di tengah (center) pada layar besar."
                 }
             ],
             "additionalInfo": {
@@ -254,35 +248,34 @@
                     "name": "show",
                     "type": "static Future<T?>",
                     "default": "",
-                    "desc": "Metode statis tunggal untuk memunculkan modal ke atas layar. Menggunakan generic type <T> untuk menangkap data kembalian secara mutlak saat modal ditutup melalui perintah pop."
+                    "desc": "Metode statis tunggal untuk memunculkan modal ke atas layar. Menggunakan generic type <T> untuk kemudahan menangkap data kembalian saat modal ditutup melalui pop."
                 }
             ],
             "behaviors": [
                 {
-                    "name": "Smart Layout & Shrink-wrap",
-                    "type": "UI Render",
+                    "name": "Interactive Gestures Engine",
+                    "type": "UX Physics",
                     "default": "",
-                    "desc": "Bodi modal menggunakan MainAxisSize.min yang bersifat shrink-wrap (memeluk konten dan hanya setinggi isi di dalamnya), namun dibatasi secara presisi agar tidak melampaui batas maksimal layar."
+                    "desc": "Modal tidak hanya bisa ditutup, namun bodinya akan menempel pada jari pengguna saat ditarik ke bawah (Follow Finger), merespons hempasan cepat (Velocity Flick), dan memantul halus kembali ke posisi semula jika dilepas di tengah jalan (Bounce Back)."
+                },
+                {
+                    "name": "Intelligent Scroll Synchronization",
+                    "type": "UX Physics",
+                    "default": "",
+                    "desc": "Terintegrasi dengan sensor ScrollNotification. Jika ada ListView di dalam modal, gestur tutup hanya akan aktif JIKA pengguna menarik layar saat posisi scroll sudah berada pada posisi paling puncak (index 0). Tidak akan terjadi bentrok gestur."
                 },
                 {
                     "name": "Frosted Glass Overlay",
                     "type": "UI Transition",
                     "default": "",
-                    "desc": "Menerapkan komponen BackdropFilter dengan ImageFilter.blur yang diinterpolasi dengan pergerakan animasi masuk/keluar, memberikan efek blur modern yang mulus pada layar latar belakang."
-                },
-                {
-                    "name": "Translucent Velocity Drag",
-                    "type": "UX Physics",
-                    "default": "",
-                    "desc": "Deteksi gestur usapan ditanamkan pada seluruh bodi modal (translucent hit test), bukan hanya di garis abu-abu atas. Modal merespons kecepatan tinggi (velocity > 250) maupun tarikan (delta > 12) ke arah bawah secara intuitif."
+                    "desc": "Menerapkan komponen BackdropFilter dengan ImageFilter.blur yang disinkronisasi dengan durasi masuk/keluar, memberikan efek blur modern yang mulus pada layar latar."
                 }
             ],
             "specialNotes": [
-                "Peringatan Layout Tinggi (Stretching): Jika Anda menggunakan ListView di dalam builder modal, pastikan Anda menambahkan 'shrinkWrap: true' pada ListView tersebut. Jika tidak, ListView akan memaksa modal merentang (stretch) mengambil ruang kosong hingga batas maksimum layar (90%).",
-                "Pembaruan Arsitektur: Komponen ini membangun rute independen lewat 'PageRouteBuilder' untuk kontrol penuh atas transisi blur dan constraint layar yang lebih absolut dibanding fungsi bawaan framework.",
-                "Konteks Keamanan (Safety Context): Mengubah parameter 'child' menjadi 'builder' adalah langkah kritis. Selalu gunakan context yang dilempar dari dalam builder (contoh: 'sheetContext') saat memanggil Navigator.pop() guna menghindari tertutupnya parent screen."
+                "Agnostic Layout: Komponen ini tidak menyuntikkan SingleChildScrollView secara otomatis. Jika konten yang Anda buat panjang, Anda diwajibkan untuk membungkusnya secara mandiri menggunakan SingleChildScrollView atau ListView.",
+                "Peringatan Layout Tinggi (Stretching): Jika Anda menggunakan ListView di dalam builder modal, pastikan Anda menambahkan 'shrinkWrap: true' pada ListView tersebut. Jika tidak, ListView akan memaksa modal mengambil tinggi absolut (90% layar)."
             ],
-            "code": "// Contoh Pemanggilan Bottom Sheet yang Aman\nfinal String? selectedOption = await ModalBottomSheetWidget.show(\n  context,\n  isFlexibleContent: true,\n  maxWidth: 500, \n  padding: const EdgeInsets.symmetric(horizontal: 16),\n  builder: (sheetContext) { // <-- SUNTIKAN CONTEXT MODAL TERISOLASI\n    return ListView.builder(\n      shrinkWrap: true, // KUNCI: Mencegah modal membengkak tinggi\n      physics: const ClampingScrollPhysics(),\n      itemCount: 10,\n      itemBuilder: (context, index) {\n        return ListTile(\n          title: Text('Opsi ${index + 1}'),\n          onTap: () {\n            // Gunakan sheetContext untuk menutup modal!\n            Navigator.pop(sheetContext, 'Opsi ${index + 1}');\n          },\n        );\n      },\n    );\n  },\n);\n\nif (selectedOption != null) {\n  print('Pengguna mengonfirmasi: $selectedOption');\n}"
+            "code": "// Contoh Pemanggilan Modal yang Dinamis & Aman\nfinal String? result = await ModalBottomSheetWidget.show(\n  context,\n  maxWidth: 500, // Menjaga UI tetap proporsional di PC/Tablet\n  padding: const EdgeInsets.symmetric(horizontal: 16),\n  builder: (sheetContext) { // <-- GUNAKAN CONTEXT INI\n    return ListView.builder(\n      shrinkWrap: true, // <-- WAJIB: Agar tinggi modal menyesuaikan jumlah isi\n      physics: const ClampingScrollPhysics(), // Mematikan efek mantul bawaan ListView\n      itemCount: 8,\n      itemBuilder: (context, index) {\n        return ListTile(\n          leading: const Icon(Icons.check_circle_outline),\n          title: Text('Pilihan Utama ${index + 1}'),\n          onTap: () {\n            // Gunakan sheetContext untuk pop!\n            Navigator.pop(sheetContext, 'Pilihan ${index + 1}');\n          },\n        );\n      },\n    );\n  },\n);\n\nif (result != null) {\n  print('Data diterima: $result');\n}"
         },
         {
             "id": "ModalWidget",
