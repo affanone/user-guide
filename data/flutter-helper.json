@@ -3358,6 +3358,12 @@
                     "desc": "Mengonversi Timestamp atau DateTime ke format pendek tanpa jam (contoh: 12 Jan 2024)."
                 },
                 {
+                    "name": "toShortDateTime",
+                    "type": "String Extension Method",
+                    "default": "'-'",
+                    "desc": "Mengonversi Timestamp atau DateTime ke format pendek dengan jam (contoh: 12 Jan 2024, 15:30)."
+                },
+                {
                     "name": "getGreeting",
                     "type": "String Extension Method",
                     "default": "",
