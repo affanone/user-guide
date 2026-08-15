@@ -187,19 +187,19 @@
             "group": "Alert",
             "name": "Modal Bottom Sheet",
             "icon": "fa-solid fa-window-maximize",
-            "description": "Widget utilitas statis untuk menampilkan bottom sheet (panel bawah) bergaya modern dengan sudut melengkung (rounded corners), indikator drag (drag handle), dan dukungan adaptasi tema otomatis (Dark/Light mode). Komponen ini juga menyediakan kontrol layout cerdas untuk menangani konten statis maupun konten yang dapat di-scroll secara independen.",
+            "description": "Widget utilitas statis untuk menampilkan bottom sheet (panel bawah) bergaya modern dengan sudut melengkung (rounded corners), indikator drag (drag handle), dukungan adaptasi tema otomatis (Dark/Light mode), serta efek transisi layar latar blur (frosted glass). Menggunakan pendekatan fungsi `builder` untuk mengisolasi context dan dilengkapi pengunci lebar (maxWidth) agar tampil proporsional di layar Desktop/Tablet.",
             "mandatoryProps": [
                 {
                     "name": "context",
                     "type": "BuildContext",
                     "default": "",
-                    "desc": "Konteks aplikasi saat ini yang terhubung dengan Navigator untuk merender bottom sheet di atas tampilan yang sedang aktif."
+                    "desc": "Konteks aplikasi induk (parent) saat ini yang terhubung dengan Navigator utama untuk memicu rute baru di atas layar aktif."
                 },
                 {
-                    "name": "child",
-                    "type": "Widget",
+                    "name": "builder",
+                    "type": "WidgetBuilder",
                     "default": "",
-                    "desc": "Konten utama atau widget yang akan ditampilkan di dalam bottom sheet."
+                    "desc": "Fungsi callback yang mengembalikan UI Widget. Memberikan akses ke 'sheetContext' (context terisolasi khusus milik modal) yang menjamin perintah penutupan navigasi seperti 'Navigator.pop()' hanya akan menutup modal, tanpa menabrak halaman di bawahnya."
                 }
             ],
             "optionalProps": [
@@ -213,42 +213,48 @@
                     "name": "isDismissible",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Jika bernilai true, pengguna dapat menutup bottom sheet dengan mengetuk area kosong (barrier) di luar bottom sheet."
+                    "desc": "Jika bernilai true, pengguna dapat menutup bottom sheet dengan mengetuk area kosong (barrier gelap) di luar panel bottom sheet."
                 },
                 {
                     "name": "enableDrag",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Mengaktifkan atau menonaktifkan kemampuan pengguna untuk menutup bottom sheet dengan gestur usap (swipe/drag) ke arah bawah."
+                    "desc": "Mengaktifkan atau menonaktifkan kemampuan pengguna untuk menutup bottom sheet secara interaktif dengan gestur usap/tarik (swipe down) berkecepatan tinggi."
                 },
                 {
                     "name": "useSafeArea",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Menjamin agar bottom sheet tidak menabrak area sistem layar seperti notch, status bar, atau tombol navigasi OS."
+                    "desc": "Menjamin agar bottom sheet tidak menabrak area perangkat keras sistem layar seperti notch, island, atau tombol navigasi OS di bagian bawah."
                 },
                 {
                     "name": "isFlexibleContent",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Parameter layout pintar. Jika diatur ke false, konten akan dibungkus SingleChildScrollView (aman untuk konten statis). Jika diatur ke true, konten dibungkus Expanded (wajib digunakan jika child memiliki ListView/GridView sendiri agar dapat di-scroll dengan benar)."
+                    "desc": "Parameter layout pintar. Jika diatur ke false, konten akan otomatis dibungkus SingleChildScrollView (aman untuk UI statis). Jika diatur ke true, konten dibungkus Expanded (wajib jika builder merender widget scrollable independen seperti ListView/GridView)."
                 },
                 {
                     "name": "padding",
                     "type": "EdgeInsetsGeometry?",
                     "default": "null",
-                    "desc": "Jarak bantalan (padding) yang mengelilingi widget child. Jika tidak diisi, maka tidak ada padding tambahan (EdgeInsets.zero)."
+                    "desc": "Jarak bantalan (padding) yang mengelilingi widget hasil builder. Jika tidak diisi, maka tidak ada padding tambahan (EdgeInsets.zero)."
+                },
+                {
+                    "name": "maxWidth",
+                    "type": "double",
+                    "default": "600",
+                    "desc": "Membatasi pelebaran bodi modal agar tidak memanjang secara ekstrem di layar beresolusi tinggi (Web, Windows, macOS, iPad). Modal akan otomatis merata-tengah (center) jika lebar layar melampaui batas ini."
                 }
             ],
             "additionalInfo": {
-                "dependencies": "flutter/material.dart"
+                "dependencies": "dart:ui, flutter/material.dart"
             },
             "methods": [
                 {
                     "name": "show",
                     "type": "static Future<T?>",
                     "default": "",
-                    "desc": "Method tunggal untuk memunculkan modal bottom sheet. Menggunakan generic type  untuk mengembalikan nilai saat bottom sheet ditutup (misalnya melalui Navigator.pop(context, data))."
+                    "desc": "Metode statis tunggal untuk memunculkan modal ke atas layar. Menggunakan generic type <T> untuk kemudahan menangkap data kembalian saat modal ditutup."
                 }
             ],
             "behaviors": [
@@ -256,27 +262,27 @@
                     "name": "Smart Layout Switching",
                     "type": "UI Render",
                     "default": "",
-                    "desc": "Berdasarkan parameter 'isFlexibleContent', widget akan secara otomatis mengganti pembungkus (wrapper) layout. Expanded untuk konten yang mengatur scroll-nya sendiri, dan Flexible + SingleChildScrollView untuk konten statis agar secara otomatis aman dari overflow."
+                    "desc": "Berdasarkan parameter 'isFlexibleContent', widget akan secara otomatis mengganti pembungkus (wrapper) layout. Expanded untuk konten yang mengatur scroll-nya sendiri, dan Flexible + SingleChildScrollView untuk konten statis agar terhindar dari overflow."
                 },
                 {
-                    "name": "Theme Auto-Adaptation",
-                    "type": "UI Responsive",
+                    "name": "Frosted Glass Overlay",
+                    "type": "UI Transition",
                     "default": "",
-                    "desc": "Membaca properti Brightness dari Theme.of(context). Pada mode gelap (Dark Mode), warna latar belakang secara otomatis berubah menjadi abu-abu gelap (0xFF1E1E1E), dan pada mode terang menjadi putih."
+                    "desc": "Menerapkan komponen BackdropFilter dengan ImageFilter.blur yang diinterpolasi dengan pergerakan animasi masuk/keluar, memberikan efek blur modern yang mulus pada layar latar."
                 },
                 {
-                    "name": "Automatic Drag Handle",
-                    "type": "Visual Cue",
+                    "name": "Velocity Drag Handle",
+                    "type": "UX Physics",
                     "default": "",
-                    "desc": "Secara otomatis menyuntikkan indikator drag (garis abu-abu horisontal dengan sudut membulat) di bagian tengah atas bottom sheet untuk memberi petunjuk visual bahwa komponen tersebut dapat ditarik ke bawah."
+                    "desc": "Indikator garis abu-abu atas dibungkus dengan detektor onVerticalDragEnd khusus. Jika mendeteksi tolakan kecepatan (primaryVelocity) ke bawah lebih besar dari 200, modal otomatis tertutup sempurna."
                 }
             ],
             "specialNotes": [
-                "Best Practice: Jika Anda merender ListView atau daftar pencarian tak terbatas (infinite list) di dalam parameter 'child', pastikan Anda mengeset parameter 'isFlexibleContent: true' agar tidak terjadi konflik scroll constraint.",
-                "Best Practice: Manfaatkan kembalian fungsi ini (menggunakan await) untuk menangkap data dari form atau aksi yang ada di dalam bottom sheet saat ditutup.",
-                "Limitation: Warna latar (backgroundColor) diset mentah ke Colors.transparent pada fungsi bawaan showModalBottomSheet agar dekorasi kustom melengkung (rounded corners) dari kelas ini dapat terlihat."
+                "Pembaruan Arsitektur: Komponen ini tidak lagi menggunakan fungsi konvensional 'showModalBottomSheet' bawaan material, melainkan membangun rute independen lewat 'PageRouteBuilder' untuk kontrol transisi blur dan pembatasan constraint layar yang lebih absolut.",
+                "Konteks Keamanan (Safety Context): Mengubah parameter 'child' menjadi 'builder' adalah langkah kritis. Selalu gunakan nama variabel context di dalam builder (seperti 'sheetContext' atau 'modalContext') untuk memanggil Navigator.pop(). Ini mencegah bug tertutupnya halaman utama secara tidak sengaja.",
+                "Best Practice List: Jika Anda merender ListView atau daftar pencarian tak terbatas (infinite list) di dalam builder, pastikan mengatur 'isFlexibleContent: true'."
             ],
-            "code": "final String? selectedOption = await ModalBottomSheetWidget.show(\n  context,\n  isFlexibleContent: true,\n  padding: const EdgeInsets.symmetric(horizontal: 16),\n  child: ListView.builder(\n    itemCount: 10,\n    itemBuilder: (context, index) {\n      return ListTile(\n        title: Text('Opsi ${index + 1}'),\n        onTap: () {\n          // Mengembalikan data dan menutup bottom sheet\n          Navigator.pop(context, 'Opsi ${index + 1}');\n        },\n      );\n    },\n  ),\n);\n\nif (selectedOption != null) {\n  print('Pengguna memilih: $selectedOption');\n}"
+            "code": "// Contoh Pemanggilan Bottom Sheet Pengembalian Data\nfinal String? selectedOption = await ModalBottomSheetWidget.show(\n  context,\n  isFlexibleContent: true,\n  maxWidth: 500, // Mengunci lebar agar tidak tumpah di desktop\n  padding: const EdgeInsets.symmetric(horizontal: 16),\n  builder: (sheetContext) {\n    return ListView.builder(\n      itemCount: 10,\n      itemBuilder: (context, index) {\n        return ListTile(\n          title: Text('Opsi ${index + 1}'),\n          onTap: () {\n            // Menggunakan sheetContext yang terisolasi secara aman\n            Navigator.pop(sheetContext, 'Opsi ${index + 1}');\n          },\n        );\n      },\n    );\n  },\n);\n\nif (selectedOption != null) {\n  print('Pengguna mengonfirmasi opsi: $selectedOption');\n}"
         },
         {
             "id": "ModalWidget",
