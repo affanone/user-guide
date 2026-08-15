@@ -187,7 +187,7 @@
             "group": "Alert",
             "name": "Modal Bottom Sheet",
             "icon": "fa-solid fa-window-maximize",
-            "description": "Widget utilitas statis untuk menampilkan bottom sheet (panel bawah) bergaya modern dengan engine gestur interaktif (Bounce Back & Follow Finger). Dilengkapi dengan efek transisi layar latar blur (frosted glass), pembatas rasio desktop (maxWidth), dan arsitektur layout Agnostic yang menyerahkan kontrol UI sepenuhnya kepada developer.",
+            "description": "Widget utilitas statis kelas premium untuk menampilkan bottom sheet bergaya modern. Dilengkapi dengan engine gestur interaktif cerdas (Follow Finger, Bounce Back, dan sinkronisasi lintas platform Desktop/Mouse), Sticky Header otomatis, serta efek transisi layar latar blur (frosted glass). Menggunakan pendekatan fungsi `builder` untuk injeksi context terisolasi agar navigasi sangat aman.",
             "mandatoryProps": [
                 {
                     "name": "context",
@@ -199,45 +199,63 @@
                     "name": "builder",
                     "type": "WidgetBuilder",
                     "default": "",
-                    "desc": "Fungsi callback wajib yang merender UI Anda. Fungsi ini menyuntikkan 'sheetContext' murni milik modal, yang wajib digunakan ketika Anda ingin memanggil Navigator.pop(sheetContext) agar navigasi tertutup dengan aman."
+                    "desc": "Fungsi callback wajib yang merender UI Anda. Fungsi ini menyuntikkan 'sheetContext' murni milik modal, yang wajib digunakan ketika memanggil Navigator.pop(sheetContext) agar navigasi tertutup dengan aman tanpa salah sasaran."
                 }
             ],
             "optionalProps": [
                 {
+                    "name": "title",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Secara otomatis membuatkan Sticky Header (terkunci di atas) berisi teks tebal dan tombol silang (X) untuk menutup modal."
+                },
+                {
+                    "name": "customHeader",
+                    "type": "Widget?",
+                    "default": "null",
+                    "desc": "Jika Anda membutuhkan desain header yang lebih kompleks dari sekadar teks judul, kirimkan widget custom ke sini. Widget ini juga akan bertindak sebagai Sticky Header (tidak ikut ter-scroll)."
+                },
+                {
+                    "name": "isScrollableContent",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Parameter layout cerdas. Jika false, isi builder akan otomatis dibungkus SingleChildScrollView (untuk UI form/teks statis). Jika true, isi builder langsung dirender murni (wajib digunakan jika builder mengembalikan ListView/GridView)."
+                },
+                {
                     "name": "isScrollControlled",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Jika bernilai true, modal diizinkan untuk meregang hingga maksimal 90% dari tinggi layar. Jika false, modal dibatasi ketat maksimal 56% tinggi layar. Sangat disarankan bernilai true untuk konten form agar tidak tertindih oleh keyboard."
+                    "desc": "Jika true, modal diizinkan meregang menyesuaikan tinggi konten hingga maksimal 90% layar. Jika false, modal dibatasi ketat maksimal 56% tinggi layar. Disarankan bernilai true untuk sebagian besar kasus."
                 },
                 {
-                    "name": "isDismissible",
+                    "name": "closeOnOverlayTap",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Jika bernilai true, pengguna dapat menutup bottom sheet dengan mengetuk area kosong (barrier gelap blur) di luar panel."
+                    "desc": "Jika bernilai true, pengguna dapat menutup bottom sheet dengan mengetuk area kosong (barrier gelap blur) di luar panel modal."
                 },
                 {
-                    "name": "enableDrag",
+                    "name": "closeOnSwipe",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Mengaktifkan pendeteksi interaksi usap/tarik ke bawah (swipe down). Jika diset ke false, modal akan terkunci di layar (berguna untuk modal formulir yang mewajibkan pengguna menekan tombol Submit/Cancel secara eksplisit)."
+                    "desc": "Mengaktifkan engine gestur usap/tarik ke bawah (swipe down) untuk menutup modal. Mendukung kecepatan lemparan (flick) dan akan otomatis memantul kembali (bounce back) jika tarikan dibatalkan."
                 },
                 {
                     "name": "useSafeArea",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Menjamin agar bodi konten bagian bawah tidak terpotong oleh notch, island, atau navigasi OS bawaan."
+                    "desc": "Menjamin agar bodi konten bagian bawah tidak tertutup atau terpotong oleh sistem seperti notch, island, atau navigasi layar OS bawaan."
                 },
                 {
                     "name": "padding",
                     "type": "EdgeInsetsGeometry?",
                     "default": "null",
-                    "desc": "Jarak bantalan (padding) yang mengelilingi widget hasil builder. Jika tidak diisi, maka tidak ada padding tambahan (EdgeInsets.zero)."
+                    "desc": "Jarak bantalan (padding) yang mengelilingi widget konten hasil builder. (Catatan: Header otomatis tidak akan terpengaruh oleh padding ini)."
                 },
                 {
                     "name": "maxWidth",
                     "type": "double",
                     "default": "600.0",
-                    "desc": "Membatasi ukuran lebar bodi modal agar tidak memanjang/stretching secara ekstrem di layar tablet atau desktop. Modal akan otomatis berada di tengah (center) pada layar besar."
+                    "desc": "Membatasi ukuran lebar bodi modal agar tidak melebar/stretching secara ekstrem di layar tablet atau desktop. Akan otomatis rata-tengah (center alignment)."
                 }
             ],
             "additionalInfo": {
@@ -248,34 +266,40 @@
                     "name": "show",
                     "type": "static Future<T?>",
                     "default": "",
-                    "desc": "Metode statis tunggal untuk memunculkan modal ke atas layar. Menggunakan generic type <T> untuk kemudahan menangkap data kembalian saat modal ditutup melalui pop."
+                    "desc": "Metode statis tunggal untuk memunculkan modal ke atas layar. Gunakan generic type <T> untuk kemudahan menangkap data kembalian saat modal ditutup melalui pop."
                 }
             ],
             "behaviors": [
                 {
+                    "name": "Smart Layout & Sticky Header",
+                    "type": "UI Render",
+                    "default": "",
+                    "desc": "Memisahkan area header dan area konten secara fisik. Header akan selalu terkunci di atas (sticky), sementara bodi konten menggunakan shrink-wrap yang tingginya otomatis menyesuaikan isi hingga menyentuh batas 90% layar."
+                },
+                {
                     "name": "Interactive Gestures Engine",
                     "type": "UX Physics",
                     "default": "",
-                    "desc": "Modal tidak hanya bisa ditutup, namun bodinya akan menempel pada jari pengguna saat ditarik ke bawah (Follow Finger), merespons hempasan cepat (Velocity Flick), dan memantul halus kembali ke posisi semula jika dilepas di tengah jalan (Bounce Back)."
+                    "desc": "Terintegrasi dengan NotificationListener dan Listener murni. Modal menempel pada jari saat ditarik, merespons hentakan cepat, dan mematuhi posisi ScrollView (gestur tutup aktif HANYA jika list berada di posisi paling atas / index 0)."
                 },
                 {
-                    "name": "Intelligent Scroll Synchronization",
-                    "type": "UX Physics",
+                    "name": "Desktop & Pointer Intelligence",
+                    "type": "Cross-Platform",
                     "default": "",
-                    "desc": "Terintegrasi dengan sensor ScrollNotification. Jika ada ListView di dalam modal, gestur tutup hanya akan aktif JIKA pengguna menarik layar saat posisi scroll sudah berada pada posisi paling puncak (index 0). Tidak akan terjadi bentrok gestur."
+                    "desc": "Mampu mendeteksi apakah sistem berjalan di Desktop (Windows/Mac/Linux) atau menggunakan kursor Mouse. Jika ya, gestur klik-dan-tarik akan langsung menutup modal secara mutlak tanpa mempedulikan posisi scroll list di dalamnya."
                 },
                 {
                     "name": "Frosted Glass Overlay",
                     "type": "UI Transition",
                     "default": "",
-                    "desc": "Menerapkan komponen BackdropFilter dengan ImageFilter.blur yang disinkronisasi dengan durasi masuk/keluar, memberikan efek blur modern yang mulus pada layar latar."
+                    "desc": "Menerapkan BackdropFilter dengan ImageFilter.blur yang dirender real-time bersama animasi masuk/keluar, memberikan efek kaca buram modern ala iOS/macOS."
                 }
             ],
             "specialNotes": [
-                "Agnostic Layout: Komponen ini tidak menyuntikkan SingleChildScrollView secara otomatis. Jika konten yang Anda buat panjang, Anda diwajibkan untuk membungkusnya secara mandiri menggunakan SingleChildScrollView atau ListView.",
-                "Peringatan Layout Tinggi (Stretching): Jika Anda menggunakan ListView di dalam builder modal, pastikan Anda menambahkan 'shrinkWrap: true' pada ListView tersebut. Jika tidak, ListView akan memaksa modal mengambil tinggi absolut (90% layar)."
+                "Peringatan Layout List (Stretching): Jika Anda me-return ListView di dalam builder modal, Anda DIWAJIBKAN menambahkan parameter 'shrinkWrap: true' pada ListView tersebut. Jika diabaikan, ListView akan memaksa modal merentang tinggi absolut yang merusak desain UI.",
+                "Konteks Keamanan (Safety Context): Selalu gunakan context yang disuntikkan dari dalam builder (misal: 'sheetContext') saat Anda memanggil Navigator.pop(). Menggunakan context luar berisiko membuat parent screen Anda tertutup."
             ],
-            "code": "// Contoh Pemanggilan Modal yang Dinamis & Aman\nfinal String? result = await ModalBottomSheetWidget.show(\n  context,\n  maxWidth: 500, // Menjaga UI tetap proporsional di PC/Tablet\n  padding: const EdgeInsets.symmetric(horizontal: 16),\n  builder: (sheetContext) { // <-- GUNAKAN CONTEXT INI\n    return ListView.builder(\n      shrinkWrap: true, // <-- WAJIB: Agar tinggi modal menyesuaikan jumlah isi\n      physics: const ClampingScrollPhysics(), // Mematikan efek mantul bawaan ListView\n      itemCount: 8,\n      itemBuilder: (context, index) {\n        return ListTile(\n          leading: const Icon(Icons.check_circle_outline),\n          title: Text('Pilihan Utama ${index + 1}'),\n          onTap: () {\n            // Gunakan sheetContext untuk pop!\n            Navigator.pop(sheetContext, 'Pilihan ${index + 1}');\n          },\n        );\n      },\n    );\n  },\n);\n\nif (result != null) {\n  print('Data diterima: $result');\n}"
+            "code": "// Contoh Pemanggilan Modal Cerdas dengan Sticky Header\nfinal String? result = await ModalBottomSheetWidget.show(\n  context,\n  title: 'Pilih Gudang', // Modal otomatis buatkan header tebal yang diam di atas\n  isScrollableContent: true, // Wajib true karena kita mau merender ListView\n  maxWidth: 500, \n  builder: (sheetContext) { // <-- GUNAKAN CONTEXT INI UNTUK POP\n    return ListView.builder(\n      shrinkWrap: true, // <-- WAJIB: Agar tinggi modal menyesuaikan jumlah list\n      physics: const ClampingScrollPhysics(), // Mematikan efek mantul bawaan scroll\n      itemCount: 8,\n      itemBuilder: (context, index) {\n        return ListTile(\n          leading: const Icon(Icons.warehouse),\n          title: Text('Gudang Cabang ${index + 1}'),\n          onTap: () {\n            // Gunakan sheetContext untuk pop!\n            Navigator.pop(sheetContext, 'Gudang ${index + 1}');\n          },\n        );\n      },\n    );\n  },\n);\n\nif (result != null) {\n  print('Pengguna memilih: $result');\n}"
         },
         {
             "id": "ModalWidget",
