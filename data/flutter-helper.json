@@ -4041,7 +4041,7 @@
             "group": "Widget",
             "name": "Card Premium",
             "icon": "fa-solid fa-address-card",
-            "description": "Widget pengelola tata letak (container) tingkat lanjut yang mengadaptasi desain enterprise ke dalam bentuk komponen inline. Menawarkan efek bayangan meluas yang elegan, batas melengkung, serta struktur layout bawaan yang cerdas (Header, Scrollable/Fixed Body, dan Footer). Sangat ideal sebagai fondasi formulir atau penyajian data kompleks.",
+            "description": "Widget pengelola tata letak (container) tingkat lanjut yang mengadaptasi desain enterprise ke dalam bentuk komponen inline. Menawarkan efek bayangan meluas yang elegan, batas melengkung, serta struktur layout bawaan yang cerdas (Header, Scrollable/Fixed Body, dan Footer). Sangat ideal sebagai fondasi formulir atau penyajian data kompleks. Kini dilengkapi dengan sistem Theming adaptif.",
             "mandatoryProps": [],
             "optionalProps": [
                 {
@@ -4054,7 +4054,7 @@
                     "name": "title",
                     "type": "String?",
                     "default": "null",
-                    "desc": "Teks yang akan ditampilkan pada sisi kiri atas Header Card dengan ketebalan teks semi-bold."
+                    "desc": "Teks yang akan ditampilkan pada sisi kiri atas Header Card dengan ketebalan teks semi-bold. Warnanya akan otomatis menyesuaikan rona warna jika opsi `theme` digunakan."
                 },
                 {
                     "name": "headerActions",
@@ -4085,10 +4085,16 @@
                     "type": "bool",
                     "default": "true",
                     "desc": "Secara default, konten akan dibungkus oleh SingleChildScrollView untuk mencegah isu overflow (cocok untuk Column/Form biasa). Set menjadi false jika child Anda adalah ListView/GridView yang sudah memiliki scroll engine mandiri untuk menghindari konflik nested scroll."
+                },
+                {
+                    "name": "theme",
+                    "type": "CardWidgetTheme?",
+                    "default": "null",
+                    "desc": "Menentukan skema warna Card menggunakan named constructors (contoh: CardWidgetTheme.success()). Menghasilkan warna pastel/soft dengan teknik Color.lerp (campuran warna solid) untuk mencegah bayangan tembus pandang. Mendukung parameter kustom `opacity` sebagai master pengatur intensitas warna Card."
                 }
             ],
             "additionalInfo": {
-                "styling": "Pewarnaan elemen Card dan batas garis (border) bereaksi dinamis terhadap Brightness parent. Tema cerah menggunakan background putih murni dengan bayangan lembut, sementara tema gelap menggunakan Color(0xFF1E1E1E) dengan border transparan keputihan (white opacity 0.08).",
+                "styling": "Pewarnaan elemen Card bereaksi dinamis terhadap Brightness parent dan opsi tema. Jika `theme` aktif, warna dasar latar (hitam/putih) akan di-blend dengan warna tema menggunakan Color.lerp, menjaga sifat warna tetap 'solid' sehingga BoxShadow tidak tembus pandang (no shadow bleed). Warna garis batas (border), divider, dan title secara proporsional beradaptasi mengikuti ketebalan tema.",
                 "animation": "CardWidget adalah komponen layout statis (inline). Disarankan dibungkus dengan AnimatedSwitcher atau AnimatedSize pada layer parent untuk transisi yang dinamis."
             },
             "methods": [],
@@ -4110,13 +4116,19 @@
                     "type": "Layout Flow",
                     "default": "",
                     "desc": "Widget mendeteksi state isScrollable untuk membebaskan scroll mandiri pada child bertipe ListView, sehingga terhindar dari Unbounded Height Exception (RenderBox Error) yang umum terjadi di Flutter saat menumpuk scrollview."
+                },
+                {
+                    "name": "Opacity Safety Guard",
+                    "type": "Data Validation",
+                    "default": "",
+                    "desc": "Jika parameter `opacity` pada `theme` diinput di luar batas Flutter (>1.0, misal: 100), komponen memiliki Safety Guard internal yang mengasumsikannya sebagai persentase (dibagi 100) dan menguncinya (clamp) di rentang absolut 0.0 - 1.0 demi mencegah fatal AssertionError atau aplikasi crash."
                 }
             ],
             "specialNotes": [
                 "Best Practice: Gunakan CardWidget sebagai komponen kontainer terstruktur untuk form atau informasi detail pada layar yang luas.",
                 "Stateless Design: Komponen ini tidak memiliki internal loading state. Semua logika loading (misalnya pada tombol di footerActions) harus dikelola oleh parent widget melalui state management."
             ],
-            "code": "// 1. Mode Standar (Dengan Auto Scroll)\nCardWidget(\n  title: 'Edit Detail',\n  child: Column(\n    children: [ /* Banyak form input */ ],\n  ),\n  footerActions: [\n    TextButton(onPressed: () {}, child: const Text('Batal')),\n    FilledButton(onPressed: () {}, child: const Text('Simpan')),\n  ],\n)\n\n// 2. Mode Fix (Mematikan Scroll agar sinkron dengan ListView)\nCardWidget(\n  title: 'Daftar Karyawan',\n  isScrollable: false, // MATIKAN AGAR TIDAK KONFLIK\n  child: ListView.separated(\n    shrinkWrap: true,\n    itemCount: 10,\n    itemBuilder: (ctx, i) => Text('Karyawan $i'),\n    separatorBuilder: (ctx, i) => Divider(),\n  ),\n)"
+            "code": "// 1. Mode Standar (Auto Scroll)\nCardWidget(\n  title: 'Edit Detail',\n  child: Column(\n    children: [ /* Form inputs */ ],\n  ),\n  footerActions: [\n    TextButton(onPressed: () {}, child: const Text('Batal')),\n    FilledButton(onPressed: () {}, child: const Text('Simpan')),\n  ],\n)\n\n// 2. Mode Fix (Mematikan Scroll agar sinkron dengan ListView internal)\nCardWidget(\n  title: 'Daftar Karyawan',\n  isScrollable: false, // MATIKAN AGAR TIDAK KONFLIK\n  child: ListView.separated(\n    shrinkWrap: true,\n    itemCount: 10,\n    itemBuilder: (ctx, i) => Text('Karyawan $i'),\n    separatorBuilder: (ctx, i) => const Divider(),\n  ),\n)\n\n// 3. Mode Tema (Warna Soft Harmonis dengan Master Opacity)\nCardWidget(\n  title: 'Operasi Sukses',\n  theme: const CardWidgetTheme.success(opacity: 0.25), // Mix 25%\n  child: const Text('Semua konfigurasi berhasil disimpan ke sistem.'),\n)"
         },
         {
             "id": "socket-helper-chunk-ecosystem",
