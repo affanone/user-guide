@@ -3343,25 +3343,25 @@
                     "name": "toIntSafe",
                     "type": "Object? Extension",
                     "default": "0",
-                    "desc": "Memaksa konversi berbagai tipe data (int, double, String) menjadi integer murni. Mengembalikan 0 jika data null atau gagal di-parse."
+                    "desc": "Memaksa konversi berbagai tipe data (int, double, String) menjadi integer murni. Sangat tangguh karena akan memotong (truncate) sisa desimal dengan aman jika membaca format String pecahan (misal: '12.5' menjadi 12), tanpa memicu error parsing. Mengembalikan 0 jika data null atau sama sekali tidak valid."
                 },
                 {
                     "name": "toDoubleSafe",
                     "type": "Object? Extension",
                     "default": "0.0",
-                    "desc": "Memaksa konversi tipe data menjadi double. Secara otomatis memperbaiki format koma (,) menjadi titik (.) jika data mentah berupa String."
+                    "desc": "Memaksa konversi data menjadi tipe double secara presisi. Tidak sekadar mengganti koma, metode ini dibekali fitur Auto-Guess dan parameter {decimalSeparator} opsional untuk menghindari fatal bug (Double-Dot Exception) saat mem-parsing string dengan pemisah ribuan (contoh: '1,234.50' akan sukses menjadi 1234.5)."
                 },
                 {
                     "name": "normalizeNumber",
                     "type": "Object? Extension",
                     "default": "0",
-                    "desc": "Mem-parsing angka kotor dan mengembalikan tipe turunan num yang paling presisi secara otomatis (int jika angka bulat sempurna, double jika memiliki desimal)."
+                    "desc": "Fungsi cerdas untuk mem-parsing angka menjadi tipe turunan num yang paling efisien/presisi di memori: int jika angkanya bulat sempurna (misal: '15.0' -> 15), atau double jika memiliki nilai pecahan ('15.5' -> 15.5). Sepenuhnya terintegrasi dengan logika pembersihan {decimalSeparator} bawaan toDoubleSafe."
                 },
                 {
                     "name": "extractNumber",
                     "type": "Object? Extension",
                     "default": "fallback (0)",
-                    "desc": "Mengekstrak paksa nilai numerik dari string kotor yang mengandung karakter alfabet, simbol, atau format penulisan nominal yang salah. Mendukung parameter opsional {fallback} jika data rusak total."
+                    "desc": "Mengekstrak paksa nilai numerik dari teks (string) kotor yang mengandung karakter alfabet, simbol, atau format mata uang campuran. Dilengkapi sistem Auto-Guess untuk mengenali format Eropa/Indonesia (1.234,56) atau Amerika (1,234.56). Menyediakan parameter opsional {fallback} sebagai nilai gagal, serta {decimalSeparator} (misal: '.' atau ',') untuk mengaktifkan 'Strict Mode' guna mencegah desimal terhapus pada angka berakhiran nol."
                 }
             ],
             "behaviors": [],
