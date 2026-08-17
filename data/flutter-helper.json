@@ -511,87 +511,126 @@
             "code": "SmartBuilder(\n  builder: (ctx, ctrl) {\n    // 1. LOCAL MEMORY: Inisialisasi variabel tanpa perlu mendefinisikannya di class luar\n    bool isExpanded = control.use('is_expanded', false);\n    int counter = control.use('counter', 0);\n\n    // 2. THEME AWARE: Deteksi mode gelap/terang tanpa Theme.of(context) yang panjang\n    Color textColor = control.isDark ? Colors.white : Colors.black87;\n\n    // 3. RESPONSIVE AWARE: Deteksi ukuran layar seketika\n    double cardWidth = control.isMobile ? double.infinity : 400.0;\n\n    return Container(\n      width: cardWidth,\n      padding: const EdgeInsets.all(16),\n      decoration: BoxDecoration(\n        border: Border.all(color: control.theme.dividerColor),\n        borderRadius: BorderRadius.circular(8),\n      ),\n      child: Column(\n        crossAxisAlignment: CrossAxisAlignment.start,\n        children: [\n          Text(\n            'Device: ${control.isDesktop ? \"Desktop\" : \"Mobile\"}',\n            style: TextStyle(color: textColor, fontWeight: FontWeight.bold),\n          ),\n          const SizedBox(height: 16),\n          Row(\n            children: [\n              ElevatedButton(\n                // Merubah state lokal & memicu rebuild otomatis\n                onPressed: () => control.set('counter', counter + 1),\n                child: Text('Klik: $counter'),\n              ),\n              const SizedBox(width: 8),\n              OutlinedButton(\n                onPressed: () => control.set('is_expanded', !isExpanded),\n                child: Text(isExpanded ? 'Tutup Detail' : 'Buka Detail'),\n              ),\n            ],\n          ),\n          // Merender UI tambahan secara bersyarat berdasarkan state lokal\n          if (isExpanded) ...[\n            const Divider(height: 24),\n            const Text('Ini adalah area detail tersembunyi yang dikontrol oleh Local Memory SmartBuilder!'),\n          ],\n        ],\n      ),\n    );\n  },\n)"
         },
         {
-            "id": "string-text-widget-ext",
+            "id": "TextWidget",
             "group": "Widget",
-            "name": "Text Color",
+            "name": "Semantic Text",
             "icon": "fa-solid fa-palette",
-            "description": "Ekstensi untuk mengubah tipe data String secara langsung menjadi widget Text dengan pewarnaan semantik bawaan. Mengurangi boilerplate code saat membangun UI yang membutuhkan banyak teks berformat.",
-            "mandatoryProps": [],
-            "additionalInfo": {},
+            "description": "Widget teks serbaguna yang menyederhanakan penerapan pewarnaan semantik bawaan. Mendukung penggunaan deklaratif melalui enum `TextWidgetType` maupun pendekatan ringkas lewat `Factory Constructors`. Sangat fleksibel untuk data statis maupun rendering dinamis yang bersumber dari API, serta menghilangkan kebutuhan penulisan boilerplate TextStyle yang berulang.",
+            "mandatoryProps": [
+                {
+                    "name": "text",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Teks utama yang akan dirender ke layar."
+                }
+            ],
             "optionalProps": [
+                {
+                    "name": "type",
+                    "type": "TextWidgetType?",
+                    "default": "null",
+                    "desc": "Menentukan tema warna bawaan melalui enum (primary, secondary, danger, warning, success, info, white, black, muted). Sangat ideal untuk status dinamis dari backend."
+                },
                 {
                     "name": "size",
                     "type": "double?",
+                    "default": "null",
                     "desc": "Mengatur ukuran font teks secara instan tanpa perlu memanggil objek TextStyle penuh."
+                },
+                {
+                    "name": "color",
+                    "type": "Color?",
+                    "default": "null",
+                    "desc": "Menimpa (override) warna secara eksplisit jika Anda membutuhkan warna khusus di luar tema bawaan."
                 },
                 {
                     "name": "style",
                     "type": "TextStyle?",
-                    "desc": "Memberikan kustomisasi gaya tambahan. Jika parameter ini diisi, propertinya akan digabungkan (copyWith) dengan warna default fungsi."
+                    "default": "null",
+                    "desc": "Memberikan kustomisasi gaya tingkat lanjut (seperti fontWeight atau letterSpacing). Propertinya akan digabungkan (copyWith) secara cerdas dengan pengaturan warna default."
+                },
+                {
+                    "name": "textAlign",
+                    "type": "TextAlign?",
+                    "default": "null",
+                    "desc": "Pengaturan perataan teks (kiri, tengah, kanan, atau justify)."
+                },
+                {
+                    "name": "maxLines",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Membatasi jumlah baris maksimal teks yang ditampilkan."
+                },
+                {
+                    "name": "overflow",
+                    "type": "TextOverflow?",
+                    "default": "null",
+                    "desc": "Menentukan perilaku teks saat melebihi batas (contoh: TextOverflow.ellipsis)."
                 }
             ],
             "methods": [
                 {
-                    "name": "textPrimary",
-                    "type": "String Extension",
+                    "name": "TextWidget.primary",
+                    "type": "Factory Constructor",
                     "default": "Colors.blue",
                     "desc": "Menghasilkan widget Text dengan warna utama (biru). Digunakan untuk teks aksi atau highlight utama."
                 },
                 {
-                    "name": "textSecondary",
-                    "type": "String Extension",
+                    "name": "TextWidget.secondary",
+                    "type": "Factory Constructor",
                     "default": "Colors.grey",
                     "desc": "Menghasilkan widget Text dengan warna sekunder (abu-abu). Digunakan untuk teks pendukung."
                 },
                 {
-                    "name": "textDanger",
-                    "type": "String Extension",
+                    "name": "TextWidget.danger",
+                    "type": "Factory Constructor",
                     "default": "Colors.red",
                     "desc": "Menghasilkan widget Text dengan warna bahaya/error (merah). Digunakan untuk peringatan kritis atau validasi gagal."
                 },
                 {
-                    "name": "textWarning",
-                    "type": "String Extension",
+                    "name": "TextWidget.warning",
+                    "type": "Factory Constructor",
                     "default": "Colors.orange",
                     "desc": "Menghasilkan widget Text dengan warna peringatan (oranye). Digunakan untuk status tertunda atau atensi medium."
                 },
                 {
-                    "name": "textSuccess",
-                    "type": "String Extension",
+                    "name": "TextWidget.success",
+                    "type": "Factory Constructor",
                     "default": "Colors.green",
                     "desc": "Menghasilkan widget Text dengan warna sukses (hijau). Digunakan untuk indikator berhasil atau konfirmasi positif."
                 },
                 {
-                    "name": "textInfo",
-                    "type": "String Extension",
+                    "name": "TextWidget.info",
+                    "type": "Factory Constructor",
                     "default": "Colors.lightBlue",
                     "desc": "Menghasilkan widget Text dengan warna informatif (biru muda). Digunakan untuk petunjuk atau informasi tambahan."
                 },
                 {
-                    "name": "textWhite",
-                    "type": "String Extension",
+                    "name": "TextWidget.white",
+                    "type": "Factory Constructor",
                     "default": "Colors.white",
                     "desc": "Menghasilkan widget Text berwarna putih. Digunakan sebagai kontras di atas background gelap."
                 },
                 {
-                    "name": "textBlack",
-                    "type": "String Extension",
+                    "name": "TextWidget.black",
+                    "type": "Factory Constructor",
                     "default": "Colors.black",
                     "desc": "Menghasilkan widget Text berwarna hitam. Digunakan untuk teks solid di background terang."
                 },
                 {
-                    "name": "textMuted",
-                    "type": "String Extension",
+                    "name": "TextWidget.muted",
+                    "type": "Factory Constructor",
                     "default": "Colors.grey.shade600",
                     "desc": "Menghasilkan widget Text dengan warna abu-abu redup. Digunakan untuk teks yang tidak perlu menarik perhatian penuh, seperti timestamp atau metadata."
                 }
             ],
+            "additionalInfo": {},
             "behaviors": [],
             "specialNotes": [
-                "Efisiensi Render: Ekstensi ini menggunakan metode private _buildText terpusat untuk meminimalisir redundansi kode. Jangan mengubah alur logika copyWith di dalamnya agar tidak terjadi alokasi memori berlebih saat me-render list dalam jumlah masif.",
-                "Hierarki Gaya (Style Priority): Parameter 'size' memiliki prioritas eksekusi. Jika 'style' juga memiliki definisi 'fontSize' atau 'color', logika ekstensi akan menimpanya secara presisi sesuai warna default fungsi untuk menjaga konsistensi UI."
+                "Hierarki Gaya (Style Priority): Terdapat 3 tingkat prioritas penentuan warna. Jika warna disuntikkan secara eksplisit melalui parameter 'style.color' atau parameter 'color', maka nilai tersebut menjadi prioritas absolut. Jika tidak ada, barulah sistem akan menerapkan fallback warna semantik bawaan dari parameter 'type'.",
+                "Backward Compatibility: Berkat pola arsitektur Factory Constructor, perubahan ke sistem tipe enum ini tidak merusak (breaking change) kode lama Anda. Pemanggilan TextWidget.danger() akan secara otomatis memetakan dirinya ke TextWidgetType.danger di balik layar."
             ],
-            "code": "String title = 'Konfirmasi Penghapusan';\nWidget titleWidget = title.textDanger(size: 18.0);\n\nString successMsg = 'Data berhasil disimpan';\nWidget customWidget = successMsg.textSuccess(\n  style: const TextStyle(fontWeight: FontWeight.bold),\n);"
+            "code": "// 1. Penggunaan Standar dengan Enum (Sangat cocok untuk data dinamis)\nTextWidget(\n  'Transaksi Gagal',\n  type: TextWidgetType.danger,\n  size: 16.0,\n)\n\n// 2. Penggunaan dengan Factory Constructor (Gaya Cepat & Ringkas)\nTextWidget.success(\n  'Data berhasil disimpan',\n  style: const TextStyle(fontWeight: FontWeight.bold),\n)\n\n// 3. Pengesampingan Prioritas (Override)\nTextWidget(\n  'Warna Custom',\n  type: TextWidgetType.warning, // Seharusnya Oranye...\n  color: Colors.purple,         // ...tapi digantikan oleh Ungu karena prioritas 'color' lebih tinggi\n)"
         },
         {
             "id": "TableWidget",
