@@ -460,31 +460,31 @@
             "mandatoryProps": [
                 {
                     "name": "builder",
-                    "type": "Widget Function(BuildContext context, SmartCtx ctrl)",
+                    "type": "Widget Function(BuildContext context, SmartBuilderControl control)",
                     "default": "",
-                    "desc": "Fungsi utama yang bertugas merender UI. Menyediakan `BuildContext` standar dan `SmartCtx` (controller super) yang berisi utilitas responsif, tema, dan local state memory."
+                    "desc": "Fungsi utama yang bertugas merender UI. Menyediakan `BuildContext` standar dan `SmartBuilderControl` (controller super) yang berisi utilitas responsif, tema, dan local state memory."
                 }
             ],
             "optionalProps": [],
             "additionalInfo": {
                 "styling": "SmartBuilder murni bertindak sebagai 'Logic Engine' atau 'Invisible Wrapper'. Ia sama sekali tidak menambahkan elemen visual bawaan seperti Padding, Margin, Container, atau Color, sehingga tata letak desain aslimu tetap 100% terjaga.",
-                "animation": "Sangat aman dipadukan dengan implicit animations (seperti AnimatedContainer atau AnimatedSize). Rebuild lokal yang dipicu oleh ctrl.set() akan menjalankan animasi dengan mulus tanpa mengganggu elemen di luarnya."
+                "animation": "Sangat aman dipadukan dengan implicit animations (seperti AnimatedContainer atau AnimatedSize). Rebuild lokal yang dipicu oleh control.set() akan menjalankan animasi dengan mulus tanpa mengganggu elemen di luarnya."
             },
             "methods": [
                 {
-                    "name": "ctrl.use<T>(String key, T initialValue)",
+                    "name": "control.use<T>(String key, T initialValue)",
                     "type": "T",
                     "default": "",
                     "desc": "Mengambil atau mendaftarkan variabel lokal ke dalam memori widget. Jika 'key' belum ada, nilai initialValue akan disimpan. Mengembalikan nilai bertipe T. Sangat berguna untuk boolean toggle atau counter."
                 },
                 {
-                    "name": "ctrl.set<T>(String key, T newValue)",
+                    "name": "control.set<T>(String key, T newValue)",
                     "type": "void",
                     "default": "",
                     "desc": "Memperbarui nilai variabel di dalam memori berdasarkan 'key', dan secara otomatis memicu render ulang (rebuild) HANYA pada bagian dalam SmartBuilder tersebut."
                 },
                 {
-                    "name": "ctrl.update(VoidCallback fn)",
+                    "name": "control.update(VoidCallback fn)",
                     "type": "void",
                     "default": "",
                     "desc": "Menjalankan fungsi dan memicu setState manual secara lokal. Bertindak persis seperti setState bawaan Flutter."
@@ -495,20 +495,20 @@
                     "name": "Responsive & Theme Aware",
                     "type": "Environment Detection",
                     "default": "",
-                    "desc": "SmartCtx secara instan menyediakan getter praktis: `isMobile`, `isTablet`, `isDesktop` untuk tata letak layar, `size` untuk dimensi absolut, `constraints` untuk batas ruang yang tersedia, serta `isDark` dan `theme` untuk deteksi mode gelap/terang."
+                    "desc": "SmartBuilderControl secara instan menyediakan getter praktis: `isMobile`, `isTablet`, `isDesktop` untuk tata letak layar, `size` untuk dimensi absolut, `constraints` untuk batas ruang yang tersedia, serta `isDark` dan `theme` untuk deteksi mode gelap/terang."
                 },
                 {
                     "name": "Localized Rebuild (Isolasi Render)",
                     "type": "Performance Optimization",
                     "default": "",
-                    "desc": "Saat state diubah menggunakan `ctrl.set()`, Flutter hanya akan merender ulang (rebuild) widget yang ada di dalam builder ini saja. Komponen parent (seperti AppBar, Background, Header) tidak akan ikut berkedip atau terbebani."
+                    "desc": "Saat state diubah menggunakan `control.set()`, Flutter hanya akan merender ulang (rebuild) widget yang ada di dalam builder ini saja. Komponen parent (seperti AppBar, Background, Header) tidak akan ikut berkedip atau terbebani."
                 }
             ],
             "specialNotes": [
                 "Meskipun memiliki state lokal mandiri, SmartBuilder tetap mematuhi prinsip Cascade Rebuild. Jika parent widget memicu `setState`, SmartBuilder akan ikut ter-update secara otomatis membaca variabel global yang baru.",
                 "Sangat disarankan sebagai pengganti widget bawaan `Builder` atau penggunaan Helper Method (fungsi yang mengembalikan Widget) guna menghindari Spaghetti Code pada method utama `build()`."
             ],
-            "code": "SmartBuilder(\n  builder: (ctx, ctrl) {\n    // 1. LOCAL MEMORY: Inisialisasi variabel tanpa perlu mendefinisikannya di class luar\n    bool isExpanded = ctrl.use('is_expanded', false);\n    int counter = ctrl.use('counter', 0);\n\n    // 2. THEME AWARE: Deteksi mode gelap/terang tanpa Theme.of(context) yang panjang\n    Color textColor = ctrl.isDark ? Colors.white : Colors.black87;\n\n    // 3. RESPONSIVE AWARE: Deteksi ukuran layar seketika\n    double cardWidth = ctrl.isMobile ? double.infinity : 400.0;\n\n    return Container(\n      width: cardWidth,\n      padding: const EdgeInsets.all(16),\n      decoration: BoxDecoration(\n        border: Border.all(color: ctrl.theme.dividerColor),\n        borderRadius: BorderRadius.circular(8),\n      ),\n      child: Column(\n        crossAxisAlignment: CrossAxisAlignment.start,\n        children: [\n          Text(\n            'Device: ${ctrl.isDesktop ? \"Desktop\" : \"Mobile\"}',\n            style: TextStyle(color: textColor, fontWeight: FontWeight.bold),\n          ),\n          const SizedBox(height: 16),\n          Row(\n            children: [\n              ElevatedButton(\n                // Merubah state lokal & memicu rebuild otomatis\n                onPressed: () => ctrl.set('counter', counter + 1),\n                child: Text('Klik: $counter'),\n              ),\n              const SizedBox(width: 8),\n              OutlinedButton(\n                onPressed: () => ctrl.set('is_expanded', !isExpanded),\n                child: Text(isExpanded ? 'Tutup Detail' : 'Buka Detail'),\n              ),\n            ],\n          ),\n          // Merender UI tambahan secara bersyarat berdasarkan state lokal\n          if (isExpanded) ...[\n            const Divider(height: 24),\n            const Text('Ini adalah area detail tersembunyi yang dikontrol oleh Local Memory SmartBuilder!'),\n          ],\n        ],\n      ),\n    );\n  },\n)"
+            "code": "SmartBuilder(\n  builder: (ctx, ctrl) {\n    // 1. LOCAL MEMORY: Inisialisasi variabel tanpa perlu mendefinisikannya di class luar\n    bool isExpanded = control.use('is_expanded', false);\n    int counter = control.use('counter', 0);\n\n    // 2. THEME AWARE: Deteksi mode gelap/terang tanpa Theme.of(context) yang panjang\n    Color textColor = control.isDark ? Colors.white : Colors.black87;\n\n    // 3. RESPONSIVE AWARE: Deteksi ukuran layar seketika\n    double cardWidth = control.isMobile ? double.infinity : 400.0;\n\n    return Container(\n      width: cardWidth,\n      padding: const EdgeInsets.all(16),\n      decoration: BoxDecoration(\n        border: Border.all(color: control.theme.dividerColor),\n        borderRadius: BorderRadius.circular(8),\n      ),\n      child: Column(\n        crossAxisAlignment: CrossAxisAlignment.start,\n        children: [\n          Text(\n            'Device: ${control.isDesktop ? \"Desktop\" : \"Mobile\"}',\n            style: TextStyle(color: textColor, fontWeight: FontWeight.bold),\n          ),\n          const SizedBox(height: 16),\n          Row(\n            children: [\n              ElevatedButton(\n                // Merubah state lokal & memicu rebuild otomatis\n                onPressed: () => control.set('counter', counter + 1),\n                child: Text('Klik: $counter'),\n              ),\n              const SizedBox(width: 8),\n              OutlinedButton(\n                onPressed: () => control.set('is_expanded', !isExpanded),\n                child: Text(isExpanded ? 'Tutup Detail' : 'Buka Detail'),\n              ),\n            ],\n          ),\n          // Merender UI tambahan secara bersyarat berdasarkan state lokal\n          if (isExpanded) ...[\n            const Divider(height: 24),\n            const Text('Ini adalah area detail tersembunyi yang dikontrol oleh Local Memory SmartBuilder!'),\n          ],\n        ],\n      ),\n    );\n  },\n)"
         },
         {
             "id": "string-text-widget-ext",
