@@ -2655,6 +2655,11 @@
             },
             "methods": [
                 {
+                    "name": "getWidth(context)",
+                    "returnType": "double",
+                    "desc": "Mendapatkan nilai absolut lebar layar saat ini menggunakan `MediaQuery.sizeOf(context).width`. Berkinerja tinggi dan terhindar dari rebuild tree yang tidak perlu akibat perubahan non-dimensi (seperti kemunculan keyboard)."
+                },
+                {
                     "name": "breakpoint(context, {width})",
                     "returnType": "Breakpoint",
                     "desc": "Mendapatkan nilai enum `Breakpoint` aktif secara instan berdasarkan ukuran layar saat ini."
@@ -2697,7 +2702,7 @@
                 "Selalu letakkan pemanggilan fungsi ini langsung di dalam method `build` agar widget dapat bereaksi instan saat resolusi perangkat berubah.",
                 "Tidak perlu menyuplai setiap breakpoint. Cukup suplai `initialValue` dan titik di mana perubahan tata letak diperlukan (misalnya hanya di `md` dan `lg`)."
             ],
-            "code": "Widget build(BuildContext context) {\n  final crossAxisCount = Responsive.value<int>(\n    context,\n    initialValue: 2,\n    md: 3,\n    lg: 4,\n    xxl: 6,\n  );\n\n  final padding = Responsive.value<double>(\n    context,\n    initialValue: 16.0,\n    md: 24.0,\n    xl: 32.0,\n  );\n\n  final showSidebar = Responsive.isResponsive(\n    context,\n    initialValue: false,\n    lg: true,\n  );\n\n  return Scaffold(\n    body: GridView.count(\n      padding: EdgeInsets.all(padding),\n      crossAxisCount: crossAxisCount,\n      children: [ /* Komponen Grid */ ],\n    ),\n  );\n}"
+            "code": "Widget build(BuildContext context) {\n  final currentWidth = Responsive.getWidth(context);\n\n  final crossAxisCount = Responsive.value<int>(\n    context,\n    initialValue: 2,\n    md: 3,\n    lg: 4,\n    xxl: 6,\n  );\n\n  final padding = Responsive.value<double>(\n    context,\n    initialValue: 16.0,\n    md: 24.0,\n    xl: 32.0,\n  );\n\n  final showSidebar = Responsive.isResponsive(\n    context,\n    initialValue: false,\n    lg: true,\n  );\n\n  return Scaffold(\n    body: GridView.count(\n      padding: EdgeInsets.all(padding),\n      crossAxisCount: crossAxisCount,\n      children: [ /* Komponen Grid */ ],\n    ),\n  );\n}"
         },
         {
             "id": "CropWidget",
