@@ -608,7 +608,7 @@
             "group": "Widget",
             "name": "Table Widget Engine",
             "icon": "fa-solid fa-table",
-            "description": "Widget tabel tingkat lanjut yang responsif dan berkinerja tinggi berbasis LayoutBuilder dan ListView. Mendukung penyesuaian lebar kolom otomatis berbasis pengukuran teks (TextPainter) dengan pembatasan min/max, pengguliran horizontal dan vertikal yang tersinkronisasi, baris judul yang lengket (sticky header), efek zebra interaktif saat kursor diarahkan (hover), serta parsing berbasis notasi rentang ala Excel untuk penyesuaian gaya kolom, sel spesifik, dan tinggi baris.",
+            "description": "Widget tabel tingkat lanjut yang responsif dan berkinerja tinggi yang kini ditenagai oleh mesin Material DataTable bawaan Flutter. Mendukung penyesuaian lebar kolom otomatis berbasis pengukuran teks (TextPainter) dengan pembatasan min/max, pemaksaan lebar minimum layar penuh 100% menggunakan ConstrainedBox (tetap dapat di-scroll horizontal jika meluber), efek zebra interaktif native via WidgetStateProperty, serta pemetaan gaya cerdas berbasis rentang ala Excel untuk sel, kolom, dan tinggi baris secara mulus tanpa celah bawaan (zero column spacing).",
             "mandatoryProps": [
                 {
                     "name": "columns",
@@ -628,13 +628,13 @@
                     "name": "style",
                     "type": "TableStyle",
                     "default": "const TableStyle()",
-                    "desc": "Konfigurasi gaya global tabel seperti dekorasi kontainer, gaya teks, warna latar sel/judul, padding, tinggi baris/judul, perilaku responsif, serta pengaturan sticky header dan hover zebra."
+                    "desc": "Konfigurasi gaya global tabel seperti dekorasi kontainer, gaya teks, warna latar sel/judul, padding, tinggi baris/judul, perilaku responsif, serta pengaturan status interaktif hover zebra."
                 },
                 {
                     "name": "columnStyles",
                     "type": "List<ColumnStyle>",
                     "default": "const []",
-                    "desc": "Daftar konfigurasi spesifik untuk kolom tertentu. Menggunakan notasi rentang indeks kolom ala Excel (misalnya, 'A', 'A-C', 'A, C') untuk mengatur perataan, dekorasi, dan gaya teks."
+                    "desc": "Daftar konfigurasi spesifik untuk kolom tertentu. Menggunakan notasi rentang indeks kolom ala Excel (misalnya, 'A', 'A-C', 'A, C') untuk mengatur perataan, dekorasi, dan gaya teks ke dalam DataColumn dan DataCell."
                 },
                 {
                     "name": "dataStyles",
@@ -656,8 +656,8 @@
                 }
             ],
             "additionalInfo": {
-                "styling": "Tabel secara bawaan dibungkus dalam Container dengan batas (border) abu-abu terang (grey.shade300), memiliki radius kelengkungan sudut sebesar 8, dan kliping anti-alias aktif untuk memastikan sudut melingkar terpotong rapi.",
-                "animation": "Pembaruan visual baris data saat status hover berubah dikelola secara efisien menggunakan RepaintBoundary guna mengisolasi proses render ulang pada baris yang terpengaruh saja."
+                "styling": "Tabel secara bawaan dibungkus dalam Container dengan batas (border) dari warna divider bawaan tema, memiliki radius kelengkungan sudut sebesar 8, kotak bayangan halus (box shadow), dan kliping anti-alias (ClipRRect) yang memotong ujung header DataTable dengan rapi.",
+                "animation": "Pembaruan visual baris data saat status hover berubah kini dikelola secara native dan teroptimasi menggunakan WidgetStateProperty bawaan DataTable, sehingga tidak lagi memerlukan widget MouseRegion maupun RepaintBoundary manual."
             },
             "methods": [
                 {
@@ -676,7 +676,7 @@
                     "name": "_calculateColumnWidths",
                     "type": "void",
                     "default": "",
-                    "desc": "Menghitung lebar setiap kolom secara dinamis. Mendahulukan lebar manual dari user, mengukur panjang teks sampel (maksimal 50 baris pertama) menggunakan TextPainter, membatasi nilainya dengan clamp min/max width, dan membagikan sisa ruang kosong layar secara merata jika fitur responsif aktif."
+                    "desc": "Menghitung lebar setiap kolom secara dinamis dengan LayoutBuilder. Mendahulukan lebar manual dari user, mengukur panjang teks sampel menggunakan TextPainter dengan clamp min/max width, dan mendistribusikan sisa ruang kosong layar jika responsif aktif."
                 },
                 {
                     "name": "_measureTextWidth",
@@ -712,13 +712,13 @@
                     "name": "TableRangeParser.isCellInRange",
                     "type": "static bool",
                     "default": "",
-                    "desc": "Mengevaluasi apakah koordinat baris (1-indexed) dan kolom (0-indexed) tertentu berada di dalam string pola rentang Excel (mendukung format kolom penuh 'A', rentang kolom 'A-Z', sel tunggal 'A1', maupun rentang blok area 'A1-B5')."
+                    "desc": "Mengevaluasi apakah koordinat baris (1-indexed) dan kolom (0-indexed) tertentu berada di dalam string pola rentang Excel."
                 },
                 {
                     "name": "TableCellResolver.resolve",
                     "type": "static Widget",
                     "default": "",
-                    "desc": "Fungsi resolusi komponen sel. Mengembalikan SizedBox.shrink jika null, merender langsung jika berupa Widget, menampilkan ikon khusus untuk tipe Boolean (Check/Cancel), memformat objek DateTime dengan format 'dd MMM yyyy HH:mm', dan menampilkan komponen Text dengan pembatasan elipsis untuk tipe data lainnya."
+                    "desc": "Fungsi resolusi komponen sel. Mengembalikan SizedBox.shrink jika null, merender langsung jika berupa Widget, menampilkan ikon Boolean otomatis, memformat DateTime, dan menangani elipsis teks."
                 }
             ],
             "behaviors": [
@@ -726,27 +726,33 @@
                     "name": "Normalisasi Data Otomatis",
                     "type": "Engine Data Alignment",
                     "default": "",
-                    "desc": "TableEngine secara otomatis menghitung panjang kolom maksimum dari baris data mentah yang diberikan. Baris yang kekurangan elemen atau kolom tajuk yang lebih pendek akan secara otomatis diisi dengan string kosong ('') untuk mencegah terjadinya error akibat indeks di luar jangkauan (out of bounds)."
+                    "desc": "TableEngine secara otomatis menghitung panjang kolom maksimum. Baris atau kolom tajuk yang kekurangan elemen akan diisi string kosong ('') untuk menyelaraskan matriks DataTable."
                 },
                 {
-                    "name": "Hover Zebra Interaktif",
+                    "name": "Integrasi Gaya Sel Tanpa Celah (Zero Spacing)",
+                    "type": "UI Layout Hack",
+                    "default": "",
+                    "desc": "Dengan menyetel columnSpacing: 0 dan horizontalMargin: 0 pada konfigurasi DataTable, margin bawaan material dihilangkan. Properti padding dan warna background dari DataStyle diterapkan pada level Container di dalam DataCell, memungkinkannya membentang penuh 100% pada setiap sel."
+                },
+                {
+                    "name": "Hover Zebra Interaktif Native",
                     "type": "UI Interactive State",
                     "default": "",
-                    "desc": "Jika enableHoverZebra aktif, widget memanfaatkan MouseRegion pada setiap baris data untuk memperbarui state indeks baris yang sedang disorot kursor, mengubah warna latar belakangnya menjadi warna hover tema (Theme.of(context).hoverColor), dan mengembalikan warna sel selang-seling (alternate) ketika kursor keluar."
+                    "desc": "Jika enableHoverZebra aktif, warna baris dikendalikan menggunakan WidgetStateProperty.resolveWith pada properti color DataRow. Secara native baris merespons WidgetState.hovered dan menggambar garis loreng (zebra) berdasarkan indeks genap-ganjil."
                 },
                 {
-                    "name": "Sticky Header Alignment",
+                    "name": "Pemaksaan Lebar Minimum 100% (Responsive Min-Width)",
                     "type": "UI Layout Composition",
                     "default": "",
-                    "desc": "Jika stickyHeader bernilai true, kontainer judul tabel diposisikan secara tetap di luar ListView tubuh tabel di dalam komponen Column utama. Jika false, baris judul dimasukkan sebagai elemen pertama di dalam Scrollable Column terintegrasi."
+                    "desc": "DataTable dibungkus dengan ConstrainedBox yang memaksa minWidth mengikuti constraints.maxWidth layar. Hal ini memastikan tabel tidak menyusut jika kolomnya sedikit, namun tetap bisa di-scroll secara horizontal mulus jika kontennya meluber melewati layar."
                 }
             ],
             "specialNotes": [
-                "Pengukuran lebar otomatis menggunakan TextPainter hanya mengambil sampel maksimal 50 baris pertama dari data (`min(50, data.length)`) demi menjaga efisiensi performa rendering tabel berukuran besar.",
-                "Notasi indeks baris pada konfigurasi heightRows dan dataStyles mengadopsi standar Excel berbasis 1 (baris pertama adalah 1), sedangkan indeks baris pada visualisasi internal Flutter dikonversi ke berbasis 0. Fungsi parser internal menangani penyesuaian delta indeks ini secara otomatis (`rowIndex + 1`).",
-                "Komponen sel dibungkus dengan komponen Align yang secara bawaan memiliki perataan kiri-tengah (`Alignment.centerLeft`) kecuali dioverride secara eksplisit lewat konfigurasi ColumnStyle atau DataStyle."
+                "Pengukuran lebar otomatis menggunakan TextPainter hanya mengambil sampel maksimal 50 baris pertama dari data (`min(50, data.length)`) demi menjaga efisiensi performa rendering.",
+                "Notasi indeks baris pada konfigurasi heightRows dan dataStyles mengadopsi standar Excel berbasis 1 (baris pertama adalah 1), sedangkan iterasi pada visualisasi internal DataTable Flutter dikonversi ke berbasis 0.",
+                "Konsep `stickyHeader` secara otomatis tertangani karena seluruh `DataTable` digulir bersamaan secara vertikal di dalam `SingleChildScrollView` utama."
             ],
-            "code": "import 'package:flutter/material.dart';\n\n// Contoh implementasi penggunaan TableWidget dengan berbagai konfigurasi gaya\nWidget myCustomTable(BuildContext context) {\n  return TableWidget(\n    columns: const ['Nama Produk', 'Kode', 'Tersedia', 'Tanggal Rilis', 'Harga'],\n    data: const [\n      ['Laptop Asus ROG', 'A001', true, '2026-03-15 10:00:00', 'Rp 25.000.000'],\n      ['Samsung Galaxy S26', 'B002', true, '2026-01-20 08:30:00', 'Rp 18.500.000'],\n      ['Apple iPhone 17', 'C003', false, '2025-09-12 18:00:00', 'Rp 21.000.000'],\n      ['Xiaomi Ultra Smart', 'D004', true, '2026-05-05 14:15:00', 'Rp 12.000.000'],\n    ],\n    style: TableStyle(\n      minColumnWidth: 100.0,\n      maxColumnWidth: 250.0,\n      headerHeight: 55.0,\n      defaultRowHeight: 48.0,\n      stickyHeader: true,\n      enableHoverZebra: true,\n      alternateCellBackgroundColor: Colors.blue.withOpacity(0.02),\n      headerBackgroundColor: Colors.blueGrey.shade900,\n      headerTextStyle: const TextStyle(\n        color: Colors.white,\n        fontWeight: FontWeight.bold,\n        fontSize: 14,\n      ),\n    ),\n    columnStyles: const [\n      ColumnStyle(\n        columnIndex: 'B, C', // Mengatur kolom Kode dan Tersedia ke posisi tengah\n        alignment: Alignment.center,\n      ),\n      ColumnStyle(\n        columnIndex: 'E', // Kolom harga diset rata kanan\n        alignment: Alignment.centerRight,\n        textStyle: TextStyle(fontWeight: FontWeight.w600, color: Colors.indigo),\n      ),\n    ],\n    dataStyles: [\n      DataStyle(\n        range: 'C2', // Contoh spesifik memberikan warna background merah transparan pada produk yang tidak tersedia\n        backgroundColor: Colors.red.shade50,\n        textStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),\n      ),\n      DataStyle(\n        range: 'A1-E1', // Memberikan dekorasi tebal khusus pada baris pertama data\n        textStyle: const TextStyle(fontWeight: FontWeight.bold),\n      ),\n    ],\n    widthColumns: const [\n      WidthColumn(columnIndex: 'A', width: 200.0), // Memaksa kolom nama memiliki lebar 200\n      WidthColumn(columnIndex: 'B', width: 90.0),\n    ],\n    heightRows: const [\n      HeightRow(rowIndex: '1', height: 60.0), // Memaksa baris pertama data memiliki tinggi khusus\n    ],\n  );\n}"
+            "code": "import 'package:flutter/material.dart';\n\n// Contoh implementasi penggunaan TableWidget dengan berbagai konfigurasi gaya\nWidget myCustomTable(BuildContext context) {\n  return TableWidget(\n    columns: const ['Nama Produk', 'Kode', 'Tersedia', 'Tanggal Rilis', 'Harga'],\n    data: const [\n      ['Laptop Asus ROG', 'A001', true, DateTime.parse('2026-03-15 10:00:00'), 'Rp 25.000.000'],\n      ['Samsung Galaxy S26', 'B002', true, DateTime.parse('2026-01-20 08:30:00'), 'Rp 18.500.000'],\n      ['Apple iPhone 17', 'C003', false, DateTime.parse('2025-09-12 18:00:00'), 'Rp 21.000.000'],\n      ['Xiaomi Ultra Smart', 'D004', true, DateTime.parse('2026-05-05 14:15:00'), 'Rp 12.000.000'],\n    ],\n    style: TableStyle(\n      minColumnWidth: 100.0,\n      maxColumnWidth: 250.0,\n      headerHeight: 55.0,\n      defaultRowHeight: 48.0,\n      enableHoverZebra: true,\n      alternateCellBackgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),\n      headerBackgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,\n      headerTextStyle: const TextStyle(\n        fontWeight: FontWeight.bold,\n        fontSize: 14,\n      ),\n    ),\n    columnStyles: const [\n      ColumnStyle(\n        columnIndex: 'B, C', // Mengatur kolom Kode dan Tersedia ke posisi tengah\n        alignment: Alignment.center,\n      ),\n      ColumnStyle(\n        columnIndex: 'E', // Kolom harga diset rata kanan\n        alignment: Alignment.centerRight,\n        textStyle: TextStyle(fontWeight: FontWeight.w600, color: Colors.indigo),\n      ),\n    ],\n    dataStyles: [\n      DataStyle(\n        range: 'C2', // Contoh spesifik memberikan warna background merah transparan pada produk yang tidak tersedia\n        backgroundColor: Colors.red.shade50,\n        textStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),\n      ),\n      DataStyle(\n        range: 'A1-E1', // Memberikan dekorasi tebal khusus pada baris pertama data\n        textStyle: const TextStyle(fontWeight: FontWeight.bold),\n      ),\n    ],\n    widthColumns: const [\n      WidthColumn(columnIndex: 'A', width: 200.0), // Memaksa kolom nama memiliki lebar 200\n      WidthColumn(columnIndex: 'B', width: 90.0),\n    ],\n    heightRows: const [\n      HeightRow(rowIndex: '1', height: 60.0), // Memaksa baris pertama data memiliki tinggi khusus\n    ],\n  );\n}"
         },
         {
             "id": "AnimationWidget",
