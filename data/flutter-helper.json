@@ -604,155 +604,206 @@
             "code": "// 1. Format teks tebal & miring\nTextWidget.primary(\n  'Informasi Penting',\n  bold: true,\n  italic: true,\n  size: 16.0,\n)\n\n// 2. Format harga coret (Strikethrough)\nTextWidget.muted(\n  'Rp 150.000',\n  strikethrough: true,\n  italic: true,\n)\n\n// 3. Kombinasi Garis Bawah & Coret\nTextWidget.danger(\n  'Dilarang Masuk',\n  bold: true,\n  underline: true,\n  strikethrough: true,\n)"
         },
         {
-            "id": "TableWidget",
-            "group": "Widget",
-            "name": "Table Widget Engine",
-            "icon": "fa-solid fa-table",
-            "description": "Widget tabel tingkat lanjut yang responsif dan berkinerja tinggi yang kini ditenagai oleh mesin Material DataTable bawaan Flutter. Mendukung penyesuaian lebar kolom otomatis berbasis pengukuran teks (TextPainter) dengan pembatasan min/max, pemaksaan lebar minimum layar penuh 100% menggunakan ConstrainedBox (tetap dapat di-scroll horizontal jika meluber), efek zebra interaktif native via WidgetStateProperty, serta pemetaan gaya cerdas berbasis rentang ala Excel untuk sel, kolom, dan tinggi baris secara mulus tanpa celah bawaan (zero column spacing).",
-            "mandatoryProps": [
+            "widget_name": "TableWidget",
+            "version": "2.0.0",
+            "description": "Widget tabel data tingkat lanjut dengan dukungan seleksi bergaya Excel (A1, A-C, 1-3), lebar kolom dinamis, dan sistem tema bawaan (TableTheme).",
+            "main_properties": [
                 {
                     "name": "columns",
                     "type": "List<dynamic>",
-                    "default": "",
-                    "desc": "Kumpulan data mentah untuk kolom tabel. Panjang list ini menentukan jumlah kolom awal pada tabel sebelum proses normalisasi."
+                    "required": true,
+                    "description": "Daftar data untuk header kolom. Bisa berupa String atau Widget.",
+                    "example": "['No', 'Nama', 'Umur', 'Aksi']"
                 },
                 {
                     "name": "data",
                     "type": "List<List<dynamic>>",
-                    "default": "",
-                    "desc": "Kumpulan data matriks dua dimensi mentah untuk baris tabel. Setiap baris akan dinormalisasi secara otomatis agar sesuai dengan jumlah kolom maksimum tabel."
-                }
-            ],
-            "optionalProps": [
+                    "required": true,
+                    "description": "Data baris tabel dua dimensi. Tipe data bisa berupa String, DateTime, boolean (otomatis jadi Icon), atau Widget.",
+                    "example": "[['1', 'Andi', 24, true], ['2', 'Budi', 30, false]]"
+                },
                 {
                     "name": "style",
                     "type": "TableStyle",
-                    "default": "const TableStyle()",
-                    "desc": "Konfigurasi gaya global tabel seperti dekorasi kontainer, gaya teks, warna latar sel/judul, padding, tinggi baris/judul, perilaku responsif, serta pengaturan status interaktif hover zebra."
+                    "required": false,
+                    "default": "TableTheme.standard(context)",
+                    "description": "Pengaturan gaya tabel. Dapat menggunakan tema instan dari TableTheme atau mengatur TableStyle kustom."
                 },
                 {
                     "name": "columnStyles",
                     "type": "List<ColumnStyle>",
-                    "default": "const []",
-                    "desc": "Daftar konfigurasi spesifik untuk kolom tertentu. Menggunakan notasi rentang indeks kolom ala Excel (misalnya, 'A', 'A-C', 'A, C') untuk mengatur perataan, dekorasi, dan gaya teks ke dalam DataColumn dan DataCell."
+                    "required": false,
+                    "description": "Kustomisasi spesifik untuk kolom tertentu (misal: mengatur alignment kolom B)."
                 },
                 {
                     "name": "dataStyles",
                     "type": "List<DataStyle>",
-                    "default": "const []",
-                    "desc": "Daftar konfigurasi dekorasi dan gaya teks untuk sel atau rentang sel data tertentu. Rentang didefinisikan dengan ekspresi string ala Excel (misalnya, 'A1', 'A1-B5', 'C')."
+                    "required": false,
+                    "description": "Kustomisasi spesifik untuk rentang sel/data tertentu menggunakan notasi Excel (misal: 'B2-C5')."
                 },
                 {
                     "name": "widthColumns",
                     "type": "List<WidthColumn>",
-                    "default": "const []",
-                    "desc": "Koleksi spesifikasi lebar khusus untuk kolom tertentu yang diidentifikasi melalui notasi string alfabet indeks kolom Excel."
+                    "required": false,
+                    "description": "Pengaturan lebar statis untuk kolom tertentu (misal: Kolom A lebarnya 50)."
                 },
                 {
                     "name": "heightRows",
                     "type": "List<HeightRow>",
-                    "default": "const []",
-                    "desc": "Koleksi spesifikasi tinggi khusus untuk baris tertentu yang diidentifikasi dengan string indeks baris berbasis 1 (1-indexed)."
+                    "required": false,
+                    "description": "Pengaturan tinggi baris statis untuk baris tertentu (misal: Baris 1-3 tingginya 100)."
                 }
             ],
-            "additionalInfo": {
-                "styling": "Tabel secara bawaan dibungkus dalam Container dengan batas (border) dari warna divider bawaan tema, memiliki radius kelengkungan sudut sebesar 8, kotak bayangan halus (box shadow), dan kliping anti-alias (ClipRRect) yang memotong ujung header DataTable dengan rapi.",
-                "animation": "Pembaruan visual baris data saat status hover berubah kini dikelola secara native dan teroptimasi menggunakan WidgetStateProperty bawaan DataTable, sehingga tidak lagi memerlukan widget MouseRegion maupun RepaintBoundary manual."
+            "configuration_models": {
+                "TableStyle": {
+                    "description": "Model untuk mendefinisikan tampilan keseluruhan dari tabel.",
+                    "properties": {
+                        "outerBorderWidth": {
+                            "type": "double",
+                            "default": 1.0,
+                            "description": "Ketebalan bingkai luar tabel."
+                        },
+                        "borderRadius": {
+                            "type": "double",
+                            "default": 8.0,
+                            "description": "Lengkungan sudut luar tabel."
+                        },
+                        "showGridBorders": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Tampilkan garis pembatas vertikal dan horizontal antar sel (seperti Excel)."
+                        },
+                        "borderColor": {
+                            "type": "Color?",
+                            "default": "Theme dividerColor",
+                            "description": "Warna garis border tabel."
+                        },
+                        "headerBackgroundColor": {
+                            "type": "Color?",
+                            "description": "Warna latar belakang untuk baris header."
+                        },
+                        "cellBackgroundColor": {
+                            "type": "Color?",
+                            "description": "Warna latar sel biasa."
+                        },
+                        "alternateCellBackgroundColor": {
+                            "type": "Color?",
+                            "description": "Warna latar sel belang-belang (Zebra stripe)."
+                        },
+                        "enableHoverZebra": {
+                            "type": "boolean",
+                            "default": true,
+                            "description": "Mengaktifkan efek highlight saat kursor hover dan warna selang-seling pada baris tabel."
+                        },
+                        "minColumnWidth": {
+                            "type": "double",
+                            "default": 80.0,
+                            "description": "Lebar minimal kolom saat dihitung otomatis."
+                        },
+                        "maxColumnWidth": {
+                            "type": "double",
+                            "default": 300.0,
+                            "description": "Lebar maksimal kolom saat dihitung otomatis."
+                        },
+                        "headerHeight": {
+                            "type": "double",
+                            "default": 48.0,
+                            "description": "Tinggi baris header."
+                        },
+                        "defaultRowHeight": {
+                            "type": "double",
+                            "default": 48.0,
+                            "description": "Tinggi baris data default."
+                        }
+                    }
+                },
+                "ColumnStyle": {
+                    "description": "Mengatur gaya untuk kolom tertentu menggunakan indeks A, B, C atau rentang.",
+                    "properties": {
+                        "columnIndex": {
+                            "type": "String",
+                            "example": "'A', 'B-D', '1-3'"
+                        },
+                        "alignment": {
+                            "type": "AlignmentGeometry?"
+                        },
+                        "textStyle": {
+                            "type": "TextStyle?"
+                        }
+                    }
+                },
+                "DataStyle": {
+                    "description": "Mengatur gaya untuk sel data tertentu dengan format Excel.",
+                    "properties": {
+                        "range": {
+                            "type": "String",
+                            "example": "'A1', 'B2-C4', 'D'"
+                        },
+                        "backgroundColor": {
+                            "type": "Color?"
+                        },
+                        "textStyle": {
+                            "type": "TextStyle?"
+                        }
+                    }
+                }
             },
-            "methods": [
-                {
-                    "name": "_initEngine",
-                    "type": "void",
-                    "default": "",
-                    "desc": "Menginisialisasi ulang objek TableEngine serta memicu kalkulasi tinggi baris kustom. Dipanggil di initState dan didUpdateWidget ketika parameter kolom atau data berubah."
+            "themes": {
+                "TableTheme.standard": {
+                    "description": "Tema default yang ramah UI modern. Berbingkai dengan sudut melengkung, hanya menggunakan garis horizontal pembatas.",
+                    "preset": {
+                        "outerBorderWidth": 1.0,
+                        "borderRadius": 8.0,
+                        "showGridBorders": false,
+                        "enableHoverZebra": true
+                    }
                 },
-                {
-                    "name": "_calculateRowHeights",
-                    "type": "void",
-                    "default": "",
-                    "desc": "Memetakan konfigurasi tinggi baris kustom dari properti heightRows ke dalam map internal berbasis indeks baris numerik riil."
+                "TableTheme.bordered": {
+                    "description": "Tema bergaya Spreadsheet/Excel. Berbingkai penuh, kaku, dan setiap sel memiliki kotak garis pembatas.",
+                    "preset": {
+                        "outerBorderWidth": 1.5,
+                        "borderRadius": 0.0,
+                        "showGridBorders": true,
+                        "enableHoverZebra": false
+                    }
                 },
-                {
-                    "name": "_calculateColumnWidths",
-                    "type": "void",
-                    "default": "",
-                    "desc": "Menghitung lebar setiap kolom secara dinamis dengan LayoutBuilder. Mendahulukan lebar manual dari user, mengukur panjang teks sampel menggunakan TextPainter dengan clamp min/max width, dan mendistribusikan sisa ruang kosong layar jika responsif aktif."
+                "TableTheme.borderless": {
+                    "description": "Tema modern yang bersih tanpa ada bingkai yang mengelilingi tabel.",
+                    "preset": {
+                        "outerBorderWidth": 0.0,
+                        "borderRadius": 0.0,
+                        "showGridBorders": false,
+                        "enableHoverZebra": true
+                    }
                 },
-                {
-                    "name": "_measureTextWidth",
-                    "type": "double",
-                    "default": "",
-                    "desc": "Mengukur lebar piksel string data secara akurat menggunakan TextPainter berdasarkan TextStyle yang berlaku (Header vs Data). Mengembalikan nilai minColumnWidth jika data berupa Widget."
+                "TableTheme.sharp": {
+                    "description": "Tema formal yang memiliki bingkai namun tanpa sudut melengkung (sudut tajam 90 derajat).",
+                    "preset": {
+                        "outerBorderWidth": 1.0,
+                        "borderRadius": 0.0,
+                        "showGridBorders": false
+                    }
                 },
-                {
-                    "name": "ExcelColumnParser.stringToIndex",
-                    "type": "static int",
-                    "default": "",
-                    "desc": "Mengonversi representasi string kolom alfabet ala Excel (misal: 'A', 'AA') menjadi indeks integer berbasis 0 (0-indexed)."
-                },
-                {
-                    "name": "ExcelColumnParser.indexToString",
-                    "type": "static String",
-                    "default": "",
-                    "desc": "Mengonversi indeks integer berbasis 0 kembali menjadi representasi string alfabet kolom Excel."
-                },
-                {
-                    "name": "TableRangeParser.parseColumns",
-                    "type": "static Set<int>",
-                    "default": "",
-                    "desc": "Memecah string rentang kolom alfabet Excel (seperti 'A-C, E') menjadi sebuah Set berisi indeks kolom integer berbasis 0."
-                },
-                {
-                    "name": "TableRangeParser.parseRows",
-                    "type": "static Set<int>",
-                    "default": "",
-                    "desc": "Memecah string rentang baris numerik Excel (seperti '1-3, 5') menjadi sebuah Set berisi indeks baris integer berbasis 1."
-                },
-                {
-                    "name": "TableRangeParser.isCellInRange",
-                    "type": "static bool",
-                    "default": "",
-                    "desc": "Mengevaluasi apakah koordinat baris (1-indexed) dan kolom (0-indexed) tertentu berada di dalam string pola rentang Excel."
-                },
-                {
-                    "name": "TableCellResolver.resolve",
-                    "type": "static Widget",
-                    "default": "",
-                    "desc": "Fungsi resolusi komponen sel. Mengembalikan SizedBox.shrink jika null, merender langsung jika berupa Widget, menampilkan ikon Boolean otomatis, memformat DateTime, dan menangani elipsis teks."
+                "TableTheme.compact": {
+                    "description": "Tema padat yang menghemat ruang layar. Cocok untuk data berkapasitas besar atau dashboard sempit.",
+                    "preset": {
+                        "headerHeight": 36.0,
+                        "defaultRowHeight": 32.0,
+                        "cellPadding": "horizontal: 8, vertical: 2",
+                        "headerTextStyle": "fontSize: 12"
+                    }
                 }
-            ],
-            "behaviors": [
+            },
+            "usage_examples": [
                 {
-                    "name": "Normalisasi Data Otomatis",
-                    "type": "Engine Data Alignment",
-                    "default": "",
-                    "desc": "TableEngine secara otomatis menghitung panjang kolom maksimum. Baris atau kolom tajuk yang kekurangan elemen akan diisi string kosong ('') untuk menyelaraskan matriks DataTable."
+                    "title": "Basic Table with Compact Theme",
+                    "code_snippet": "TableWidget(\n  columns: ['ID', 'Name', 'Status'],\n  data: [\n    ['001', 'Alice', true],\n    ['002', 'Bob', false]\n  ],\n  style: TableTheme.compact(context),\n)"
                 },
                 {
-                    "name": "Integrasi Gaya Sel Tanpa Celah (Zero Spacing)",
-                    "type": "UI Layout Hack",
-                    "default": "",
-                    "desc": "Dengan menyetel columnSpacing: 0 dan horizontalMargin: 0 pada konfigurasi DataTable, margin bawaan material dihilangkan. Properti padding dan warna background dari DataStyle diterapkan pada level Container di dalam DataCell, memungkinkannya membentang penuh 100% pada setiap sel."
-                },
-                {
-                    "name": "Hover Zebra Interaktif Native",
-                    "type": "UI Interactive State",
-                    "default": "",
-                    "desc": "Jika enableHoverZebra aktif, warna baris dikendalikan menggunakan WidgetStateProperty.resolveWith pada properti color DataRow. Secara native baris merespons WidgetState.hovered dan menggambar garis loreng (zebra) berdasarkan indeks genap-ganjil."
-                },
-                {
-                    "name": "Pemaksaan Lebar Minimum 100% (Responsive Min-Width)",
-                    "type": "UI Layout Composition",
-                    "default": "",
-                    "desc": "DataTable dibungkus dengan ConstrainedBox yang memaksa minWidth mengikuti constraints.maxWidth layar. Hal ini memastikan tabel tidak menyusut jika kolomnya sedikit, namun tetap bisa di-scroll secara horizontal mulus jika kontennya meluber melewati layar."
+                    "title": "Overriding Theme Attributes",
+                    "code_snippet": "TableWidget(\n  columns: ['A', 'B'],\n  data: [['1', '2']],\n  style: TableTheme.bordered(context).copyWith(\n    borderColor: Colors.blue,\n    headerBackgroundColor: Colors.blue.withOpacity(0.1),\n  ),\n)"
                 }
-            ],
-            "specialNotes": [
-                "Pengukuran lebar otomatis menggunakan TextPainter hanya mengambil sampel maksimal 50 baris pertama dari data (`min(50, data.length)`) demi menjaga efisiensi performa rendering.",
-                "Notasi indeks baris pada konfigurasi heightRows dan dataStyles mengadopsi standar Excel berbasis 1 (baris pertama adalah 1), sedangkan iterasi pada visualisasi internal DataTable Flutter dikonversi ke berbasis 0.",
-                "Konsep `stickyHeader` secara otomatis tertangani karena seluruh `DataTable` digulir bersamaan secara vertikal di dalam `SingleChildScrollView` utama."
-            ],
-            "code": "import 'package:flutter/material.dart';\n\n// Contoh implementasi penggunaan TableWidget dengan berbagai konfigurasi gaya\nWidget myCustomTable(BuildContext context) {\n  return TableWidget(\n    columns: const ['Nama Produk', 'Kode', 'Tersedia', 'Tanggal Rilis', 'Harga'],\n    data: const [\n      ['Laptop Asus ROG', 'A001', true, DateTime.parse('2026-03-15 10:00:00'), 'Rp 25.000.000'],\n      ['Samsung Galaxy S26', 'B002', true, DateTime.parse('2026-01-20 08:30:00'), 'Rp 18.500.000'],\n      ['Apple iPhone 17', 'C003', false, DateTime.parse('2025-09-12 18:00:00'), 'Rp 21.000.000'],\n      ['Xiaomi Ultra Smart', 'D004', true, DateTime.parse('2026-05-05 14:15:00'), 'Rp 12.000.000'],\n    ],\n    style: TableStyle(\n      minColumnWidth: 100.0,\n      maxColumnWidth: 250.0,\n      headerHeight: 55.0,\n      defaultRowHeight: 48.0,\n      enableHoverZebra: true,\n      alternateCellBackgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.02),\n      headerBackgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,\n      headerTextStyle: const TextStyle(\n        fontWeight: FontWeight.bold,\n        fontSize: 14,\n      ),\n    ),\n    columnStyles: const [\n      ColumnStyle(\n        columnIndex: 'B, C', // Mengatur kolom Kode dan Tersedia ke posisi tengah\n        alignment: Alignment.center,\n      ),\n      ColumnStyle(\n        columnIndex: 'E', // Kolom harga diset rata kanan\n        alignment: Alignment.centerRight,\n        textStyle: TextStyle(fontWeight: FontWeight.w600, color: Colors.indigo),\n      ),\n    ],\n    dataStyles: [\n      DataStyle(\n        range: 'C2', // Contoh spesifik memberikan warna background merah transparan pada produk yang tidak tersedia\n        backgroundColor: Colors.red.shade50,\n        textStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),\n      ),\n      DataStyle(\n        range: 'A1-E1', // Memberikan dekorasi tebal khusus pada baris pertama data\n        textStyle: const TextStyle(fontWeight: FontWeight.bold),\n      ),\n    ],\n    widthColumns: const [\n      WidthColumn(columnIndex: 'A', width: 200.0), // Memaksa kolom nama memiliki lebar 200\n      WidthColumn(columnIndex: 'B', width: 90.0),\n    ],\n    heightRows: const [\n      HeightRow(rowIndex: '1', height: 60.0), // Memaksa baris pertama data memiliki tinggi khusus\n    ],\n  );\n}"
+            ]
         },
         {
             "id": "AnimationWidget",
