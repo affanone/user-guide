@@ -2660,6 +2660,11 @@
                     "desc": "Mendapatkan nilai absolut lebar layar saat ini menggunakan `MediaQuery.sizeOf(context).width`. Berkinerja tinggi dan terhindar dari rebuild tree yang tidak perlu akibat perubahan non-dimensi (seperti kemunculan keyboard)."
                 },
                 {
+                    "name": "getHeight(context)",
+                    "returnType": "double",
+                    "desc": "Mendapatkan nilai absolut tinggi layar saat ini menggunakan `MediaQuery.sizeOf(context).height`. Berkinerja tinggi dan terhindar dari rebuild tree yang tidak perlu akibat perubahan non-dimensi (seperti kemunculan keyboard)."
+                },
+                {
                     "name": "breakpoint(context, {width})",
                     "returnType": "Breakpoint",
                     "desc": "Mendapatkan nilai enum `Breakpoint` aktif secara instan berdasarkan ukuran layar saat ini."
