@@ -664,14 +664,15 @@
                     "TableTheme.compact() -> Hemat dimensi vertikal untuk menampilkan data berjumlah padat. Menggunakan bantalan (padding) rapat dan menurunkan default size font tajuk ke angka 12[cite: 48, 49, 50]."
                 ],
                 "katalogPaletWarna": [
-                    "TableColor.muted -> Permukaan standar UI dengan kombinasi dividerColor bawaan skema[cite: 9].",
-                    "TableColor.white -> Render spesifik berfokus ke latar belakang solid paling terang dengan deteksi kegelapan tema adaptif[cite: 6].",
-                    "TableColor.black -> Variasi gelap ekstrem[cite: 8].",
-                    "TableColor.primary & secondary -> Warna basis berdasarkan ColorScheme framework[cite: 10, 11].",
-                    "TableColor.danger -> Merah elegan kustom (0xFFDC2626)[cite: 12].",
-                    "TableColor.warning -> Oranye/Amber elegan kustom (0xFFD97706)[cite: 13].",
-                    "TableColor.success -> Hijau elegan kustom (0xFF16A34A)[cite: 14].",
-                    "TableColor.info -> Biru elegan kustom (0xFF2563EB)[cite: 15]."
+                    "TableColor.muted -> Permukaan standar UI dengan kombinasi dividerColor bawaan skema.",
+                    "TableColor.white -> Render spesifik berfokus ke latar belakang solid paling terang dengan deteksi kegelapan tema adaptif.",
+                    "TableColor.black -> Variasi gelap ekstrem.",
+                    "TableColor.primary & secondary -> Warna basis berdasarkan ColorScheme framework.",
+                    "TableColor.danger -> Merah elegan kustom (0xFFDC2626).",
+                    "TableColor.warning -> Oranye/Amber elegan kustom (0xFFD97706).",
+                    "TableColor.success -> Hijau elegan kustom (0xFF16A34A).",
+                    "TableColor.info -> Biru elegan kustom (0xFF2563EB).",
+                    "TableColor.transparent -> Menghilangkan latar belakang sel secara total dan menonaktifkan efek zebra, dikombinasikan dengan warna header abu-abu adaptif dan border bawaan tema."
                 ]
             },
             "methods": [],
