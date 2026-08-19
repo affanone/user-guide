@@ -187,7 +187,7 @@
             "group": "Alert",
             "name": "Modal Bottom Sheet",
             "icon": "fa-solid fa-window-maximize",
-            "description": "Widget utilitas statis kelas premium dengan pola arsitektur 'Type-Safe Factory Builder'. Menghilangkan kebutuhan konfigurasi layout manual (seperti shrinkWrap atau ScrollPhysics) dengan menyuntikkan asisten 'ModalLayoutControl'. Dilengkapi Sticky Header otomatis, engine gestur interaktif cerdas (Follow Finger, Bounce Back), sinkronisasi lintas platform (Desktop/Mouse), serta efek transisi frosted glass.",
+            "description": "Widget utilitas statis kelas premium dengan pola arsitektur 'Type-Safe Factory Builder' dan 'Scoped State Management'. Menghilangkan kebutuhan konfigurasi layout manual dengan menyuntikkan asisten 'ModalLayoutControl'. Mendukung update UI internal secara real-time (Interaktif) tanpa me-rebuild halaman utama. Dilengkapi Sticky Header otomatis, engine gestur interaktif cerdas (Follow Finger, Bounce Back), dan sinkronisasi lintas platform (Desktop/Mouse).",
             "mandatoryProps": [
                 {
                     "name": "context",
@@ -197,9 +197,9 @@
                 },
                 {
                     "name": "builder",
-                    "type": "ModalLayoutResult Function(BuildContext ctx, ModalLayoutControl layout)",
+                    "type": "ModalLayoutResult Function(BuildContext ctx, StateSetter setModalState, ModalLayoutControl layout)",
                     "default": "",
-                    "desc": "Fungsi callback wajib yang mengeksekusi UI Anda. Menyuntikkan context modal murni (ctx) untuk Navigator.pop() yang aman, dan asisten (layout) untuk menyusun widget anti-overflow. Anda DIWAJIBKAN mengembalikan nilai dari metode layout (misal: layout.fromChild(...))."
+                    "desc": "Fungsi callback wajib yang mengeksekusi UI Anda. Menyuntikkan context modal murni (ctx) untuk Navigator.pop() yang aman, fungsi (setModalState) untuk me-refresh khusus area modal saja, dan asisten (layout) untuk menyusun widget anti-overflow. Anda DIWAJIBKAN mengembalikan nilai dari metode layout (misal: layout.fromChild(...))."
                 }
             ],
             "optionalProps": [
@@ -242,6 +242,7 @@
             ],
             "additionalInfo": {
                 "dependencies": "dart:ui, flutter/material.dart",
+                "StateSetter (setModalState)": "Berfungsi persis seperti setState, namun diisolasi khusus untuk merender ulang area di dalam modal saja tanpa membebani halaman induk.",
                 "ModalLayoutControl.fromSingleScroll()": "Membungkus konten statis yang panjang (seperti Formulir) dengan SingleChildScrollView.",
                 "ModalLayoutControl.fromListViewBuilder()": "Membuat ListView.builder dengan shrinkWrap dan ClampingScrollPhysics otomatis (Solusi mutlak anti-overflow dan anti-bentrok gestur).",
                 "ModalLayoutControl.fromListViewSeparated()": "Sama seperti builder, namun otomatis menambahkan garis pembatas (Divider) rapi di antara item list.",
@@ -262,6 +263,12 @@
                     "type": "Architecture",
                     "default": "",
                     "desc": "Developer tidak bisa lagi sembarangan me-return Column atau ListView mentah yang memicu error overflow. IDE/Compiler akan mendeteksi garis merah dan memaksa developer menggunakan asisten layout."
+                },
+                {
+                    "name": "Scoped State Management",
+                    "type": "Performance",
+                    "default": "",
+                    "desc": "Menggunakan StatefulBuilder secara internal sehingga developer dapat mengubah state (seperti menambah counter, list, atau loading) langsung di dalam bottom sheet tanpa me-render ulang parent widget."
                 },
                 {
                     "name": "Smart Sticky Header",
@@ -286,7 +293,7 @@
                 "Metode Wajib (Restricted Type): Di dalam scope builder, Anda WAJIB mengembalikan salah satu metode dari objek 'layout'. Jika Anda mengembalikan widget biasa (seperti Column) secara langsung, kode akan mengalami error kompilasi.",
                 "Konteks Keamanan: Selalu gunakan parameter 'ctx' yang dilempar oleh builder saat Anda memanggil 'Navigator.pop(ctx)'. Memakai context bawaan halaman berpotensi memicu bug tertutupnya halaman utama."
             ],
-            "code": "// Contoh Pemanggilan Super Bersih & Anti-Error\nfinal String? result = await ModalBottomSheetWidget.show(\n  context,\n  title: 'Pilih Cabang Gudang', // Modal otomatis buatkan Sticky Header\n  builder: (ctx, layout) { // <-- INJEKSI ASISTEN LAYOUT\n    // WAJIB me-return metode dari 'layout'\n    return layout.fromListViewSeparated(\n      itemCount: 15,\n      padding: const EdgeInsets.only(bottom: 16),\n      separatorBuilder: (_, __) => const Divider(height: 1),\n      itemBuilder: (context, index) {\n        return ListTile(\n          leading: const Icon(Icons.storefront),\n          title: Text('Cabang ${index + 1}'),\n          onTap: () {\n            // Menutup modal dengan aman menggunakan 'ctx' lokal\n            Navigator.pop(ctx, 'Gudang ${index + 1}');\n          },\n        );\n      },\n    );\n  },\n);\n\nif (result != null) {\n  print('Pengguna mengonfirmasi: $result');\n}"
+            "code": "// Contoh Pemanggilan Interaktif & Anti-Error\nint counter = 0; // Variabel State Lokal\n\nfinal String? result = await ModalBottomSheetWidget.show(\n  context,\n  title: 'Keranjang Interaktif',\n  builder: (ctx, setModalState, layout) { // <-- INJEKSI STATE & ASISTEN\n    return layout.fromSingleScroll(\n      padding: const EdgeInsets.all(16),\n      child: Column(\n        crossAxisAlignment: CrossAxisAlignment.stretch,\n        children: [\n          Text(\n            'Jumlah Item: $counter',\n            textAlign: TextAlign.center,\n            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n          ),\n          const SizedBox(height: 16),\n          ElevatedButton(\n            onPressed: () {\n              // Refresh KHUSUS area modal saja!\n              setModalState(() => counter++);\n            },\n            child: const Text('Tambah Item'),\n          ),\n          ElevatedButton(\n            onPressed: () => Navigator.pop(ctx, 'Total dibeli: $counter'),\n            child: const Text('Selesai & Tutup'),\n          ),\n        ],\n      ),\n    );\n  },\n);\n\nif (result != null) {\n  print('Pengguna mengonfirmasi: $result');\n}"
         },
         {
             "id": "ModalWidget",
