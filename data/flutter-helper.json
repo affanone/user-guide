@@ -3396,7 +3396,7 @@
             "group": "Extension",
             "name": "Date & Time Formatting",
             "icon": "fa-solid fa-calendar-days",
-            "description": "Kumpulan Dart Extensions modern yang kaya fitur untuk memformat dan mengonversi dua arah secara presisi antara objek DateTime, Timestamp Firestore, Integer (YYYYMMDD & Unix Epoch), dan String. Mendukung null-safety mutlak, pelokalan Indonesia (id_ID), dan pemanggilan langsung dari variabel tanpa membungkus fungsi.",
+            "description": "Kumpulan Dart Extensions yang praktis dan modern untuk memformat waktu serta mengonversi data secara bolak-balik antara DateTime, Firestore Timestamp, Integer (seperti format YYYYMMDD atau Unix Epoch), dan String. Ditulis dengan standar null-safety tinggi dan pelokalan bahasa Indonesia (id_ID), memungkinkan kamu memanggil fungsinya langsung dari variabel dengan cara di-chaining (contoh: variabel.toFullDate()).",
             "mandatoryProps": [],
             "optionalProps": [],
             "additionalInfo": {
@@ -3408,109 +3408,109 @@
                     "name": "toTimestamp",
                     "type": "Timestamp Extension Method",
                     "default": "",
-                    "desc": "[KONVERSI] Mengubah objek DateTime murni menjadi Firestore Timestamp secara langsung (ideal untuk pra-penyimpanan ke database)."
+                    "desc": "[KONVERSI] Mengubah objek DateTime atau String menjadi Firestore Timestamp secara langsung (ideal sebelum menyimpan data ke database)."
                 },
                 {
                     "name": "toDateTimeSafe",
                     "type": "DateTime? Extension Method",
                     "default": "null",
-                    "desc": "[KONVERSI] Mengonversi Timestamp menjadi DateTime dengan aman (Null-Safe). Menghindari error bawaan '.toDate()' jika data dari Firestore bernilai null."
+                    "desc": "[KONVERSI] Mengubah Timestamp menjadi DateTime dengan aman (Null-Safe). Sangat berguna agar aplikasi tidak crash atau error bawaan '.toDate()' saat membaca data kosong dari Firestore."
                 },
                 {
                     "name": "toSmartTime",
                     "type": "String Extension Method",
                     "default": "'-'",
-                    "desc": "Menerjemahkan Timestamp atau DateTime menjadi format relatif pintar. Menampilkan 'HH:mm' (hari ini), 'Kemarin, HH:mm' (H-1), nama hari (dalam seminggu), atau tanggal penuh untuk tahun lampau."
+                    "desc": "Menerjemahkan Timestamp atau DateTime menjadi waktu relatif yang lebih natural. Contoh: '12:30' (jika hari ini), 'Kemarin, 12:30' (jika kemarin), atau langsung menampilkan tanggalnya jika sudah lewat lama."
                 },
                 {
                     "name": "toTimeAgo",
                     "type": "String Extension Method",
                     "default": "'-'",
-                    "desc": "Mengonversi Timestamp atau DateTime menjadi format waktu relatif ala sosial media (contoh: 'Baru saja', '5 menit yang lalu', '2 hari yang lalu')."
-                },
-                {
-                    "name": "toFullDateTime",
-                    "type": "String Extension Method",
-                    "default": "'-'",
-                    "desc": "Mengonversi Timestamp atau DateTime ke format panjang dengan jam (contoh: 12 Januari 2024, 15:30)."
+                    "desc": "Mengonversi Timestamp atau DateTime menjadi format waktu ala sosial media, seperti 'Baru saja', '5 menit yang lalu', atau '2 hari yang lalu'."
                 },
                 {
                     "name": "toShortDate",
                     "type": "String Extension Method",
                     "default": "'-'",
-                    "desc": "Mengonversi Timestamp atau DateTime ke format pendek tanpa jam (contoh: 12 Jan 2024)."
+                    "desc": "Memformat waktu menjadi tanggal pendek TANPA jam (contoh: 12 Jan 2024)."
+                },
+                {
+                    "name": "toFullDate",
+                    "type": "String Extension Method",
+                    "default": "'-'",
+                    "desc": "Memformat waktu menjadi tanggal panjang TANPA jam (contoh: 12 Januari 2024)."
                 },
                 {
                     "name": "toShortDateTime",
                     "type": "String Extension Method",
                     "default": "'-'",
-                    "desc": "Mengonversi Timestamp atau DateTime ke format pendek dengan jam (contoh: 12 Jan 2024, 15:30)."
+                    "desc": "Memformat waktu menjadi tanggal pendek DENGAN jam (contoh: 12 Jan 2024, 15:30)."
+                },
+                {
+                    "name": "toFullDateTime",
+                    "type": "String Extension Method",
+                    "default": "'-'",
+                    "desc": "Memformat waktu menjadi tanggal panjang DENGAN jam (contoh: 12 Januari 2024, 15:30)."
                 },
                 {
                     "name": "getGreeting",
                     "type": "String Extension Method",
                     "default": "",
-                    "desc": "Menghasilkan sapaan otomatis berdasarkan jam pada objek DateTime (contoh: 'Selamat Pagi', 'Selamat Siang', 'Selamat Malam')."
+                    "desc": "Menghasilkan kalimat sapaan otomatis berdasarkan jam pada objek DateTime (contoh: 'Selamat Pagi', 'Selamat Siang', 'Selamat Sore', 'Selamat Malam')."
                 },
                 {
                     "name": "format",
                     "type": "String Extension Method",
                     "default": "'yyyy-MM-dd HH:mm:ss'",
-                    "desc": "Memformat objek DateTime atau Timestamp bawaan menggunakan custom format string secara dinamis dan aman."
+                    "desc": "Memformat objek DateTime atau Timestamp menggunakan string format kustom sesuka hatimu secara dinamis."
                 },
                 {
                     "name": "toDateFromYMD",
                     "type": "DateTime? Extension Method",
                     "default": "null",
-                    "desc": "[KONVERSI] Mengonversi angka absolut berformat YYYYMMDD (contoh: 20240112) menjadi objek DateTime secara aman."
+                    "desc": "[KONVERSI] Mengubah nilai integer dengan pola tanggal (misal: 20240112) menjadi objek DateTime secara aman."
                 },
                 {
                     "name": "toTimestampFromYMD",
                     "type": "Timestamp? Extension Method",
                     "default": "null",
-                    "desc": "[KONVERSI] Mengonversi angka absolut berformat YYYYMMDD langsung menjadi objek Firestore Timestamp."
+                    "desc": "[KONVERSI] Mengubah nilai integer dengan pola tanggal (misal: 20240112) langsung menjadi Firestore Timestamp."
                 },
                 {
                     "name": "toDateTimeFromEpoch",
                     "type": "DateTime Extension Method",
                     "default": "",
-                    "desc": "[KONVERSI] Mengonversi nilai integer Unix Epoch Milliseconds ke objek DateTime murni."
+                    "desc": "[KONVERSI] Mengubah nilai integer Unix Epoch Milliseconds kembali menjadi objek DateTime."
                 },
                 {
                     "name": "toTimestampFromEpoch",
                     "type": "Timestamp Extension Method",
                     "default": "",
-                    "desc": "[KONVERSI] Mengonversi nilai integer Unix Epoch Milliseconds langsung ke objek Firestore Timestamp."
+                    "desc": "[KONVERSI] Mengubah nilai integer Unix Epoch Milliseconds langsung menjadi Firestore Timestamp."
                 },
                 {
                     "name": "toTimeOfDayFromHM",
                     "type": "TimeOfDay? Extension Method",
                     "default": "null",
-                    "desc": "Mengonversi angka absolut berformat HHMM menjadi objek TimeOfDay secara aman."
+                    "desc": "[KONVERSI] Mengubah nilai integer yang mempresentasikan jam (misal: 1530) menjadi objek TimeOfDay di Flutter."
                 },
                 {
                     "name": "toIndonesianDay",
                     "type": "String Extension Method",
                     "default": "''",
-                    "desc": "Menerjemahkan integer (1-7) menjadi nama hari dalam bahasa Indonesia dengan engine intl (Senin-Minggu)."
+                    "desc": "Menerjemahkan angka (1-7) menjadi nama hari dalam bahasa Indonesia (Senin-Minggu)."
                 },
                 {
                     "name": "toIndonesianMonth",
                     "type": "String Extension Method",
                     "default": "''",
-                    "desc": "Menerjemahkan integer (1-12) menjadi nama bulan dalam bahasa Indonesia dengan engine intl."
+                    "desc": "Menerjemahkan angka (1-12) menjadi nama bulan utuh dalam bahasa Indonesia (Januari-Desember)."
                 },
                 {
                     "name": "toDateTime",
                     "type": "DateTime? Extension Method",
                     "default": "null",
-                    "desc": "[KONVERSI] Mem-parsing string waktu standar (contoh: YYYY-MM-DD HH:mm:ss) menjadi objek DateTime murni secara aman dan efisien."
-                },
-                {
-                    "name": "toTimestamp",
-                    "type": "Timestamp? Extension Method",
-                    "default": "null",
-                    "desc": "[KONVERSI] Mem-parsing string waktu standar langsung menjadi objek Firestore Timestamp (memanfaatkan StringTimeX)."
+                    "desc": "[KONVERSI] Mencoba membaca dan mem-parsing text (String) dengan format waktu standar menjadi objek DateTime."
                 }
             ],
             "behaviors": [
@@ -3518,20 +3518,20 @@
                     "name": "Absolute Null-Safety",
                     "type": "Safety Handling",
                     "default": "'-'",
-                    "desc": "Ekstensi diterapkan pada nullable Timestamp (Timestamp?) dan validasi data string/integer. Jika variabel bernilai null atau parsing gagal, fungsi otomatis mengembalikan string fallback atau null tanpa memicu eksekusi fatal (NullPointerException)."
+                    "desc": "Ekstensi ini dirancang khusus pada objek yang nullable (seperti Timestamp?). Jika data yang ditarik dari database ternyata null, kodenya tidak akan crash, melainkan mengembalikan string default (seperti '-') atau null secara anggun."
                 },
                 {
                     "name": "Direct Invocation (Intellisense)",
                     "type": "Developer Experience",
                     "default": "",
-                    "desc": "Karena menggunakan Extension, metode dipanggil secara berantai langsung dari objeknya, memicu autocomplete di IDE tanpa perlu mengimpor fungsi spesifik satu per satu."
+                    "desc": "Karena berjalan sebagai Dart Extension, kamu tidak perlu memanggil fungsi rumit. Cukup ketik titik (.) setelah variabel tanggal/waktu di IDE, maka semua fungsi konversi akan langsung muncul di menu autocomplete."
                 }
             ],
             "specialNotes": [
-                "Pastikan initializeDateFormatting('id_ID', null) sudah dipanggil di level main() aplikasi Anda agar DateFormat dapat memproses pelokalan Indonesia tanpa error.",
-                "Untuk menggunakannya di file UI, cukup import file utilitas waktu tempat extension ini didefinisikan."
+                "Sangat disarankan: Pastikan kode initializeDateFormatting('id_ID', null) sudah dipanggil di level main() / saat aplikasi pertama kali dijalankan agar paket 'intl' dapat menerjemahkan format Indonesia tanpa error.",
+                "Untuk memakai kemampuan luar biasa ini di berbagai file UI, jangan lupa import file utilitas ini ya!"
             ],
-            "code": "Timestamp stamp = DateTime.now().toTimestamp();\nDateTime? safeDate = firestoreDoc['createdAt'].toDateTimeSafe();\nTimestamp? stampFromInt = 20240112.toTimestampFromYMD();\nString displayDate = firestoreDoc['createdAt'].toSmartTime();\nTimestamp? stampFromStr = '2024-01-12 15:30:00'.toTimestamp();"
+            "code": "// 1. PENGGUNAAN PADA OBJEK DATETIME\nDateTime waktuSkrg = DateTime.now();\nprint(waktuSkrg.toShortDate());       // ➔ 12 Jan 2024\nprint(waktuSkrg.toFullDate());        // ➔ 12 Januari 2024\nprint(waktuSkrg.toShortDateTime());   // ➔ 12 Jan 2024, 15:30\nprint(waktuSkrg.toFullDateTime());    // ➔ 12 Januari 2024, 15:30\nprint(waktuSkrg.toSmartTime());       // ➔ Kemarin, 15:30\nprint(waktuSkrg.toTimeAgo());         // ➔ 5 menit yang lalu\nprint(waktuSkrg.getGreeting());       // ➔ Selamat Sore\n\n// 2. PENGGUNAAN PADA FIRESTORE TIMESTAMP\n// (Sangat aman meski docMap['createdAt'] bernilai null)\nTimestamp? waktuData = docMap['createdAt'];\nDateTime? safeDate = waktuData.toDateTimeSafe();\nprint(waktuData.toShortDate());       // ➔ 12 Jan 2024\nprint(waktuData.toFullDate());        // ➔ 12 Januari 2024\nprint(waktuData.toShortDateTime());   // ➔ 12 Jan 2024, 15:30\nprint(waktuData.toFullDateTime());    // ➔ 12 Januari 2024, 15:30\n\n// 3. PENGGUNAAN PADA INTEGER\nprint(20240112.toDateFromYMD());      // ➔ DateTime(2024, 1, 12)\nprint(20240112.toTimestampFromYMD()); // ➔ Timestamp(seconds: 1705017600)\nprint(1.toIndonesianDay());           // ➔ Senin\nprint(12.toIndonesianMonth());        // ➔ Desember\nprint(1530.toTimeOfDayFromHM());      // ➔ TimeOfDay(15:30)\n\n// 4. PENGGUNAAN PADA STRING\nprint('2024-01-12'.toDateTime());     // ➔ DateTime(2024, 1, 12)\nprint('2024-01-12'.toTimestamp());    // ➔ Timestamp(seconds: 1705017600)"
         },
         {
             "id": "safe-fallback",
