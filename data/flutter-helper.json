@@ -1088,6 +1088,12 @@
                     "desc": "Kumpulan struktur data grup dan item menu yang akan dirender ke dalam arsitektur sidebar. Diwajibkan baik untuk konstruktor standar maupun metode statis .createApp()."
                 },
                 {
+                    "name": "bottomGroups",
+                    "type": "List<SidebarGroup>?",
+                    "default": "null",
+                    "desc": "Kumpulan struktur data grup dan item menu opsional yang akan dirender secara statis (menempel/sticky) di bagian bawah sidebar. Menu pada properti ini dipisahkan dari area scroll utama sehingga akan selalu terlihat di layar. Sangat cocok digunakan untuk menu utilitas seperti Pengaturan (Settings), Bantuan (Help), atau Keluar (Logout)."
+                },
+                {
                     "name": "currentRoute",
                     "type": "String",
                     "default": "",
