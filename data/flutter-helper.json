@@ -378,7 +378,7 @@
                 {
                     "name": "showCancelButton",
                     "type": "bool",
-                    "default": "false",
+                    "default": "true",
                     "desc": "Menampilkan tombol Outlined (Secondary) untuk membatalkan dialog."
                 },
                 {
