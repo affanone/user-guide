@@ -615,19 +615,19 @@
             "group": "Widget",
             "name": "Table Engine & Widget",
             "icon": "fa-solid fa-table",
-            "description": "Widget tabel responsif tingkat lanjut yang memadukan logika rendering efisien dengan parser rentang (range) bergaya Excel[cite: 58, 63, 149]. Dilengkapi engine internal untuk menormalkan matriks data secara otomatis, meresolusi tipe data spesifik menjadi widget yang relevan, dan membagi sisa ruang kolom secara proporsional[cite: 90, 97, 122]. Mendukung sistem tema komprehensif, striping zebra yang responsif terhadap kursor (hover), dan kustomisasi baris/kolom granular[cite: 35, 136, 137].",
+            "description": "Widget tabel responsif tingkat lanjut yang memadukan logika rendering efisien dengan parser rentang (range) bergaya Excel. Dilengkapi engine internal untuk menormalkan matriks data secara otomatis, meresolusi tipe data spesifik menjadi widget yang relevan, membagi sisa ruang kolom secara proporsional, serta sistem skala cerdas (TableSize) yang memadatkan UI tanpa merusak constraint layout. Mendukung sistem tema komprehensif, striping zebra, dan kustomisasi granular.",
             "mandatoryProps": [
                 {
                     "name": "columns",
                     "type": "List<dynamic>",
                     "default": "",
-                    "desc": "Daftar data mentah yang mendefinisikan label tajuk kolom (header) dari tabel. Mendukung input string murni maupun widget kustom[cite: 97, 101, 124]."
+                    "desc": "Daftar data mentah yang mendefinisikan label tajuk kolom (header) dari tabel. Mendukung input string murni maupun widget kustom."
                 },
                 {
                     "name": "data",
                     "type": "List<List<dynamic>>",
                     "default": "",
-                    "desc": "Matriks dua dimensi yang merepresentasikan isi data tabel. Setiap daftar di dalamnya akan diurai sebagai baris tunggal, dan `TableEngine` akan otomatis menyesuaikan panjang elemen agar sesuai dengan jumlah kolom[cite: 97, 100, 101]."
+                    "desc": "Matriks dua dimensi yang merepresentasikan isi data tabel. Setiap daftar di dalamnya akan diurai sebagai baris tunggal, dan `TableEngine` akan otomatis menyesuaikan panjang elemen agar sesuai dengan jumlah kolom."
                 }
             ],
             "optionalProps": [
@@ -635,40 +635,47 @@
                     "name": "style",
                     "type": "TableStyle?",
                     "default": "TableTheme.borderless(context)",
-                    "desc": "Konfigurasi gaya visual utama untuk seluruh tabel. Jika kosong, sistem otomatis tereduksi ke `TableTheme.borderless`[cite: 101, 145]."
+                    "desc": "Konfigurasi gaya visual utama untuk seluruh tabel. Sangat disarankan dibuat melalui factory `TableTheme` yang kini mendukung parameter `size: TableSize`. Jika kosong, sistem otomatis tereduksi ke `TableTheme.borderless`."
                 },
                 {
                     "name": "columnStyles",
                     "type": "List<ColumnStyle>",
                     "default": "[]",
-                    "desc": "Daftar aturan penataan kolom spesifik berbasis pengenal alfabetik Excel (contoh: 'A' atau 'A-C'). Digunakan untuk memberikan gaya font, penyelarasan, dan dekorasi tingkat kolom[cite: 52, 102, 128]."
+                    "desc": "Daftar aturan penataan kolom spesifik berbasis pengenal alfabetik Excel (contoh: 'A' atau 'A-C'). Digunakan untuk memberikan gaya font, penyelarasan, dan dekorasi tingkat kolom."
                 },
                 {
                     "name": "dataStyles",
                     "type": "List<DataStyle>",
                     "default": "[]",
-                    "desc": "Daftar aturan penataan untuk baris atau rentang sel yang ditargetkan menggunakan koordinat alfanumerik Excel (contoh: 'A1', 'B2-C4'). Override dekorasi di atas standar tema maupun kolom[cite: 54, 102, 130, 137]."
+                    "desc": "Daftar aturan penataan untuk baris atau rentang sel yang ditargetkan menggunakan koordinat alfanumerik Excel (contoh: 'A1', 'B2-C4'). Override dekorasi di atas standar tema maupun kolom."
                 },
                 {
                     "name": "widthColumns",
                     "type": "List<WidthColumn>",
                     "default": "[]",
-                    "desc": "Mendefinisikan lebar absolut (fixed-width) bagi kolom tertentu, menimpa ukuran otomatis engine[cite: 56, 102, 112]."
+                    "desc": "Mendefinisikan lebar absolut (fixed-width) bagi kolom tertentu, menimpa ukuran otomatis engine."
                 },
                 {
                     "name": "heightRows",
                     "type": "List<HeightRow>",
                     "default": "[]",
-                    "desc": "Menentukan tinggi absolut baris untuk rentang tertentu, mengesampingkan parameter tinggi default dari `TableStyle`[cite: 57, 102, 110]."
+                    "desc": "Menentukan tinggi absolut baris untuk rentang tertentu, mengesampingkan parameter tinggi default dari `TableStyle`."
                 }
             ],
             "additionalInfo": {
+                "katalogSkalaUkuran (TableSize)": [
+                    "TableSize.xs -> Super Ekstrim Padat. Teks/widget diskalakan 50% (0.5), padding ditipiskan drastis, tinggi baris 24px. Sangat ideal untuk menampilkan ratusan baris data ala spreadsheet.",
+                    "TableSize.sm -> Padat Elegan. Teks/widget diskalakan 60% (0.6), padding dipertipis, tinggi baris 32px.",
+                    "TableSize.md -> [DEFAULT] Standar. Skala 100% (1.0), padding 16px, tinggi baris 48px.",
+                    "TableSize.lg -> Melonggar & Premium. Skala 115% (1.15), tinggi baris 60px. Cocok untuk data yang butuh banyak ruang nafas.",
+                    "TableSize.xl -> Super Lega. Skala 135% (1.35), padding 32px, tinggi baris 72px."
+                ],
                 "katalogPresetCerdas": [
-                    "TableTheme.borderless() -> [DEFAULT] Tema modern minimalis tanpa bingkai (border) terluar dan nol radius untuk tampilan membaur[cite: 35, 36, 145].",
-                    "TableTheme.standard() -> Gaya klasik dengan border halus, lengkungan radius pada sudut (8.0), baris yang sedikit lebih tinggi, dan efek shadow dinamis[cite: 38, 39, 40].",
-                    "TableTheme.bordered() -> Tampilan kaku bergaya Excel dengan ketebalan border 1.5, menonaktifkan efek zebra, dan menyematkan bingkai penuh di semua sisi grid (showGridBorders)[cite: 42, 43, 44].",
-                    "TableTheme.sharp() -> Nuansa formal dengan border tegas yang menyudut patah (radius 0.0) diakhiri latar selengkapnya tanpa garis internal[cite: 45, 46, 47].",
-                    "TableTheme.compact() -> Hemat dimensi vertikal untuk menampilkan data berjumlah padat. Menggunakan bantalan (padding) rapat dan menurunkan default size font tajuk ke angka 12[cite: 48, 49, 50]."
+                    "TableTheme.borderless() -> [DEFAULT] Tema modern minimalis tanpa bingkai (border) terluar dan nol radius untuk tampilan membaur.",
+                    "TableTheme.standard() -> Gaya klasik dengan border halus, lengkungan radius pada sudut (8.0), dan efek shadow dinamis.",
+                    "TableTheme.bordered() -> Tampilan kaku bergaya Excel dengan ketebalan border 1.5, menonaktifkan efek zebra, dan menyematkan bingkai penuh di semua sisi grid (showGridBorders).",
+                    "TableTheme.sharp() -> Nuansa formal dengan border tegas yang menyudut patah (radius 0.0) diakhiri latar selengkapnya tanpa garis internal.",
+                    "TableTheme.compact() -> Secara otomatis memanggil ukuran default `TableSize.xs` untuk menghasilkan versi tabel yang paling hemat dimensi vertikal."
                 ],
                 "katalogPaletWarna": [
                     "TableColor.muted -> Permukaan standar UI dengan kombinasi dividerColor bawaan skema.",
@@ -685,32 +692,38 @@
             "methods": [],
             "behaviors": [
                 {
+                    "name": "Smart Scale & Natural Constraint",
+                    "type": "UI Density Engine",
+                    "desc": "Resolusi kustom widget dan ikon dibungkus secara proporsional menggunakan kombinasi Transform.scale dan FittedBox. Tinggi baris dan padding mengecil secara matematis sesuai parameter TableSize tanpa menyebabkan error overflow pada layout layar."
+                },
+                {
                     "name": "Smart Data Type Resolver",
                     "type": "Rendering Logic",
-                    "desc": "Mesin tabel akan mencegat tipe boolean murni dan menggantinya menjadi perwujudan grafis Icons.check_circle hijau atau Icons.cancel merah[cite: 93]. Begitu juga objek DateTime otomatis dikonversi dengan standar format 'dd MMM yyyy HH:mm'[cite: 94]."
+                    "desc": "Mesin tabel akan mencegat tipe boolean murni dan menggantinya menjadi perwujudan grafis Icons.check_circle hijau atau Icons.cancel merah. Begitu juga objek DateTime otomatis dikonversi dengan standar format 'dd MMM yyyy HH:mm'."
                 },
                 {
                     "name": "Excel Range Parser",
                     "type": "Data Selection Algorithm",
-                    "desc": "Pemilihan referensi baris, kolom, atau sel sangat fleksibel berbekal logika stringToIndex. Target area seperti 'B', 'B-D', atau 'C2-D4' ditangani layaknya operasi di dalam Spreadsheet[cite: 58, 63, 64, 78]."
+                    "desc": "Pemilihan referensi baris, kolom, atau sel sangat fleksibel berbekal logika stringToIndex. Target area seperti 'B', 'B-D', atau 'C2-D4' ditangani layaknya operasi di dalam Spreadsheet."
                 },
                 {
                     "name": "Responsive Space Distribution",
                     "type": "Layout Algorithm",
-                    "desc": "Mendeteksi ketersediaan batas lebar kontainer layar. Jika total seluruh lebar kolom masih lebih kecil dari jangkauan maksimal dan mode `responsive` aktif, sisa jarak layar akan dibagi-bagi ke setiap kolom fleksibel untuk mencegah penumpukan data di sebelah kiri[cite: 119, 120, 121, 122]."
+                    "desc": "Mendeteksi ketersediaan batas lebar kontainer layar. Jika total seluruh lebar kolom masih lebih kecil dari jangkauan maksimal dan mode `responsive` aktif, sisa jarak layar akan dibagi-bagi ke setiap kolom fleksibel untuk mencegah penumpukan data di sebelah kiri."
                 },
                 {
                     "name": "Auto-Normalization Engine",
                     "type": "Data Handling",
-                    "desc": "Data yang rusak atau cacat (jumlah elemen per baris yang berbeda dengan header) akan dinormalkan otomatis. Sel kosong dibuat jika matriks terpotong agar antarmuka tidak menimbulkan error IndexOutOfBounds[cite: 97, 98, 99, 100]."
+                    "desc": "Data yang rusak atau cacat (jumlah elemen per baris yang berbeda dengan header) akan dinormalkan otomatis. Sel kosong dibuat jika matriks terpotong agar antarmuka tidak menimbulkan error IndexOutOfBounds."
                 }
             ],
             "specialNotes": [
-                "PRIORITAS DEKORASI: Secara teknis, spesifikasi yang ditugaskan pada DataStyle dan ColumnStyle menimpa pengaturan dari root TableStyle[cite: 137, 138]. Dekorasi DataStyle memegang otoritas teratas[cite: 140].",
-                "PENGGUNAAN TEMA: Meskipun Anda dapat membuat struktur TableStyle dari nol, sangat dianjurkan memanggil pola turunan pabrik (factory) seperti TableTheme.bordered() dan mengatur aksen warna via TableColor[cite: 36, 43].",
-                "UKURAN TEXT PREDIKTIF: Widget menggunakan utilitas tingkat rendah dart:ui TextPainter untuk melakukan pra-penghitungan ukuran lebar fisik font berdasarkan 50 sampel dari tumpukan data untuk menciptakan distribusi lebar kolom paling efisien[cite: 115, 116, 126]."
+                "PERFORMA DATA BESAR: Karena framework dasar menggunakan rendering eager, untuk memuat lebih dari 50-100 baris data sangat direkomendasikan mengkombinasikan tabel ini dengan sistem Pagination dari backend/API untuk mencegah stuttering pada CPU/GPU.",
+                "PRIORITAS DEKORASI: Secara teknis, spesifikasi yang ditugaskan pada DataStyle dan ColumnStyle menimpa pengaturan dari root TableStyle. Dekorasi DataStyle memegang otoritas teratas.",
+                "PENGGUNAAN TEMA: Meskipun Anda dapat membuat struktur TableStyle dari nol, sangat dianjurkan memanggil pola turunan pabrik (factory) seperti TableTheme.bordered() dan mengatur aksen warna via TableColor beserta ukurannya lewat TableSize.",
+                "UKURAN TEXT PREDIKTIF: Widget menggunakan utilitas tingkat rendah dart:ui TextPainter untuk melakukan pra-penghitungan ukuran lebar fisik font berdasarkan 50 sampel dari tumpukan data untuk menciptakan distribusi lebar kolom paling efisien."
             ],
-            "code": "// ===========================================================================\n// CONTOH 1: PENGGUNAAN TABEL BASIC MENGGUNAKAN THEME PRESET\n// ===========================================================================\nTableWidget(\n  columns: const ['NO', 'NAMA', 'STATUS', 'TERDAFTAR'],\n  data: [\n    [1, 'Alice', true, DateTime.now()],\n    [2, 'Bob', false, DateTime.now().subtract(const Duration(days: 1))],\n    [3, 'Charlie', true, DateTime.now().subtract(const Duration(days: 3))],\n  ],\n  // Memanfaatkan preset TableTheme dengan warna dasar Success (Hijau Elegan)\n  style: TableTheme.standard(context, color: TableColor.success),\n)\n\n// ===========================================================================\n// CONTOH 2: PENARGETAN SPESIFIK MENGGUNAKAN EXCEL RANGE PARSER\n// ===========================================================================\nTableWidget(\n  columns: const ['ID', 'PRODUK', 'KATEGORI', 'HARGA', 'STOK'],\n  data: const [\n    ['P01', 'Keyboard', 'Elektronik', 450000, 15],\n    ['P02', 'Mouse', 'Elektronik', 200000, 0],\n    ['P03', 'Meja', 'Furnitur', 1200000, 5],\n  ],\n  style: TableTheme.compact(context, color: TableColor.info),\n  \n  // Penataan Lebar Berbasis Alfabet Excel\n  widthColumns: const [\n    WidthColumn(columnIndex: 'A', width: 60), // Kolom ID dibatasi kecil\n    WidthColumn(columnIndex: 'D-E', width: 120), // Rentang Harga sampai Stok\n  ],\n\n  // Gaya Keselarasan per Kolom\n  columnStyles: const [\n    ColumnStyle(\n      columnIndex: 'A,D,E', // Multiple kolom terpisah koma\n      alignment: Alignment.center,\n    ),\n  ],\n\n  // Manipulasi gaya sel murni pada sel tertentu menggunakan koordinat absolut\n  dataStyles: [\n    DataStyle(\n      range: 'E2', // Menargetkan baris mouse stok 0\n      backgroundColor: Colors.red.withOpacity(0.1),\n      textStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),\n    ),\n    const DataStyle(\n      range: 'B1-B3', // Bold semua nama produk\n      textStyle: TextStyle(fontWeight: FontWeight.bold),\n    )\n  ],\n)"
+            "code": "// ===========================================================================\n// CONTOH 1: TABEL BASIC DENGAN UKURAN DEFAULT (MD)\n// ===========================================================================\nTableWidget(\n  columns: const ['NO', 'NAMA', 'STATUS', 'TERDAFTAR'],\n  data: [\n    [1, 'Alice', true, DateTime.now()],\n    [2, 'Bob', false, DateTime.now().subtract(const Duration(days: 1))],\n    [3, 'Charlie', true, DateTime.now().subtract(const Duration(days: 3))],\n  ],\n  // Memanfaatkan preset TableTheme dengan warna dasar Success (Hijau Elegan)\n  style: TableTheme.standard(\n    context, \n    color: TableColor.success, \n    size: TableSize.md, // Ukuran proporsional standar\n  ),\n)\n\n// ===========================================================================\n// CONTOH 2: TABEL SUPER COMPACT (XS) & EXCEL RANGE PARSER\n// ===========================================================================\nTableWidget(\n  columns: const ['ID', 'PRODUK', 'KATEGORI', 'HARGA', 'STOK'],\n  data: const [\n    ['P01', 'Keyboard', 'Elektronik', 450000, 15],\n    ['P02', 'Mouse', 'Elektronik', 200000, 0],\n    ['P03', 'Meja', 'Furnitur', 1200000, 5],\n  ],\n  // Memanfaatkan size XS agar sangat padat dan tidak makan tempat\n  style: TableTheme.bordered(\n    context, \n    color: TableColor.info,\n    size: TableSize.xs, \n  ),\n  \n  // Penataan Lebar Berbasis Alfabet Excel\n  widthColumns: const [\n    WidthColumn(columnIndex: 'A', width: 60), // Kolom ID dibatasi kecil\n    WidthColumn(columnIndex: 'D-E', width: 120), // Rentang Harga sampai Stok\n  ],\n\n  // Gaya Keselarasan per Kolom\n  columnStyles: const [\n    ColumnStyle(\n      columnIndex: 'A,D,E', // Multiple kolom terpisah koma\n      alignment: Alignment.center,\n    ),\n  ],\n\n  // Manipulasi gaya sel murni pada sel tertentu menggunakan koordinat absolut\n  dataStyles: [\n    DataStyle(\n      range: 'E2', // Menargetkan baris mouse stok 0\n      backgroundColor: Colors.red.withOpacity(0.1),\n      textStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),\n    ),\n    const DataStyle(\n      range: 'B1-B3', // Bold semua nama produk\n      textStyle: TextStyle(fontWeight: FontWeight.bold),\n    )\n  ],\n)"
         },
         {
             "id": "AnimationWidget",
