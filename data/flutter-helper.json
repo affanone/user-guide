@@ -952,6 +952,81 @@
             "code": "ButtonWidget(\n  onPressed: () {\n    print('Aksi dieksekusi presisi');\n  },\n  borderRadius: BorderRadius.circular(12),\n  child: Ink(\n    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),\n    decoration: BoxDecoration(\n      color: Colors.blueAccent,\n      borderRadius: BorderRadius.circular(12),\n    ),\n    child: const Row(\n      mainAxisSize: MainAxisSize.min,\n      children: [\n        Icon(Icons.save, color: Colors.white),\n        SizedBox(width: 8),\n        Text(\n          'Simpan',\n          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),\n        ),\n      ],\n    ),\n  ),\n)"
         },
         {
+            "id": "CopyWidget",
+            "group": "Widget",
+            "name": "Copy Wrapper",
+            "icon": "fa-regular fa-copy",
+            "description": "Widget pembungkus (wrapper) interaktif cerdas yang berfungsi menyalin nilai teks (string) ke dalam papan klip (clipboard) sistem. Dirancang dengan mengedepankan Micro-Interactions (UX), widget ini secara otomatis menyediakan umpan balik getaran (haptic), transisi visual berkedip (fade), perubahan kursor pada platform Desktop/Web, serta dukungan notifikasi Snackbar bawaan tanpa perlu pengaturan state tambahan.",
+            "mandatoryProps": [
+                {
+                    "name": "value",
+                    "type": "String",
+                    "desc": "Teks aktual yang akan disalin ke clipboard sistem saat komponen ini ditekan/diklik."
+                },
+                {
+                    "name": "child",
+                    "type": "Widget",
+                    "desc": "Komponen visual yang akan dibungkus dan dijadikan tombol pemicu penyalinan (misalnya: Text, Icon, Chip, atau Container). Area komponen ini otomatis menjadi area yang bisa diklik (tappable)."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "afterCopied",
+                    "type": "VoidCallback?",
+                    "default": "null",
+                    "desc": "Fungsi kustom yang akan dieksekusi tepat setelah proses penyalinan teks ke clipboard berhasil dilakukan. Berguna untuk memicu logika tambahan dari parent widget."
+                },
+                {
+                    "name": "showDefaultSnackbar",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Jika bernilai true, widget akan otomatis memunculkan pop-up Snackbar elegan di bagian bawah layar sebagai indikator sukses. Matikan opsi ini jika Anda ingin menggunakan sistem notifikasi kustom sendiri melalui callback `afterCopied`."
+                },
+                {
+                    "name": "successMessage",
+                    "type": "String",
+                    "default": "'Berhasil disalin ke papan klip!'",
+                    "desc": "Teks pesan yang ditampilkan di dalam Snackbar bawaan (hanya berfungsi jika `showDefaultSnackbar` bernilai true)."
+                },
+                {
+                    "name": "enableHaptic",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Mengaktifkan getaran halus (Haptic Feedback) pada perangkat mobile Android/iOS saat widget ditekan untuk memberikan sensasi respons fisik."
+                }
+            ],
+            "additionalInfo": {
+                "styling": "Komponen ini bersifat transparan secara struktural (tidak menambah padding atau margin). Animasi interaksi yang terjadi hanyalah penurunan opasitas (AnimatedOpacity) menjadi 0.4 selama 150ms saat disalin, sehingga tidak akan merusak layout parent-nya.",
+                "accessibility": "Widget ini otomatis membungkus child-nya dengan komponen `Semantics(button: true)`, sehingga sangat ramah terhadap Screen Reader (pembaca layar untuk tunanetra)."
+            },
+            "methods": [],
+            "behaviors": [
+                {
+                    "name": "Platform-Aware Mouse Cursor",
+                    "type": "UX Enhancement",
+                    "default": "",
+                    "desc": "Otomatis mengubah kursor mouse menjadi bentuk tangan (pointer) saat didekatkan pada elemen ini di platform Web, Windows, macOS, atau Linux."
+                },
+                {
+                    "name": "Opaque Hit Testing",
+                    "type": "Gesture Detection",
+                    "default": "",
+                    "desc": "Menggunakan `HitTestBehavior.opaque`, memastikan bahwa seluruh area bounding box dari `child` tetap responsif terhadap ketukan, meskipun terdapat bagian yang kosong/transparan (misalnya jarak antar ikon dan teks)."
+                },
+                {
+                    "name": "Anti-Spam State Handling",
+                    "type": "Safety Mechanism",
+                    "default": "",
+                    "desc": "Proses animasi berkedip menggunakan pengecekan `mounted` di dalam Future.delayed, menjamin aplikasi tidak akan crash (Memory Leak) jika pengguna menekan tombol salin lalu segera berpindah halaman sebelum animasinya selesai."
+                }
+            ],
+            "specialNotes": [
+                "Fleksibilitas Penggunaan: Karena ini adalah widget wrapper, Anda dapat menggunakannya langsung di dalam sel tabel (DataCell), ListTile, Header, atau tombol mana pun tanpa harus menulis ulang logika Clipboard di setiap file.",
+                "Snackbar Context: Jika menggunakan `showDefaultSnackbar`, pastikan CopyWidget berada di dalam tree yang memiliki Scaffold (halaman normal) agar ScaffoldMessenger dapat merender notifikasi dengan benar."
+            ],
+            "code": "// 1. Mode Standar Praktis (Otomatis handle getaran, animasi, dan notifikasi)\nCopyWidget(\n  value: 'PO-20260818-221034',\n  child: Text(\n    'PO-20260818-221034',\n    style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),\n  ),\n)\n\n// 2. Mode Kustom (Mematikan notifikasi bawaan dan mengganti logic sendiri)\nCopyWidget(\n  value: 'Rp 94.550.000',\n  showDefaultSnackbar: false,\n  afterCopied: () {\n     // Lakukan sesuatu yang kustom di sini, misal showDialog()\n     print('Teks telah masuk ke clipboard!');\n  },\n  child: const Icon(Icons.copy, size: 20, color: Colors.grey),\n)\n\n// 3. Mode Pesan Custom\nCopyWidget(\n  value: '081234567890',\n  successMessage: 'Nomor telepon berhasil disalin!',\n  child: const Chip(\n    avatar: Icon(Icons.phone),\n    label: Text('081234567890'),\n  ),\n)"
+        },
+        {
             "id": "NavigatorPageWidget",
             "group": "Widget",
             "name": "Navigator Page",
