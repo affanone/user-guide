@@ -956,7 +956,7 @@
             "group": "Widget",
             "name": "Copy Wrapper",
             "icon": "fa-regular fa-copy",
-            "description": "Widget pembungkus (wrapper) interaktif cerdas yang berfungsi menyalin nilai teks (string) ke dalam papan klip (clipboard) sistem. Dirancang dengan mengedepankan Micro-Interactions (UX), widget ini secara otomatis menyediakan umpan balik getaran (haptic), transisi visual berkedip (fade), perubahan kursor pada platform Desktop/Web, serta dukungan notifikasi Snackbar bawaan tanpa perlu pengaturan state tambahan.",
+            "description": "Widget pembungkus (wrapper) interaktif cerdas yang berfungsi menyalin nilai teks (string) ke dalam papan klip (clipboard) sistem. Dirancang dengan mengedepankan Micro-Interactions (UX), widget ini secara otomatis menyediakan umpan balik getaran (haptic), transisi visual berkedip (fade), serta perubahan kursor pada platform Desktop/Web. Komponen ini bersih dari logika notifikasi internal dan kini mendukung penuh operasi asinkron (async/await) pada callback-nya.",
             "mandatoryProps": [
                 {
                     "name": "value",
@@ -972,21 +972,9 @@
             "optionalProps": [
                 {
                     "name": "afterCopied",
-                    "type": "VoidCallback?",
+                    "type": "FutureOr<void> Function()?",
                     "default": "null",
-                    "desc": "Fungsi kustom yang akan dieksekusi tepat setelah proses penyalinan teks ke clipboard berhasil dilakukan. Berguna untuk memicu logika tambahan dari parent widget."
-                },
-                {
-                    "name": "showDefaultSnackbar",
-                    "type": "bool",
-                    "default": "true",
-                    "desc": "Jika bernilai true, widget akan otomatis memunculkan pop-up Snackbar elegan di bagian bawah layar sebagai indikator sukses. Matikan opsi ini jika Anda ingin menggunakan sistem notifikasi kustom sendiri melalui callback `afterCopied`."
-                },
-                {
-                    "name": "successMessage",
-                    "type": "String",
-                    "default": "'Berhasil disalin ke papan klip!'",
-                    "desc": "Teks pesan yang ditampilkan di dalam Snackbar bawaan (hanya berfungsi jika `showDefaultSnackbar` bernilai true)."
+                    "desc": "Fungsi kustom yang dieksekusi tepat setelah penyalinan teks selesai. Menggunakan tipe `FutureOr`, sehingga mendukung fungsi sinkron biasa maupun asinkron (`async`/`await`), memungkinkan Anda untuk memanggil API logging, menyimpan ke database, atau menampilkan dialog yang di-await tanpa memblokir interaksi."
                 },
                 {
                     "name": "enableHaptic",
@@ -996,7 +984,7 @@
                 }
             ],
             "additionalInfo": {
-                "styling": "Komponen ini bersifat transparan secara struktural (tidak menambah padding atau margin). Animasi interaksi yang terjadi hanyalah penurunan opasitas (AnimatedOpacity) menjadi 0.4 selama 150ms saat disalin, sehingga tidak akan merusak layout parent-nya.",
+                "styling": "Komponen ini bersifat transparan secara struktural (tidak menambah padding atau margin). Animasi interaksi yang terjadi hanyalah penurunan opasitas (AnimatedOpacity) menjadi 0.4 selama 150ms saat disalin, sehingga tidak akan mengubah ukuran atau merusak tata letak parent-nya.",
                 "accessibility": "Widget ini otomatis membungkus child-nya dengan komponen `Semantics(button: true)`, sehingga sangat ramah terhadap Screen Reader (pembaca layar untuk tunanetra)."
             },
             "methods": [],
@@ -1014,17 +1002,17 @@
                     "desc": "Menggunakan `HitTestBehavior.opaque`, memastikan bahwa seluruh area bounding box dari `child` tetap responsif terhadap ketukan, meskipun terdapat bagian yang kosong/transparan (misalnya jarak antar ikon dan teks)."
                 },
                 {
-                    "name": "Anti-Spam State Handling",
-                    "type": "Safety Mechanism",
+                    "name": "Asynchronous Delegation",
+                    "type": "Event Flow",
                     "default": "",
-                    "desc": "Proses animasi berkedip menggunakan pengecekan `mounted` di dalam Future.delayed, menjamin aplikasi tidak akan crash (Memory Leak) jika pengguna menekan tombol salin lalu segera berpindah halaman sebelum animasinya selesai."
+                    "desc": "Mengeksekusi dan menunggu (`await`) pemanggilan fungsi `afterCopied` di dalam thread jika fungsi yang disematkan bertipe `Future`. Hal ini menjamin integrasi API atau proses asynchronous lain dieksekusi dengan urutan yang aman."
                 }
             ],
             "specialNotes": [
-                "Fleksibilitas Penggunaan: Karena ini adalah widget wrapper, Anda dapat menggunakannya langsung di dalam sel tabel (DataCell), ListTile, Header, atau tombol mana pun tanpa harus menulis ulang logika Clipboard di setiap file.",
-                "Snackbar Context: Jika menggunakan `showDefaultSnackbar`, pastikan CopyWidget berada di dalam tree yang memiliki Scaffold (halaman normal) agar ScaffoldMessenger dapat merender notifikasi dengan benar."
+                "Tanggung Jawab Notifikasi: Karena widget ini murni menangani mekanisme salin dan animasi mikro, pastikan Anda menggunakan callback `afterCopied` jika membutuhkan notifikasi pop-up (Snackbar) di antarmuka Anda.",
+                "Pemanggilan API: Anda dapat melakukan HTTP Request atau pemanggilan Supabase/Firebase di dalam `afterCopied` untuk melacak (tracking) teks apa saja yang telah disalin oleh user."
             ],
-            "code": "// 1. Mode Standar Praktis (Otomatis handle getaran, animasi, dan notifikasi)\nCopyWidget(\n  value: 'PO-20260818-221034',\n  child: Text(\n    'PO-20260818-221034',\n    style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),\n  ),\n)\n\n// 2. Mode Kustom (Mematikan notifikasi bawaan dan mengganti logic sendiri)\nCopyWidget(\n  value: 'Rp 94.550.000',\n  showDefaultSnackbar: false,\n  afterCopied: () {\n     // Lakukan sesuatu yang kustom di sini, misal showDialog()\n     print('Teks telah masuk ke clipboard!');\n  },\n  child: const Icon(Icons.copy, size: 20, color: Colors.grey),\n)\n\n// 3. Mode Pesan Custom\nCopyWidget(\n  value: '081234567890',\n  successMessage: 'Nomor telepon berhasil disalin!',\n  child: const Chip(\n    avatar: Icon(Icons.phone),\n    label: Text('081234567890'),\n  ),\n)"
+            "code": "// 1. Mode Sinkron (Biasa)\nCopyWidget(\n  value: 'PO-20260818-221034',\n  afterCopied: () {\n     ScaffoldMessenger.of(context).showSnackBar(\n       const SnackBar(content: Text('Teks disalin!'))\n     );\n  },\n  child: Text('PO-20260818-221034'),\n)\n\n// 2. Mode Asinkron (Async / Await)\nCopyWidget(\n  value: 'Rp 94.550.000',\n  afterCopied: () async {\n     // 1. Munculkan loading/notifikasi\n     ScaffoldMessenger.of(context).showSnackBar(\n       const SnackBar(content: Text('Menyalin & mencatat log...'))\n     );\n     \n     // 2. Lakukan operasi API Asynchronous\n     await _apiService.logCopyAction('Copy Total Harga', 'Rp 94.550.000');\n     \n     // 3. Tampilkan pesan berhasil\n     print('Operasi API selesai setelah copy!');\n  },\n  child: const Icon(Icons.copy, size: 20, color: Colors.grey),\n)"
         },
         {
             "id": "NavigatorPageWidget",
