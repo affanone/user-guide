@@ -3015,6 +3015,87 @@
             "code": "DriftPaginationWidget<StaffModel>(\n  initialLimit: 10,\n  initialPage: 1,\n  totalData: totalRowsFromParent, // Wajib diisi\n  streamFactory: (offset, limit) => database.staffDao.watchStaff(limit: limit, offset: offset),\n  builder: (context, control, data) {\n    if (control.isLoading && data.isEmpty) return const Center(child: CircularProgressIndicator());\n    if (control.isEmpty) return const Center(child: Text('Data tidak ditemukan'));\n\n    return Column(\n      children: [\n        Expanded(\n          child: ListView.builder(\n            itemCount: data.length,\n            itemBuilder: (_, index) => ListTile(title: Text(data[index].name)),\n          ),\n        ),\n        Row(\n          mainAxisAlignment: MainAxisAlignment.center,\n          children: [\n            IconButton(\n              icon: const Icon(Icons.arrow_back),\n              onPressed: control.page > 1 ? control.prev : null,\n            ),\n            Text('Hal ${control.page} dari ${control.pageCount}'),\n            IconButton(\n              icon: const Icon(Icons.arrow_forward),\n              onPressed: control.hasMore ? control.next : null,\n            ),\n          ],\n        )\n      ],\n    );\n  },\n)"
         },
         {
+            "id": "PaginationWidget",
+            "group": "Widget",
+            "name": "Pagination Bar",
+            "icon": "fa-solid fa-angles-right",
+            "description": "Widget navigasi pagination modern dengan kontrol tata letak mandiri (shrink-wrap) yang fleksibel. Mengusung sistem kalkulasi sliding window yang cerdas untuk mengontrol rentang nomor halaman, tombol navigasi pinned (First, Prev, Next, Last), sistem penskalaan ukuran proporsional (xs hingga xl), serta theming warna preset. Dilengkapi dukungan scrollable drag horizontal berbasis deteksi platform (mouse drag di Desktop/Web dan native touch di Mobile) serta adaptasi penuh terhadap Dark & Light mode.",
+            "mandatoryProps": [
+                {
+                    "name": "currentPage",
+                    "type": "int",
+                    "desc": "Nomor halaman aktif saat ini (1-based index). Digunakan sebagai acuan penanda visual tombol aktif serta menentukan status disabled pada tombol navigasi First (<<) dan Previous (<)."
+                },
+                {
+                    "name": "totalPages",
+                    "type": "int",
+                    "desc": "Total keseluruhan halaman yang tersedia. Menjadi batas atas kalkulasi pagination serta menentukan status disabled pada tombol navigasi Next (>) dan Last (>>)."
+                },
+                {
+                    "name": "onPageChanged",
+                    "type": "ValueChanged<int>",
+                    "desc": "Fungsi callback yang akan dipicu saat pengguna berpindah halaman (menekan nomor halaman atau tombol arah navigasi). Mengembalikan nilai integer halaman tujuan."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "visiblePagesCount",
+                    "type": "int",
+                    "default": "2",
+                    "desc": "Jumlah tombol halaman yang ditampilkan di sisi kiri dan kanan dari halaman aktif. Mengontrol lebar jendela nomor halaman (windowing) agar antarmuka tidak sesak saat total halaman berjumlah puluhan atau ratusan."
+                },
+                {
+                    "name": "size",
+                    "type": "PaginationSize",
+                    "default": "PaginationSize.md",
+                    "desc": "Mengatur skala dimensi fisik komponen (`xs`, `sm`, `md`, `lg`, `xl`). Menyesuaikan ukuran kotak tombol (28px - 56px), ukuran font angka (12px - 20px), serta jarak gap antar tombol secara proporsional."
+                },
+                {
+                    "name": "theme",
+                    "type": "PaginationTheme",
+                    "default": "PaginationTheme.primary",
+                    "desc": "Menentukan preset palet warna untuk tombol halaman aktif (`primary`, `secondary`, `success`, `info`, `warning`, `danger`, `dark`, `light`)."
+                }
+            ],
+            "additionalInfo": {
+                "styling": "Secara otomatis mendeteksi Brightness tema (Dark / Light mode). Warna border dan latar tombol non-aktif (disabled) menggunakan opasitas adaptif terhadap onSurface untuk menjamin kontras yang nyaman dan tidak menyilaukan pada mode gelap. Warna latar tombol aktif menggunakan palet tema yang dipilih dengan warna teks putih kontras.",
+                "layout": "Komponen menggunakan ukuran minimal (`MainAxisSize.min`) sehingga tidak memaksa ekspansi ke seluruh lebar layar. Sangat fleksibel untuk ditempatkan di dalam kontainer apa pun, seperti `Center()`, `Align(alignment: Alignment.centerRight)`, atau diletakkan sejajar di dalam `Row` footer tabel."
+            },
+            "methods": [],
+            "behaviors": [
+                {
+                    "name": "Intelligent Sliding Window",
+                    "type": "Algorithm",
+                    "default": "",
+                    "desc": "Menghitung indeks batas `awal` dan `akhir` halaman secara dinamis berdasarkan posisi `currentPage` dan `visiblePagesCount`, memastikan distribusi nomor halaman tetap seimbang dan relevan."
+                },
+                {
+                    "name": "Platform-Aware Drag Scroll",
+                    "type": "Gesture Handling",
+                    "default": "",
+                    "desc": "Menerapkan `_DragScrollBehavior` khusus yang hanya menginjeksi mouse drag pada platform Desktop (Windows/macOS/Linux) dan Web. Platform Mobile (Android/iOS) tetap menggunakan touch handler native murni guna mencegah beban komputasi berlebih."
+                },
+                {
+                    "name": "Proportional Spacing Scaling",
+                    "type": "Layout Strategy",
+                    "default": "",
+                    "desc": "Jarak jeda horizontal (`_gap`) antar tombol dihitung dinamis berdasarkan enum `size` (mulai dari 2.0px pada ukuran `xs` hingga 10.0px pada `xl`) untuk menjaga keharmonisan visual tata letak."
+                },
+                {
+                    "name": "Redundant Event Prevention",
+                    "type": "Event Filter",
+                    "default": "",
+                    "desc": "Menolak eksekusi `onPageChanged` apabila pengguna menekan tombol halaman yang sedang aktif atau tombol navigasi yang berada dalam kondisi non-aktif (disabled)."
+                }
+            ],
+            "specialNotes": [
+                "Positioning: Karena widget bersifat shrink-to-fit (MainAxisSize.min), bungkus widget dengan `Center(child: ...)` jika ingin ditaruh di tengah layar, atau gunakan `Align(alignment: Alignment.centerRight, ...)` untuk diletakkan di sudut kanan.",
+                "State Update: Selalu perbarui variabel halaman aktif Anda di dalam callback `onPageChanged` (misal via `setState` atau state management) dan jalankan pemanggilan fetching data/API ulang.",
+                "Responsive Safety: Tombol First/Prev dan Next/Last tetap diam di posisi terluar (pinned), sedangkan deretan nomor di tengah terbungkus Flexible ScrollView sehingga bebas dari error RenderFlex Overflow pada layar sempit."
+            ],
+            "code": "// 1. Penggunaan Dasar dengan Alignment Tengah\nCenter(\n  child: PaginationWidget(\n    currentPage: _currentPage,\n    totalPages: 25,\n    onPageChanged: (page) {\n      setState(() => _currentPage = page);\n    },\n  ),\n)\n\n// 2. Mode Ringkas (Ukuran XS / SM untuk Tabel Kompak)\nPaginationWidget(\n  currentPage: _currentPage,\n  totalPages: 10,\n  size: PaginationSize.sm,\n  visiblePagesCount: 1, // Menampilkan 1 nomor di kiri & kanan saja\n  onPageChanged: (page) => _fetchData(page),\n)\n\n// 3. Mode Tema Kustom (Contoh: Notifikasi Berhasil / Sukses)\nPaginationWidget(\n  currentPage: _currentPage,\n  totalPages: 15,\n  size: PaginationSize.md,\n  theme: PaginationTheme.success,\n  onPageChanged: (page) => _fetchData(page),\n)\n\n// 4. Implementasi pada Footer Tabel Responsif (Pojok Kanan)\nContainer(\n  padding: const EdgeInsets.all(16.0),\n  child: Row(\n    mainAxisAlignment: MainAxisAlignment.spaceBetween,\n    children: [\n      Text('Menampilkan halaman $_currentPage dari 50'),\n      PaginationWidget(\n        currentPage: _currentPage,\n        totalPages: 50,\n        size: PaginationSize.md,\n        visiblePagesCount: 2,\n        theme: PaginationTheme.primary,\n        onPageChanged: (page) {\n          setState(() => _currentPage = page);\n          _loadBatchData(page);\n        },\n      ),\n    ],\n  ),\n)"
+        },
+        {
             "id": "EmptyWidget",
             "group": "Widget",
             "name": "Empty Widget",
