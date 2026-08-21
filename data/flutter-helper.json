@@ -4264,6 +4264,12 @@
                     "desc": "Teks yang akan ditampilkan pada sisi kiri atas Header Card dengan ketebalan teks semi-bold. Warnanya akan otomatis menyesuaikan rona warna jika opsi `theme` digunakan."
                 },
                 {
+                    "name": "padding",
+                    "type": "double?",
+                    "default": "24.0",
+                    "desc": "Mengatur ketebalan padding pada area body card."
+                },
+                {
                     "name": "headerActions",
                     "type": "List<Widget>?",
                     "default": "null",
