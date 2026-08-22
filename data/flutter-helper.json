@@ -11,14 +11,8 @@
             "group": "Alert",
             "name": "Alert",
             "icon": "fa-solid fa-circle-exclamation",
-            "description": "Utility class statis yang menyediakan antarmuka dialog umpan balik (feedback alert) secara instan. Menawarkan empat varian peringatan: info, success, warning, dan error dengan desain premium, ukuran responsif, opsi draggable, auto-close, kontrol dismissable, serta dukungan Dark Mode dan animasi transisi kustom otomatis.",
+            "description": "Utility class statis yang menyediakan antarmuka dialog umpan balik (feedback alert) secara instan dan Context-Free. Berkat arsitektur GlobalKey<NavigatorState>, Anda dapat memunculkan Alert dari mana saja (UI, Controller, API Service) tanpa perlu melempar BuildContext. Menawarkan empat varian peringatan: info, success, warning, dan error dengan desain premium, opsi draggable, auto-close, kontrol dismissable, serta dukungan animasi transisi kustom otomatis.",
             "mandatoryProps": [
-                {
-                    "name": "context",
-                    "type": "BuildContext",
-                    "default": "",
-                    "desc": "Konteks aplikasi saat ini yang diperlukan oleh showGeneralDialog untuk menampilkan UI di atas layar."
-                },
                 {
                     "name": "message",
                     "type": "String",
@@ -37,34 +31,37 @@
                     "name": "draggable",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Jika diatur ke true, pengguna dapat menggeser posisi dialog secara bebas."
+                    "desc": "Jika diatur ke true, pengguna dapat menggeser/menarik (drag) posisi dialog secara bebas di atas layar."
                 },
                 {
                     "name": "dismissable",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Mengizinkan pengguna menutup dialog dengan mengetuk area latar belakang atau menekan tombol kembali (ESC)."
+                    "desc": "Mengizinkan pengguna menutup dialog dengan mengetuk area latar belakang gelap (barrier) atau menekan tombol kembali (ESC)."
                 },
                 {
                     "name": "autoCloseDuration",
                     "type": "Duration?",
                     "default": "null",
-                    "desc": "Jika diisi, dialog akan otomatis tertutup sendiri setelah durasi yang ditentukan berlalu."
+                    "desc": "Jika diisi, dialog akan secara otomatis tertutup sendiri setelah durasi yang ditentukan berlalu (menggunakan navigator pop global)."
                 },
                 {
                     "name": "inEffect",
                     "type": "AnimationEffect?",
                     "default": "null",
-                    "desc": "Memberikan efek animasi masuk (in) kustom dari package respo."
+                    "desc": "Memberikan efek animasi masuk (in) kustom dari AnimationWidget."
                 },
                 {
                     "name": "outEffect",
                     "type": "AnimationEffect?",
                     "default": "null",
-                    "desc": "Memberikan efek animasi keluar (out) kustom dari package respo saat dialog ditutup."
+                    "desc": "Memberikan efek animasi keluar (out) kustom dari AnimationWidget saat dialog ditutup."
                 }
             ],
-            "additionalInfo": {},
+            "additionalInfo": {
+                "dependencies": "google_fonts, animation_widget",
+                "architecture": "Context-Free Global Dialog Injection"
+            },
             "methods": [
                 {
                     "name": "info",
@@ -76,67 +73,70 @@
                     "name": "success",
                     "type": "static void",
                     "default": "",
-                    "desc": "Menampilkan dialog berhasil dengan ikon hijau terang. Digunakan setelah operasi sukses seperti simpan data."
+                    "desc": "Menampilkan dialog berhasil dengan ikon hijau terang. Digunakan setelah operasi krusial yang butuh konfirmasi kuat dari user."
                 },
                 {
                     "name": "warning",
                     "type": "static void",
                     "default": "",
-                    "desc": "Menampilkan dialog peringatan dengan ikon oranye. Digunakan untuk kondisi yang perlu diwaspadai pengguna."
+                    "desc": "Menampilkan dialog peringatan dengan ikon oranye. Digunakan untuk kondisi yang perlu diwaspadai pengguna sebelum melanjutkan."
                 },
                 {
                     "name": "error",
                     "type": "static void",
                     "default": "",
-                    "desc": "Menampilkan dialog error dengan ikon merah. Digunakan ketika terjadi kegagalan proses atau exception."
+                    "desc": "Menampilkan dialog error dengan ikon merah. Digunakan ketika terjadi kegagalan fatal pada proses atau exception (memblokir alur)."
                 }
             ],
             "behaviors": [
                 {
+                    "name": "Context-Free Independence",
+                    "type": "Architecture",
+                    "default": "",
+                    "desc": "Beroperasi sepenuhnya secara global menggunakan navigatorKey. Anda tidak perlu lagi menyertakan parameter 'context' saat memanggil fungsi peringatan ini."
+                },
+                {
                     "name": "Dismissible & Dynamic Barrier",
                     "type": "Interaction",
                     "default": "true",
-                    "desc": "Dialog secara default dapat ditutup dengan mengetuk area latar belakang atau menekan ESC (tergantung parameter dismissable). Jika draggable false, latar belakang memiliki efek blur (BackdropFilter) dan warna hitam transparan (black54). Jika draggable true, latar belakang transparan penuh tanpa blur."
+                    "desc": "Jika draggable false, latar belakang memiliki efek blur (BackdropFilter) dan warna hitam transparan (black54). Jika draggable true, latar belakang transparan penuh tanpa blur agar dialog mudah dipindahkan."
                 },
                 {
                     "name": "Auto Close Timer",
                     "type": "Automation",
                     "default": "null",
-                    "desc": "Jika parameter autoCloseDuration diberikan, dialog akan secara otomatis tertutup setelah durasi yang ditentukan habis. Proses ini menggunakan Future.delayed dengan pengecekan context.mounted dan flag isClosed untuk mencegah error navigasi ganda."
+                    "desc": "Jika parameter autoCloseDuration diberikan, dialog akan secara otomatis tertutup menggunakan navigatorKey.currentState?.pop(). Dilengkapi sistem pengecekan untuk mencegah navigasi ganda."
                 },
                 {
                     "name": "Draggable Support",
                     "type": "Interaction",
                     "default": "false",
-                    "desc": "Jika parameter draggable bernilai true, dialog dibungkus custom widget yang memungkinkan pengguna menggeser posisi modal secara bebas menggunakan Transform.translate dan onPanUpdate."
+                    "desc": "Membungkus dialog dengan widget Transform.translate dan GestureDetector (onPanUpdate), memungkinkan interaksi seret-dan-lepas (drag-and-drop) pada jendela dialog."
                 },
                 {
                     "name": "Custom Transitions",
                     "type": "Animation",
                     "default": "",
-                    "desc": "Mendukung kustomisasi efek animasi masuk dan keluar menggunakan inEffect dan outEffect. Jika tidak diberikan, secara default akan menggunakan kombinasi animasi FadeTransition dan ScaleTransition dengan kurva easeOutBack."
+                    "desc": "Mendukung efek animasi masuk dan keluar. Jika tidak diberikan, secara default akan menggunakan kombinasi animasi FadeTransition dan ScaleTransition dengan kurva easeOutBack yang elegan."
                 },
                 {
                     "name": "Automatic Theme Adaptation",
                     "type": "UI Render",
                     "default": "",
-                    "desc": "Mendeteksi Brightness dari Theme.of(context) secara real-time. Jika dalam Dark Mode, latar belakang dialog berubah menjadi gelap (0xFF1E1E1E) dan warna teks menyesuaikan menjadi putih/abu-abu terang secara otomatis."
+                    "desc": "Mendeteksi Brightness aplikasi. Dalam Dark Mode, latar belakang dialog berubah menjadi warna arang (0xFF1E1E1E) dan teks menyesuaikan menjadi putih/abu-abu secara otomatis."
                 },
                 {
                     "name": "Responsive Constraint",
                     "type": "UI Layout",
                     "default": "",
-                    "desc": "Konten dialog dibungkus dengan ConstrainedBox dengan maxWidth 400. Ini memastikan dialog tetap rapi dan tidak terlalu melebar ketika dijalankan pada platform layar besar seperti Tablet atau Desktop."
+                    "desc": "Konten dibatasi ConstrainedBox dengan maxWidth 400. Mencegah dialog merentang ekstrim saat aplikasi dijalankan di mode web, tablet, atau desktop."
                 }
             ],
             "specialNotes": [
-                "Dependency: Kelas ini memiliki ketergantungan pada package eksternal 'google_fonts' untuk merender jenis huruf Poppins, dan 'com.noobcode.respo' untuk AnimationEffect.",
-                "System: Menggunakan showGeneralDialog alih-alih showDialog untuk mendukung transitionBuilder kustom dan durasi animasi yang presisi.",
-                "Limitation: Tombol konfirmasi bersifat statis dengan teks 'Mengerti' dan aksi Navigator.pop(context). Tidak dapat disisipkan callback kustom untuk trigger event lain saat tombol ditekan.",
-                "Limitation: Warna tombol konfirmasi di-hardcode menggunakan Colors.deepOrange dan tidak beradaptasi dengan warna primary dari tema aplikasi.",
-                "Best Practice: Panggil AlertWidget.error() di dalam blok catch ketika menangkap Exception dari pemanggilan API untuk memberikan umpan balik langsung kepada user."
+                "SYARAT WAJIB MULTAK: Karena berjalan tanpa parameter context, Anda WAJIB MENGKAITKAN navigatorKey di root aplikasi (main.dart). Formatnya: MaterialApp(navigatorKey: AlertWidget.navigatorKey, ...)",
+                "Gunakan AlertWidget secara selektif HANYA untuk notifikasi yang bersifat kritis (Blocking UI). Untuk notifikasi ringan seperti 'Data Tersimpan', SANGAT DISARANKAN menggunakan ToastWidget agar tidak menginterupsi alur pengguna."
             ],
-            "code": "try {\n  await apiService.submitData(data);\n  AlertWidget.success(\n    context, \n    'Data pengguna berhasil diperbarui dan disimpan ke dalam sistem.',\n    title: 'Update Sukses',\n    draggable: true,\n    autoCloseDuration: const Duration(seconds: 3),\n    inEffect: AnimationEffect.shakeVertical(),\n    outEffect: AnimationEffect.zoomOut(),\n  );\n} catch (e) {\n  AlertWidget.error(\n    context, \n    'Gagal menyimpan data. Silakan periksa koneksi internet Anda.',\n    title: 'Error',\n    dismissable: false,\n    inEffect: AnimationEffect.shakeHorizontal(),\n  );\n}"
+            "code": "// --- 1. SYARAT WAJIB (Di main.dart) ---\nMaterialApp(\n  navigatorKey: AlertWidget.navigatorKey, \n  home: const MyApp(),\n);\n\n// --- 2. CONTOH PEMANGGILAN (Tanpa Context) ---\ntry {\n  await apiService.submitData(data);\n  // Panggil dari mana saja!\n  AlertWidget.success(\n    'Pembayaran telah diverifikasi dan masuk ke sistem.',\n    title: 'Transaksi Berhasil',\n    draggable: true,\n    autoCloseDuration: const Duration(seconds: 4),\n    inEffect: AnimationEffect.zoomIn(),\n    outEffect: AnimationEffect.zoomOut(),\n  );\n} catch (e) {\n  AlertWidget.error(\n    'Terjadi kesalahan saat memproses data. Saldo tidak mencukupi.',\n    title: 'Transaksi Gagal',\n    dismissable: false, // Wajib diklik tombol 'Mengerti'\n    inEffect: AnimationEffect.shakeHorizontal(),\n  );\n}"
         },
         {
             "id": "ConfirmWidget",
