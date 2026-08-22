@@ -3210,13 +3210,19 @@
             "group": "Alert",
             "name": "Loading Widget",
             "icon": "fa-solid fa-spinner",
-            "description": "Helper class utilitas (Super Premium) untuk menangani indikator pemuatan (loading). Komponen ini memiliki dua mode operasi: 1. Mode Imperatif (Overlay), memblokir layar penuh secara programmatic dengan method chaining. 2. Mode Deklaratif (Inline), menempel langsung ke dalam widget tree. Pada Mode Deklaratif, jika 'builder' diisi maka widget mengelola siklus async/await otomatis; jika 'builder' null, widget merender UI loading abadi secara efisien (bypass FutureBuilder/watcher) untuk dikontrol dari luar. Mendukung penyesuaian ukuran (xs-xl), tata letak vertikal/horizontal, tampilan 'telanjang' (tanpa background), serta Custom Wrapper (loadingWrapper). Keduanya mendukung pembaruan pesan secara real-time dan adaptasi Dark Mode.",
+            "description": "Helper class utilitas kelas atas (Super Premium) untuk menangani indikator pemuatan (loading). Komponen ini sekarang dirancang dengan 3 mode operasi yang sangat jelas: 1. Mode Imperatif (Overlay) untuk memblokir seluruh layar. 2. Mode Deklaratif Murni (.widget) untuk menampilkan UI loading super ringan tanpa memori berlebih. 3. Mode Async Automatis (.builder) untuk membungkus proses Future yang mengelola state loading, error, dan success secara mandiri. Mendukung penyesuaian ukuran (xs-xl), tata letak vertikal/horizontal, tampilan transparan (tanpa background), pembaruan teks secara real-time, serta adaptasi Dark Mode otomatis.",
             "mandatoryProps": [
                 {
                     "name": "context",
                     "type": "BuildContext",
                     "default": "",
-                    "desc": "Konteks aplikasi saat ini yang memiliki akses ke struktur Navigator dan Overlay. Hanya dibutuhkan untuk inisialisasi pada Mode Imperatif (metode .init())."
+                    "desc": "Konteks aplikasi saat ini yang memiliki akses ke struktur Navigator dan Overlay. Hanya dibutuhkan untuk inisialisasi pada Mode Imperatif (menggunakan metode .init())."
+                },
+                {
+                    "name": "builder",
+                    "type": "FutureOr<Widget> Function(LoadingController control)",
+                    "default": "",
+                    "desc": "Callback wajib khusus untuk metode .builder(). Digunakan untuk mengeksekusi logika asynchronous (seperti mengambil API) lalu mengembalikan Widget hasil akhirnya."
                 }
             ],
             "optionalProps": [
@@ -3224,145 +3230,119 @@
                     "name": "message",
                     "type": "String?",
                     "default": "null / 'Loading...'",
-                    "desc": "Teks pesan. Pada metode statis .widget(), parameter ini bertindak sebagai named parameter opsional. Jika dibiarkan null atau kosong, widget teks beserta margin spasi tidak akan dirender demi efisiensi layout."
-                },
-                {
-                    "name": "watch",
-                    "type": "Object?",
-                    "default": "null",
-                    "desc": "Saklar pendeteksi perubahan (dependency watcher) dari luar. Widget hanya akan memicu siklus loading ulang dan mengeksekusi kembali fungsi builder jika nilai yang dipantau berubah. Fitur ini otomatis dinonaktifkan jika 'builder' bernilai null."
-                },
-                {
-                    "name": "builder",
-                    "type": "FutureOr<Widget> Function(LoadingController)?",
-                    "default": "null",
-                    "desc": "Callback asynchronous opsional untuk .widget(). Jika diisi, widget mengelola siklus async hingga mengembalikan widget hasil. Jika null, widget akan menampilkan UI loading abadi tanpa menunggu return, menyerahkan kontrol penyembunyian loading sepenuhnya ke logika eksternal (misal: conditional rendering/if-else)."
+                    "desc": "Teks pesan di bawah atau di samping spinner. Jika dibiarkan null atau kosong, widget teks beserta margin spasi tidak akan di-render sama sekali demi efisiensi layout."
                 },
                 {
                     "name": "size",
                     "type": "LoadingSize",
                     "default": "LoadingSize.md",
-                    "desc": "Pilihan ukuran proporsional (xs, sm, md, lg, xl) yang otomatis mengatur dimensi spinner, ukuran font, ketebalan garis, dan jarak antar elemen (khusus Mode Deklaratif / .widget())."
+                    "desc": "Pilihan ukuran proporsional (xs, sm, md, lg, xl) yang otomatis meracik ukuran spinner, ukuran font teks, ketebalan garis (stroke), dan spasi antar elemen."
                 },
                 {
                     "name": "theme",
                     "type": "LoadingTheme",
                     "default": "LoadingTheme.vertical",
-                    "desc": "Pilihan tata letak untuk elemen loading (khusus Mode Deklaratif / .widget()). 'vertical' menampilkan spinner di atas teks, 'horizontal' menampilkan spinner dan teks sebaris."
+                    "desc": "Pilihan tata letak. 'vertical' akan menampilkan spinner di atas teks (kolom), sedangkan 'horizontal' akan menampilkannya sebaris menyamping (baris)."
+                },
+                {
+                    "name": "watch",
+                    "type": "Object?",
+                    "default": "null",
+                    "desc": "Saklar pendeteksi perubahan (dependency watcher) khusus untuk metode .builder(). Jika nilai objek yang dipantau ini berubah, siklus loading dan eksekusi future akan diulang dari awal."
                 },
                 {
                     "name": "animate",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Opsi untuk menghidupkan atau mematikan efek transisi saat pergantian dari state loading ke widget hasil (khusus Mode Deklaratif / .widget()). Jika disetel ke false atau jika 'builder' null, transisi mengeksklusi AnimatedSwitcher dari widget tree untuk menghemat beban rendering."
+                    "desc": "Opsi untuk menghidupkan efek transisi memudar (fade) saat berganti dari state loading ke widget hasil (khusus metode .builder())."
                 },
                 {
                     "name": "loadingWrapper",
                     "type": "Widget Function(Widget child)?",
                     "default": "null",
-                    "desc": "Callback opsional (khusus Mode Deklaratif / .widget()) yang memungkinkan developer membungkus UI default spinner/teks ke dalam widget lain (seperti Card, Container, atau Padding) selama masa loading."
+                    "desc": "Memberikan kebebasan untuk membungkus UI loading telanjang ke dalam desain Anda sendiri (misalnya dibungkus dengan Card, Container ber-radius, atau Padding kustom)."
                 }
             ],
             "additionalInfo": {
                 "dependencies": "google_fonts",
-                "architecture": "Overlay Injection (Imperative) & Hybrid Standalone/Future-Driven State Wrapper dengan AnimatedSwitcher (Declarative)"
+                "architecture": "Overlay Injection (Imperative), Pure Stateless UI (Declarative Static), & Future-Driven State Wrapper dengan AnimatedSwitcher (Declarative Async)"
             },
             "methods": [
                 {
                     "name": "init",
                     "type": "static LoadingWidget",
                     "default": "",
-                    "desc": "Fungsi statis (factory) utama untuk Mode Imperatif. Membuat instance LoadingWidget baru. Menerima parameter wajib context dan parameter opsional pesan awal."
+                    "desc": "Fungsi awal untuk Mode Imperatif. Membuat instance Overlay baru yang bisa dipanggil .show() dan .hide()."
                 },
                 {
                     "name": "widget",
                     "type": "static Widget",
                     "default": "",
-                    "desc": "Fungsi statis utama untuk Mode Deklaratif (Super Premium). Mengembalikan widget loading inline. Jika parameter 'builder' diisi, mengelola transisi async ke widget target secara otomatis. Jika 'builder' null, merender UI loading abadi tanpa menggunakan FutureBuilder maupun watcher."
+                    "desc": "Fungsi statis untuk merender UI Loading Murni (Super Ringan). Mengembalikan spinner dan teks saja tanpa logika apapun. Sangat cocok jika Anda mengatur state show/hide secara manual dari luar (misal dengan Obx GetX atau BlocBuilder)."
+                },
+                {
+                    "name": "builder",
+                    "type": "static Widget",
+                    "default": "",
+                    "desc": "Fungsi statis cerdas yang otomatis mengelola proses Async (Future). Anda cukup berikan fungsi async di dalamnya, dan ia akan mengurus transisi dari Loading -> Error/Sukses dengan sendirinya."
                 },
                 {
                     "name": "show",
                     "type": "LoadingWidget",
                     "default": "",
-                    "desc": "Mengeksekusi penyisipan (insert) OverlayEntry ke layar, sehingga memblokir interaksi pengguna. Mengembalikan instance dirinya sendiri (Method Chaining)."
+                    "desc": "Memunculkan pop-up overlay ke layar (memblokir ketukan user). Mengembalikan dirinya sendiri agar bisa di-chaining."
                 },
                 {
                     "name": "hide",
                     "type": "LoadingWidget",
                     "default": "",
-                    "desc": "Mencabut (remove) OverlayEntry dari layar sementara waktu tanpa menghancurkan instance secara total. Dapat dimunculkan kembali dengan memanggil show()."
+                    "desc": "Menyembunyikan overlay sementara. Bisa dimunculkan kembali dengan .show()."
                 },
                 {
                     "name": "message",
                     "type": "LoadingWidget",
                     "default": "",
-                    "desc": "Memperbarui teks loading di Mode Imperatif secara real-time. Memanggil markNeedsBuild() hanya pada lapisan overlay tanpa menyentuh widget tree induk."
+                    "desc": "Memperbarui teks loading pada overlay secara langsung di layar tanpa me-refresh halaman induk."
                 },
                 {
                     "name": "close",
                     "type": "void",
                     "default": "",
-                    "desc": "Menyembunyikan overlay dan menandai instance sebagai disposed. Mencegah pemanggilan show() berulang untuk menghindari memory leak."
+                    "desc": "Menghancurkan overlay secara permanen dari memori (mencegah memory leak saat halaman ditutup)."
                 }
             ],
             "behaviors": [
                 {
-                    "name": "Fluent Interface (Method Chaining)",
+                    "name": "Separation of Concerns",
                     "type": "Architecture",
                     "default": "",
-                    "desc": "Pada Mode Imperatif, metode seperti show(), hide(), dan message() mengembalikan objek yang sama (this), memungkinkan eksekusi kode berantai seperti LoadingWidget.init(context).show().message('Tunggu...')."
+                    "desc": "Kini tanggung jawab dipisah dengan rapi. .widget() murni urusan UI (Stateless), sedangkan .builder() mengurus logika siklus data (Stateful). Kode jadi lebih mudah di-debug dan dipelihara."
                 },
                 {
-                    "name": "Declarative Async Automation & Static Bypass",
-                    "type": "Architecture",
+                    "name": "Fluent Interface (Method Chaining)",
+                    "type": "Developer Experience",
                     "default": "",
-                    "desc": "Pada Mode Deklaratif (.widget()), jika 'builder' disediakan, komponen menangani siklus Future (Waiting, Error, Success) secara otomatis. Namun jika 'builder' null, sistem mem-bypass FutureBuilder dan watcher sepenuhnya untuk merender UI loading murni tanpa overhead resource."
+                    "desc": "Pada Mode Imperatif, metode mengembalikan objek this, sehingga penulisan kode bisa disambung rapi: LoadingWidget.init(ctx).show().message('Tunggu...')."
                 },
                 {
                     "name": "Smooth Animated Transitions",
                     "type": "UI Animation",
                     "default": "",
-                    "desc": "Ketika 'builder' diisi dan animate=true, metode .widget() menggunakan AnimatedSwitcher berdurasi 400ms (kurva easeOutCubic/easeInCubic) untuk transisi halus dari loading ke widget target."
+                    "desc": "Metode .builder() menggunakan AnimatedSwitcher berdurasi 400ms (kurva easeOutCubic/easeInCubic) untuk memastikan pergantian dari indikator loading ke konten asli terlihat mulus."
                 },
                 {
                     "name": "Isolated Repaint",
-                    "type": "State Management",
+                    "type": "Performance",
                     "default": "",
-                    "desc": "Baik Mode Imperatif (melalui _overlayEntry.markNeedsBuild) maupun Mode Deklaratif (melalui ChangeNotifier di LoadingController), keduanya memastikan UI diperbarui secara terisolasi tanpa me-rebuild halaman utama (Scaffold)."
-                },
-                {
-                    "name": "Theme Auto-Adaptation",
-                    "type": "UI Responsive",
-                    "default": "",
-                    "desc": "Membaca Brightness perangkat. Pada Dark Mode menggunakan warna dasar kotak 0xFF1E1E1E dan teks putih, sementara pada Light Mode menggunakan latar putih dan teks hitam pekat."
-                },
-                {
-                    "name": "Flexible Naked Layout (Declarative Mode)",
-                    "type": "UI Composition",
-                    "default": "",
-                    "desc": "Pada metode .widget(), komponen dirender tanpa container, background, margin, maupun padding secara default. Bebas diletakkan di dalam tombol, kartu, atau antarmuka kustom."
-                },
-                {
-                    "name": "External Wrapper Architecture",
-                    "type": "UI Composition",
-                    "default": "",
-                    "desc": "Parameter loadingWrapper mengeksekusi fungsi pembungkus di luar siklus AnimatedBuilder. Memastikan wrapper seperti Card/Container tidak dirender ulang secara paksa saat hanya teks loading yang berubah."
-                },
-                {
-                    "name": "Conditional Layout Optimization",
-                    "type": "Memory & Performance",
-                    "default": "",
-                    "desc": "Node teks dan spasi jarak (SizedBox) pada Mode Deklaratif bersifat kondisional. Jika parameter message bernilai null atau string kosong, widget tree dipangkas untuk mengefisienkan struktur layout."
+                    "desc": "Pembaruan teks loading di tengah jalan (baik melalui .message() maupun control.updateMessage()) berjalan secara terisolasi. Halaman utama aplikasi Anda tidak akan ikut ke-render ulang."
                 }
             ],
             "specialNotes": [
-                "Best Practice (Imperative): Selalu panggil metode .close() di dalam blok try-finally pada operasi asynchronous untuk menjamin overlay hilang meskipun terjadi exception.",
-                "Best Practice (Declarative Static): Jika 'builder' disetel null, gunakan kontrol alur eksternal (seperti ternary operator atau if-else pada parent widget) untuk mengganti LoadingWidget.widget() dengan widget tujuan saat data selesai dimuat.",
-                "Best Practice (Declarative Async): Gunakan fungsi control.updateMessage('Teks Baru') di dalam callback 'builder' untuk memberikan feedback proses bertahap.",
-                "Limitation: Parameter 'watch' tidak akan memicu re-render jika 'builder' bernilai null.",
-                "Design Detail (Imperative): Khusus Mode Overlay, Box loading menggunakan margin horizontal 40px, padding 32x24px, radius 20px, blur shadow 20px, serta spinner berwarna Colors.deepOrange."
+                "Wajib Overlay (Imperative): Selalu jalankan metode .close() di dalam blok 'finally' pada fungsi try-catch Anda agar overlay pasti hilang walau terjadi error.",
+                "Kontrol Async (Declarative): Di dalam fungsi .builder(), manfaatkan parameter 'control' untuk mengubah pesan loading secara dinamis (contoh: control.updateMessage('Menyimpan data...')).",
+                "Efisiensi Layout: Karena metode .widget() kini benar-benar murni (tanpa FutureBuilder), Anda bisa menggunakannya ribuan kali di dalam list tanpa takut performa drop."
             ],
-            "code": "// --- CONTOH 1: MODE IMPERATIF (OVERLAY PENUH) ---\nFuture prosesDataOverlay(BuildContext context) async {\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    loader.message('Mengunduh aset dari server...');\n    await Future.delayed(const Duration(seconds: 2));\n  } catch (e) {\n    print('Error: $e');\n  } finally {\n    loader.close();\n  }\n}\n\n// --- CONTOH 2: MODE DEKLARATIF (LOADING ABADI / KONTROL EKSTERNAL) ---\nWidget buildStaticLoading(bool isLoading) {\n  if (isLoading) {\n    return LoadingWidget.widget(\n      message: 'Memuat data...',\n      size: LoadingSize.sm,\n      theme: LoadingTheme.horizontal,\n    );\n  }\n  return const Text('Data Berhasil Dimuat dari Luar!');\n}\n\n// --- CONTOH 3: MODE DEKLARATIF (AUTOMATIC ASYNC BUILDER) ---\n@override\nWidget build(BuildContext context) {\n  return Container(\n    padding: const EdgeInsets.all(16),\n    color: Colors.grey[200],\n    child: LoadingWidget.widget(\n      message: 'Menganalisis sistem...',\n      size: LoadingSize.sm,\n      theme: LoadingTheme.horizontal,\n      loadingWrapper: (child) => Card(\n        elevation: 4,\n        child: Padding(\n          padding: const EdgeInsets.all(24.0),\n          child: child,\n        ),\n      ),\n      builder: (control) async {\n        await Future.delayed(const Duration(seconds: 2));\n        control.updateMessage('Membuat widget antarmuka...');\n        await Future.delayed(const Duration(seconds: 2));\n        \n        return const Text(\n          'Sukses! Data telah dimuat.',\n          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n        );\n      },\n    ),\n  );\n}"
+            "code": "// --- CONTOH 1: MODE IMPERATIF (OVERLAY PENUH) ---\nFuture prosesData(BuildContext context) async {\n  final loader = LoadingWidget.init(context, 'Mempersiapkan data...').show();\n\n  try {\n    await Future.delayed(const Duration(seconds: 2));\n    loader.message('Membuat laporan...'); // Ubah teks real-time\n    await Future.delayed(const Duration(seconds: 2));\n  } finally {\n    loader.close(); // Pastikan selalu ditutup\n  }\n}\n\n// --- CONTOH 2: MODE DEKLARATIF STATIS (UI MURNI) ---\n// Gunakan ini jika Anda mengatur state loading secara mandiri\nWidget build(BuildContext context) {\n  bool isLoading = true; // Anggap state dari luar\n\n  if (isLoading) {\n    return LoadingWidget.widget(\n      message: 'Sinkronisasi...', \n      size: LoadingSize.sm,\n      theme: LoadingTheme.horizontal,\n    );\n  }\n  return const Text('Data Berhasil Dimuat!');\n}\n\n// --- CONTOH 3: MODE DEKLARATIF ASYNC (AUTO BUILDER) ---\n@override\nWidget build(BuildContext context) {\n  return Container(\n    padding: const EdgeInsets.all(16),\n    child: LoadingWidget.builder( // <-- Gunakan .builder untuk future\n      message: 'Menganalisis sistem...',\n      size: LoadingSize.md,\n      loadingWrapper: (child) => Card( // Bungkus loading dengan Card\n        elevation: 4,\n        child: Padding(padding: const EdgeInsets.all(24), child: child),\n      ),\n      builder: (control) async {\n        // Simulasi proses API\n        await Future.delayed(const Duration(seconds: 2));\n        \n        // Update UI Loading secara halus dari dalam!\n        control.updateMessage('Merender antarmuka...');\n        await Future.delayed(const Duration(seconds: 2));\n        \n        // Hasil akhir yang akan dimunculkan otomatis\n        return const Text('Sukses! Semua selesai.');\n      },\n    ),\n  );\n}"
         },
         {
             "id": "text-transformation",
