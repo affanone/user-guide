@@ -2432,10 +2432,16 @@
                     "desc": "Warna latar belakang (placeholder) yang ditampilkan saat gambar masih dalam proses pemuatan, atau saat gambar mengalami kerusakan (error)."
                 },
                 {
+                    "name": "borderRadius",
+                    "type": "double",
+                    "default": "0.0",
+                    "desc": "Menentukan kelengkungan sudut gambar. Jika diberi nilai lebih dari 0, widget beserta placeholder dan error state-nya akan dipotong secara presisi menggunakan ClipRRect."
+                },
+                {
                     "name": "debugMode",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Jika bernilai true, widget akan sengaja mengganti URL dengan link yang tidak valid ('[https://no-image.com](https://no-image.com)') untuk tujuan menguji apakah mekanisme auto-retry dan fallback error berjalan dengan baik."
+                    "desc": "Jika bernilai true, widget akan sengaja mengganti URL dengan link yang tidak valid ('https://no-image.com') untuk tujuan menguji apakah mekanisme auto-retry dan fallback error berjalan dengan baik."
                 }
             ],
             "additionalInfo": {
@@ -2447,7 +2453,7 @@
                     "name": "Automatic Retry Logic",
                     "type": "Lifecycle",
                     "default": "",
-                    "desc": "Ketika terjadi kegagalan pemuatan jaringan (ditangkap oleh errorWidget), widget memicu fungsi *triggerRetry(). Fungsi ini akan menunggu selama durasi delayRetry detik, menaikkan nilai retryKey, lalu memicu setState untuk merender ulang CachedNetworkImage. Penambahan retryKey ke dalam ValueKey akan memaksa widget untuk membuang kondisi error sebelumnya dan menginisiasi request jaringan baru."
+                    "desc": "Ketika terjadi kegagalan pemuatan jaringan (ditangkap oleh errorWidget), widget memicu fungsi _triggerRetry(). Fungsi ini akan menunggu selama durasi delayRetry detik, menaikkan nilai retryKey, lalu memicu setState untuk merender ulang CachedNetworkImage. Penambahan retryKey ke dalam ValueKey akan memaksa widget untuk membuang kondisi error sebelumnya dan menginisiasi request jaringan baru."
                 },
                 {
                     "name": "Adaptive Spinner Sizing",
@@ -2460,14 +2466,20 @@
                     "type": "Error Handling",
                     "default": "",
                     "desc": "Setelah percobaan memuat ulang gagal secara berturut-turut hingga mencapai batas maxRetry, widget akan menghentikan proses antrean coba lagi dan secara permanen menampilkan ikon 'broken_image' abu-abu di atas latar belakang warna colorBackground."
+                },
+                {
+                    "name": "Conditional Clipping",
+                    "type": "Optimization",
+                    "default": "",
+                    "desc": "Widget mendeteksi nilai borderRadius. ClipRRect hanya akan digunakan jika nilai radius lebih besar dari 0. Ini adalah teknik optimasi untuk menghindari proses render pemotongan (clipping) yang tidak perlu pada bentuk gambar persegi normal."
                 }
             ],
             "specialNotes": [
                 "Ketergantungan (Dependency): Widget ini secara langsung bergantung pada package eksternal 'cached_network_image' untuk menangani cache memori dan network request.",
                 "Performance Notes: Penggunaan nilai delayRetry yang terlalu singkat dipadukan dengan maxRetry yang tinggi berpotensi memicu request beruntun pada server gambar secara tidak efisien. Pastikan durasi delay wajar sesuai environment backend aplikasi Anda.",
-                "Integration Notes: Komponen menggunakan key: ValueKey('${widget.imageUrl}*$retryKey') pada child CachedNetworkImage sebagai trik cerdas memaksa framework Flutter mengenali perubahan state saat retrying dilakukan."
+                "Integration Notes: Komponen menggunakan key: ValueKey('${widget.imageUrl}_$retryKey') pada child CachedNetworkImage sebagai trik cerdas memaksa framework Flutter mengenali perubahan state saat retrying dilakukan."
             ],
-            "code": "AutoRetryImageWidget(\n  imageUrl: '[https://example.com/images/profile.jpg](https://www.google.com/search?q=https://example.com/images/profile.jpg)',\n  width: 120.0,\n  height: 120.0,\n  delayRetry: 5,\n  maxRetry: 3,\n  colorSpinner: Colors.blueAccent,\n  colorBackground: Colors.grey[200]!,\n  debugMode: false,\n)"
+            "code": "AutoRetryImageWidget(\n  imageUrl: 'https://example.com/images/profile.jpg',\n  width: 120.0,\n  height: 120.0,\n  borderRadius: 16.0,\n  delayRetry: 5,\n  maxRetry: 3,\n  colorSpinner: Colors.blueAccent,\n  colorBackground: Colors.grey[200]!,\n  debugMode: false,\n)"
         },
         {
             "id": "BadgeWidget",
