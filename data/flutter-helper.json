@@ -2431,7 +2431,7 @@
                 {
                     "name": "colorSpinner",
                     "type": "Color",
-                    "default": "Colors.deepOrange",
+                    "default": "BaseColorApps.primary",
                     "desc": "Warna indikator pemuatan (CircularProgressIndicator) yang berputar selama gambar sedang didownload atau dalam proses percobaan ulang."
                 },
                 {
@@ -2444,7 +2444,19 @@
                     "name": "debugMode",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Jika bernilai true, widget akan sengaja mengganti URL dengan link yang tidak valid ('[https://no-image.com](https://no-image.com)') untuk tujuan menguji apakah mekanisme auto-retry dan fallback error berjalan dengan baik."
+                    "desc": "Jika bernilai true, widget akan sengaja mengganti URL dengan link yang tidak valid ('https://no-image.com') untuk tujuan menguji apakah mekanisme auto-retry dan fallback error berjalan dengan baik."
+                },
+                {
+                    "name": "borderRadius",
+                    "type": "double",
+                    "default": "0.0",
+                    "desc": "Menentukan tingkat kelengkungan sudut gambar. Jika nilainya lebih dari 0, widget akan dibungkus secara otomatis menggunakan ClipRRect."
+                },
+                {
+                    "name": "noImage",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika bernilai true, proses request URL akan diabaikan secara total dan widget langsung mereturn placeholder 'broken image'. Bersifat reaktif, sehingga jika diubah menjadi false melalui setState dari parent, gambar akan dimuat kembali secara normal."
                 }
             ],
             "additionalInfo": {
@@ -2456,7 +2468,7 @@
                     "name": "Automatic Retry Logic",
                     "type": "Lifecycle",
                     "default": "",
-                    "desc": "Ketika terjadi kegagalan pemuatan jaringan (ditangkap oleh errorWidget), widget memicu fungsi *triggerRetry(). Fungsi ini akan menunggu selama durasi delayRetry detik, menaikkan nilai retryKey, lalu memicu setState untuk merender ulang CachedNetworkImage. Penambahan retryKey ke dalam ValueKey akan memaksa widget untuk membuang kondisi error sebelumnya dan menginisiasi request jaringan baru."
+                    "desc": "Ketika terjadi kegagalan pemuatan jaringan (ditangkap oleh errorWidget), widget memicu fungsi _triggerRetry(). Fungsi ini akan menunggu selama durasi delayRetry detik, menaikkan nilai retryKey, lalu memicu setState untuk merender ulang CachedNetworkImage. Penambahan retryKey ke dalam ValueKey akan memaksa widget untuk membuang kondisi error sebelumnya dan menginisiasi request jaringan baru."
                 },
                 {
                     "name": "Adaptive Spinner Sizing",
@@ -2469,14 +2481,20 @@
                     "type": "Error Handling",
                     "default": "",
                     "desc": "Setelah percobaan memuat ulang gagal secara berturut-turut hingga mencapai batas maxRetry, widget akan menghentikan proses antrean coba lagi dan secara permanen menampilkan ikon 'broken_image' abu-abu di atas latar belakang warna colorBackground."
+                },
+                {
+                    "name": "Reactive No-Image Bypass",
+                    "type": "UI Reactive",
+                    "default": "",
+                    "desc": "Ketika properti noImage diatur menjadi true, widget akan mem-bypass CachedNetworkImage pada method build dan langsung menampilkan fallback placeholder. Karena berada di siklus build, perubahan state noImage dari true ke false (oleh parent widget) akan otomatis memicu render ulang untuk memuat URL gambar secara normal."
                 }
             ],
             "specialNotes": [
                 "Ketergantungan (Dependency): Widget ini secara langsung bergantung pada package eksternal 'cached_network_image' untuk menangani cache memori dan network request.",
                 "Performance Notes: Penggunaan nilai delayRetry yang terlalu singkat dipadukan dengan maxRetry yang tinggi berpotensi memicu request beruntun pada server gambar secara tidak efisien. Pastikan durasi delay wajar sesuai environment backend aplikasi Anda.",
-                "Integration Notes: Komponen menggunakan key: ValueKey('${widget.imageUrl}*$retryKey') pada child CachedNetworkImage sebagai trik cerdas memaksa framework Flutter mengenali perubahan state saat retrying dilakukan."
+                "Integration Notes: Komponen menggunakan key: ValueKey('${widget.imageUrl}_$retryKey') pada child CachedNetworkImage sebagai trik cerdas memaksa framework Flutter mengenali perubahan state saat retrying dilakukan."
             ],
-            "code": "AutoRetryImageWidget(\n  imageUrl: '[https://example.com/images/profile.jpg](https://www.google.com/search?q=https://example.com/images/profile.jpg)',\n  width: 120.0,\n  height: 120.0,\n  delayRetry: 5,\n  maxRetry: 3,\n  colorSpinner: Colors.blueAccent,\n  colorBackground: Colors.grey[200]!,\n  debugMode: false,\n)"
+            "code": "AutoRetryImageWidget(\n  imageUrl: 'https://example.com/images/profile.jpg',\n  width: 120.0,\n  height: 120.0,\n  delayRetry: 5,\n  maxRetry: 3,\n  colorSpinner: Colors.blueAccent,\n  colorBackground: Colors.grey[200]!,\n  borderRadius: 8.0,\n  noImage: false,\n  debugMode: false,\n)"
         },
         {
             "id": "BadgeWidget",
