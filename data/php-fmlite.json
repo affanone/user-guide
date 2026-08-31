@@ -609,7 +609,7 @@
         {
             "id": "compTeamRole",
             "group": "UI Components",
-            "name": "Team Role Glass Card",
+            "name": "Team Role",
             "icon": "fa-solid fa-users",
             "description": "Merender kotak struktur tim dengan gaya Glassmorphism. Mendukung penambahan foto profil (opsional) dan sub-jabatan.",
             "mandatoryProps": [
