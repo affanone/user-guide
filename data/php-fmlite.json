@@ -515,6 +515,34 @@
             "code": "<?php\n\\App\\Components\\Iframe::render([\n    'title' => 'Video Profil UIN',\n    'url' => 'https://www.youtube.com/embed/XXXXXX',\n    'aspectRatio' => true // Responsif 16:9\n]);\n?>"
         },
         {
+            "id": "compBlockquote",
+            "group": "UI Components",
+            "name": "Blockquote",
+            "icon": "fa-solid fa-quote-left",
+            "description": "Merender elemen blockquote dengan border kiri bergaya modern (mirip balasan WhatsApp atau Markdown), dilengkapi dukungan efek animasi AOS.",
+            "mandatoryProps": [
+                {
+                    "name": "text",
+                    "type": "String",
+                    "default": "-",
+                    "desc": "Pesan atau teks utama yang akan ditampilkan di dalam blockquote"
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "delay",
+                    "type": "Int",
+                    "default": "0",
+                    "desc": "Waktu jeda (delay) untuk animasi AOS dalam milidetik (misal: 100, 200)"
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php\n\\App\\Components\\Blockquote::render('Ini adalah contoh teks kutipan (blockquote) yang menawan dan responsif.', 150);\n?>"
+        },
+        {
             "id": "compSafeHtml",
             "group": "UI Components",
             "name": "SafeHtml Renderer",
