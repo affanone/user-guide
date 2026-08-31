@@ -663,6 +663,36 @@
             "code": "<?php\n\\App\\Components\\DutyAuthorityCard::render([\n    'role' => 'Atasan PPID',\n    'tugas' => [\n        'Menetapkan kebijakan layanan informasi publik di lingkungan UIN Madura.',\n        'Mewakili institusi dalam penyelesaian sengketa informasi.'\n    ],\n    'wewenang' => [\n        'Menyetujui atau menolak permohonan informasi publik yang bersifat dikecualikan.',\n        'Melakukan evaluasi terhadap kinerja PPID Utama dan Tim Pengarah.'\n    ]\n], 100);\n?>"
         },
         {
+            "id": "compExternalLinks",
+            "group": "UI Components",
+            "name": "External Links & Attachments",
+            "icon": "fa-solid fa-link",
+            "description": "Merender grup tautan eksternal atau lampiran file (dokumen). Dilengkapi dengan deteksi tipe file otomatis (PDF, Excel, Word, dll) untuk menampilkan ikon dan warna yang sesuai, serta mendukung opsi unduhan langsung.",
+            "mandatoryProps": [
+                {
+                    "name": "data",
+                    "type": "Array",
+                    "default": "-",
+                    "desc": "Array konfigurasi yang wajib memuat 'links' (Array berisi 'url', 'name', 'type', 'target', 'download'). Opsi tambahan untuk header: 'title', 'description', 'icon', dan 'theme'."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "delay",
+                    "type": "Int",
+                    "default": "0",
+                    "desc": "Waktu jeda (delay) untuk animasi AOS dalam milidetik."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [
+                "Tipe link ('type') yang didukung untuk perubahan ikon otomatis: pdf, doc/docx, xls/xlsx, image/jpg/png, zip/rar, video/mp4, google drive, youtube, tiktok, facebook, folder, web/link."
+            ],
+            "code": "<?php\n\\App\\Components\\ExternalLinks::render([\n    'title' => 'Dokumen & Referensi',\n    'description' => 'Unduh atau lihat dokumen terkait layanan informasi.',\n    'icon' => 'folder-down',\n    'links' => [\n        [\n            'name' => 'SK Rektor UIN Madura (Pedoman PPID)',\n            'url' => '/assets/docs/sk-rektor-2025.pdf',\n            'type' => 'pdf',\n            'download' => true\n        ],\n        [\n            'name' => 'Kunjungi Website PPID Kemenag',\n            'url' => 'https://ppid.kemenag.go.id/',\n            'type' => 'web',\n            'target' => '_blank'\n        ]\n    ]\n], 150);\n?>"
+        },
+        {
             "id": "dbSelect",
             "group": "Database",
             "name": "Pengambilan Data (SELECT)",
