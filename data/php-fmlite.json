@@ -607,6 +607,34 @@
             "code": "<?php\n\\App\\Components\\SlideBanner::render([\n    'height' => 'h-[400px] md:h-[500px]',\n    'auto_play_delay' => 3000,\n    'slides' => [\n        [\n            'content' => '<div class=\"bg-blue-600 text-white w-full h-full flex items-center justify-center\"><h1 class=\"text-2xl font-bold\">Hello Slide 1</h1></div>'\n        ],\n        [\n            'content' => '<img src=\"https://link.com/gambar.jpg\" class=\"w-full h-full object-cover\">'\n        ]\n    ]\n]);\n?>"
         },
         {
+            "id": "compTeamRole",
+            "group": "UI Components",
+            "name": "Team Role Card",
+            "icon": "fa-solid fa-users",
+            "description": "Merender kotak (card) yang menampilkan peran tim beserta daftar anggotanya. Dilengkapi dengan ikon, garis batas atas bergaya modern, dan efek animasi AOS.",
+            "mandatoryProps": [
+                {
+                    "name": "data",
+                    "type": "Array",
+                    "default": "-",
+                    "desc": "Array asosiatif yang memuat informasi tim. Mendukung key 'role' (String untuk judul), 'members' (Array of String untuk daftar nama), dan 'icon' (opsional, nama ikon Lucide)."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "delay",
+                    "type": "Int",
+                    "default": "0",
+                    "desc": "Waktu jeda (delay) untuk animasi masuk AOS dalam milidetik."
+                }
+            ],
+            "additionalInfo": {},
+            "methods": [],
+            "behaviors": [],
+            "specialNotes": [],
+            "code": "<?php\n\\App\\Components\\TeamRole::render([\n    'role' => 'Atasan PPID',\n    'members' => [\n        'Prof. Dr. H. Saiful Hadi, M.Pd.',\n        'Dr. H. Maimun, M.Ag.'\n    ],\n    'icon' => 'users'\n], 100);\n?>"
+        },
+        {
             "id": "dbSelect",
             "group": "Database",
             "name": "Pengambilan Data (SELECT)",
