@@ -2161,6 +2161,12 @@
                     "desc": "Menentukan arah orientasi susunan label dan value. Axis.vertical untuk susunan atas-bawah, Axis.horizontal untuk kiri-kanan."
                 },
                 {
+                    "name": "labelValueCenter",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Memusatkan poros pembatas antara Label dan Value tepat di tengah widget. Jika true, akan mengesampingkan [layout] menjadi horizontal, [splitColumn] menjadi 1, memaksa labelAlign menjadi end (kanan), dan valueAlign menjadi start (kiri) untuk menciptakan tampilan simetris."
+                },
+                {
                     "name": "reverse",
                     "type": "bool",
                     "default": "false",
@@ -2182,7 +2188,7 @@
                     "name": "labelWidth",
                     "type": "double?",
                     "default": "null",
-                    "desc": "Menentukan lebar pasti untuk label pada layout horizontal. Sangat berguna agar titik dua (:) atau jarak value terlihat rata dan sejajar pada banyak baris data."
+                    "desc": "Menentukan lebar pasti untuk label pada layout horizontal. Sangat berguna agar titik dua (:) atau jarak value terlihat rata dan sejajar pada banyak baris data. (Catatan: Opsi ini diabaikan jika labelValueCenter = true)."
                 },
                 {
                     "name": "splitColumn",
@@ -2275,6 +2281,12 @@
             "methods": [],
             "behaviors": [
                 {
+                    "name": "Symmetrical Centered Override (labelValueCenter)",
+                    "type": "Layout Override Logic",
+                    "default": "",
+                    "desc": "Saat labelValueCenter bernilai true, komponen secara pintar mengabaikan konfigurasi orientasi dan memaksanya menjadi baris horizontal dengan alignment yang ditengahkan. Mengunci splitColumn ke 1 secara paksa guna mencegah data terpotong, membuang limitasi labelWidth absolut, serta membuat titik awal rendering (poros tengah) sangat simetris seperti desain struk pembayaran/detail target."
+                },
+                {
                     "name": "Smart Type Inference",
                     "type": "Data Parsing",
                     "default": "",
@@ -2313,11 +2325,12 @@
             ],
             "specialNotes": [
                 "Jika label bernilai null atau string kosong (''), ruang label akan otomatis dihilangkan sepenuhnya tanpa meninggalkan sisa spasi kosong.",
-                "Untuk penyelarasan data bentuk grid/tabel menggunakan layout horizontal, sangat disarankan mendefinisikan nilai `labelWidth`.",
+                "Pengaktifan `labelValueCenter: true` akan menimpa (override) aturan konfigurasi lain seperti `layout`, `labelWidth`, `splitColumn`, `labelAlign`, dan `valueAlign`.",
+                "Untuk penyelarasan data bentuk grid/tabel menggunakan layout horizontal (dan `labelValueCenter` false), sangat disarankan mendefinisikan nilai `labelWidth`.",
                 "Komponen pembagi (Divider) tidak akan dirender di bawah item paling terakhir dalam daftar data.",
                 "Ukuran dan rentang spasi pada divider (dashed/dotted) dihitung otomatis secara proporsional berdasarkan `dividerThickness` dan `scale`."
             ],
-            "code": "SmartInfoWidget(\n  layout: Axis.horizontal,\n  labelWidth: 100,\n  spacing: 16,\n  scale: 1.1,\n  valueMaxLines: 2,\n  showDivider: true,\n  dividerStyle: SmartDividerStyle.dashed,\n  dividerThickness: 1.5,\n  horizontalVerticalAlign: CrossAxisAlignment.center,\n  data: [\n    const InfoItemWidget(label: 'Nama Lengkap', value: 'John Doe'),\n    const InfoItemWidget(label: 'Status Aktif', value: true),\n    InfoItemWidget(label: 'Tindakan', value: ElevatedButton(onPressed: () {}, child: const Text('Edit'))),\n    const InfoItemWidget(label: 'Alamat', value: 'Jalan Pahlawan Kemerdekaan No. 123, Blok C, Jakarta Selatan, 12345'),\n  ],\n)"
+            "code": "// 1. Mode Standar dengan Label Width (Kiri)\nSmartInfoWidget(\n  layout: Axis.horizontal,\n  labelWidth: 100,\n  spacing: 16,\n  scale: 1.1,\n  showDivider: true,\n  dividerStyle: SmartDividerStyle.dashed,\n  data: [\n    const InfoItemWidget(label: 'Nama Lengkap', value: 'John Doe'),\n    const InfoItemWidget(label: 'Status Aktif', value: true),\n  ],\n)\n\n// 2. Mode Poros Tengah Simetris (Sesuai Referensi Gambar)\nSmartInfoWidget(\n  labelValueCenter: true, // Akan menimpa layout, alignment, dan column count\n  spacing: 12,\n  data: [\n    const InfoItemWidget(label: 'Target Produk:', value: 'Soblug'),\n    const InfoItemWidget(label: 'Target Qty:', value: '200 pcs'),\n    const InfoItemWidget(label: 'Jadwal Mulai:', value: '31 Agu 2026, 12:12'),\n    const InfoItemWidget(label: 'Jadwal Selesai:', value: '7 Sep 2026, 12:12'),\n  ],\n)"
         },
         {
             "id": "InfoPopoverWidget",
