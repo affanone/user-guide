@@ -609,15 +609,15 @@
         {
             "id": "compTeamRole",
             "group": "UI Components",
-            "name": "Team Role Card",
+            "name": "Team Role Glass Card",
             "icon": "fa-solid fa-users",
-            "description": "Merender kotak (card) yang menampilkan peran tim beserta daftar anggotanya. Dilengkapi dengan ikon, garis batas atas bergaya modern, dan efek animasi AOS.",
+            "description": "Merender kotak struktur tim dengan gaya Glassmorphism. Mendukung penambahan foto profil (opsional) dan sub-jabatan.",
             "mandatoryProps": [
                 {
                     "name": "data",
                     "type": "Array",
                     "default": "-",
-                    "desc": "Array asosiatif yang memuat informasi tim. Mendukung key 'role' (String untuk judul), 'members' (Array of String untuk daftar nama), dan 'icon' (opsional, nama ikon Lucide)."
+                    "desc": "Array yang memuat 'role', 'icon', dan 'members' (Bisa sekadar array nama, atau array of object berisi name, role, dan photo)"
                 }
             ],
             "optionalProps": [
@@ -625,14 +625,14 @@
                     "name": "delay",
                     "type": "Int",
                     "default": "0",
-                    "desc": "Waktu jeda (delay) untuk animasi masuk AOS dalam milidetik."
+                    "desc": "Waktu jeda (delay) untuk animasi AOS."
                 }
             ],
             "additionalInfo": {},
             "methods": [],
             "behaviors": [],
             "specialNotes": [],
-            "code": "<?php\n\\App\\Components\\TeamRole::render([\n    'role' => 'Atasan PPID',\n    'members' => [\n        'Prof. Dr. H. Saiful Hadi, M.Pd.',\n        'Dr. H. Maimun, M.Ag.'\n    ],\n    'icon' => 'users'\n], 100);\n?>"
+            "code": "<?php\n\\App\\Components\\TeamRole::render([\n    'role' => 'Tim Pengarah',\n    'icon' => 'compass',\n    'members' => [\n        [\n            'name' => 'Prof. Dr. H. Maimun, S.Ag. M.HI',\n            'role' => 'Anggota Tim Pengarah',\n            'photo' => '/assets/images/pejabat/maimun.jpg'\n        ],\n        [\n            'name' => 'Dr. H. Saiful Hadi, M.Pd.',\n            // Kosongkan 'photo' jika tidak ada foto\n            'photo' => '' \n        ]\n    ]\n], 100);\n?>"
         },
         {
             "id": "dbSelect",
