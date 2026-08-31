@@ -665,7 +665,7 @@
         {
             "id": "compExternalLinks",
             "group": "UI Components",
-            "name": "External Links & Attachments",
+            "name": "External Links",
             "icon": "fa-solid fa-link",
             "description": "Merender grup tautan eksternal atau lampiran file (dokumen). Dilengkapi dengan deteksi tipe file otomatis (PDF, Excel, Word, dll) untuk menampilkan ikon dan warna yang sesuai, serta mendukung opsi unduhan langsung.",
             "mandatoryProps": [
