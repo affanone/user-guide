@@ -965,7 +965,7 @@
             "group": "Widget",
             "name": "Copy Wrapper",
             "icon": "fa-regular fa-copy",
-            "description": "Widget pembungkus (wrapper) interaktif cerdas yang berfungsi menyalin nilai teks (string) ke dalam papan klip (clipboard) sistem. Dirancang dengan mengedepankan Micro-Interactions (UX), widget ini secara otomatis menyediakan umpan balik getaran (haptic), transisi visual berkedip (fade), serta perubahan kursor pada platform Desktop/Web. Komponen ini bersih dari logika notifikasi internal dan kini mendukung penuh operasi asinkron (async/await) pada callback-nya.",
+            "description": "Widget pembungkus (wrapper) interaktif cerdas yang berfungsi menyalin nilai teks (string) ke dalam papan klip (clipboard) sistem. Dirancang dengan mengedepankan Micro-Interactions (UX), widget ini secara otomatis menyediakan umpan balik getaran (haptic), transisi visual berkedip (fade), perubahan kursor pada platform Desktop/Web, serta dukungan Tooltip opsional. Komponen ini bersih dari logika notifikasi internal dan kini mendukung penuh operasi asinkron (async/await) pada callback-nya.",
             "mandatoryProps": [
                 {
                     "name": "value",
@@ -990,6 +990,12 @@
                     "type": "bool",
                     "default": "true",
                     "desc": "Mengaktifkan getaran halus (Haptic Feedback) pada perangkat mobile Android/iOS saat widget ditekan untuk memberikan sensasi respons fisik."
+                },
+                {
+                    "name": "tooltip",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Pesan teks bantuan yang muncul saat kursor ditahan (hover) di atas elemen pada Web/Desktop, atau saat elemen ditekan dan ditahan (long-press) di perangkat mobile."
                 }
             ],
             "additionalInfo": {
@@ -1015,13 +1021,19 @@
                     "type": "Event Flow",
                     "default": "",
                     "desc": "Mengeksekusi dan menunggu (`await`) pemanggilan fungsi `afterCopied` di dalam thread jika fungsi yang disematkan bertipe `Future`. Hal ini menjamin integrasi API atau proses asynchronous lain dieksekusi dengan urutan yang aman."
+                },
+                {
+                    "name": "Hover & Long-Press Tooltip",
+                    "type": "UX Enhancement",
+                    "default": "",
+                    "desc": "Jika properti `tooltip` diisi, widget ini otomatis dibungkus dengan komponen `Tooltip` bawaan Flutter yang langsung terintegrasi tanpa memengaruhi fungsi tap (klik tunggal)."
                 }
             ],
             "specialNotes": [
                 "Tanggung Jawab Notifikasi: Karena widget ini murni menangani mekanisme salin dan animasi mikro, pastikan Anda menggunakan callback `afterCopied` jika membutuhkan notifikasi pop-up (Snackbar) di antarmuka Anda.",
                 "Pemanggilan API: Anda dapat melakukan HTTP Request atau pemanggilan Supabase/Firebase di dalam `afterCopied` untuk melacak (tracking) teks apa saja yang telah disalin oleh user."
             ],
-            "code": "// 1. Mode Sinkron (Biasa)\nCopyWidget(\n  value: 'PO-20260818-221034',\n  afterCopied: () {\n     ScaffoldMessenger.of(context).showSnackBar(\n       const SnackBar(content: Text('Teks disalin!'))\n     );\n  },\n  child: Text('PO-20260818-221034'),\n)\n\n// 2. Mode Asinkron (Async / Await)\nCopyWidget(\n  value: 'Rp 94.550.000',\n  afterCopied: () async {\n     // 1. Munculkan loading/notifikasi\n     ScaffoldMessenger.of(context).showSnackBar(\n       const SnackBar(content: Text('Menyalin & mencatat log...'))\n     );\n     \n     // 2. Lakukan operasi API Asynchronous\n     await _apiService.logCopyAction('Copy Total Harga', 'Rp 94.550.000');\n     \n     // 3. Tampilkan pesan berhasil\n     print('Operasi API selesai setelah copy!');\n  },\n  child: const Icon(Icons.copy, size: 20, color: Colors.grey),\n)"
+            "code": "// 1. Mode Sinkron (Biasa) dengan Tooltip\nCopyWidget(\n  value: 'PO-20260818-221034',\n  tooltip: 'Salin Nomor PO ke Clipboard',\n  afterCopied: () {\n     ScaffoldMessenger.of(context).showSnackBar(\n       const SnackBar(content: Text('Teks disalin!'))\n     );\n  },\n  child: Text('PO-20260818-221034'),\n)\n\n// 2. Mode Asinkron (Async / Await)\nCopyWidget(\n  value: 'Rp 94.550.000',\n  tooltip: 'Salin Total Harga',\n  afterCopied: () async {\n     // 1. Munculkan loading/notifikasi\n     ScaffoldMessenger.of(context).showSnackBar(\n       const SnackBar(content: Text('Menyalin & mencatat log...'))\n     );\n     \n     // 2. Lakukan operasi API Asynchronous\n     await _apiService.logCopyAction('Copy Total Harga', 'Rp 94.550.000');\n     \n     // 3. Tampilkan pesan berhasil\n     print('Operasi API selesai setelah copy!');\n  },\n  child: const Icon(Icons.copy, size: 20, color: Colors.grey),\n)"
         },
         {
             "id": "NavigatorPageWidget",
