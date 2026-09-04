@@ -3411,13 +3411,13 @@
             "group": "Selection & Dropdown",
             "name": "Select / Dropdown",
             "icon": "fa-solid fa-chevron-down",
-            "description": "Dropdown standar berbasis Material Flutter yang telah terintegrasi dengan mesin dekorasi global. Dikendalikan secara reaktif melalui FormNode, mendukung 'selectedItemBuilder' untuk kustomisasi tampilan.",
+            "description": "Dropdown standar berbasis Material Flutter yang telah terintegrasi dengan mesin dekorasi global. Dikendalikan secara reaktif melalui FormNode, mendukung 'selectedItemBuilder' untuk kustomisasi tampilan, dan menggunakan model data universal FormSelectItem.",
             "mandatoryProps": [
                 {
                     "name": "items",
-                    "type": "List<DropdownMenuItem<T>>",
+                    "type": "List<FormSelectItem<T>>",
                     "default": "",
-                    "desc": "Daftar pilihan dropdown yang menggunakan DropdownMenuItem standar Flutter."
+                    "desc": "Daftar pilihan dropdown yang menggunakan model universal FormSelectItem. Memudahkan pertukaran komponen antara Select, Select2, dan SelectMultiple tanpa mengubah struktur data."
                 }
             ],
             "optionalProps": [
@@ -3547,9 +3547,308 @@
                 "globalDecoration": "Semua widget memiliki style otomatis dari FormStyle dan FormHelperWidget.decoration."
             },
             "specialNotes": [
-                "Menggunakan tipe generik <T> mutlak. Jika node digunakan, tipe data T harus selaras dengan parsing node (misalnya int atau String)."
+                "Menggunakan tipe generik <T> mutlak. Jika node digunakan, tipe data T harus selaras dengan parsing node (misalnya int atau String).",
+                "Kini terintegrasi penuh dengan model data FormSelectItem, sehingga dapat saling bertukar tipe UI (ke Select2 atau SelectMultiple) tanpa perlu merombak sumber data array."
             ],
-            "code": "FormHelperWidget.Select<int>(\n  label: 'Kategori',\n  node: _formCtrl.node('kategori'),\n  items: [\n    DropdownMenuItem(value: 1, child: Text('Makanan')),\n    DropdownMenuItem(value: 2, child: Text('Minuman')),\n  ],\n  displayBuilder: (val) => val == 1 ? 'Food' : 'Drink',\n  validator: (val) => val == null ? 'Pilih kategori!' : null,\n)"
+            "code": "FormHelperWidget.Select<int>(\n  label: 'Kategori',\n  node: _formCtrl.node('kategori'),\n  items: [\n    FormSelectItem(1, 'Makanan'),\n    FormSelectItem(2, 'Minuman'),\n  ],\n  displayBuilder: (val) => val == 1 ? 'Food' : 'Drink',\n  validator: (val) => val == null ? 'Pilih kategori!' : null,\n)"
+        },
+        {
+            "id": "select2",
+            "group": "Selection & Dropdown",
+            "name": "Select2 (Searchable)",
+            "icon": "fa-solid fa-magnifying-glass-arrow-right",
+            "description": "Dropdown searchable tingkat Enterprise. Saat diklik, widget akan membuka modal BottomSheet yang dilengkapi dengan kolom pencarian (filter) real-time. Sempurna untuk menangani daftar pilihan yang sangat panjang (ratusan item) agar user tidak kesulitan mencari. Kini terintegrasi dengan model universal FormSelectItem dan mendukung validasi terisolasi.",
+            "mandatoryProps": [
+                {
+                    "name": "items",
+                    "type": "List<FormSelectItem<T>>",
+                    "default": "",
+                    "desc": "Array objek FormSelectItem universal yang berisi nilai (value) dan label tampilan."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "key",
+                    "type": "Key?",
+                    "default": "null",
+                    "desc": "Kunci unik widget."
+                },
+                {
+                    "name": "label",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Label teks mengambang di atas form."
+                },
+                {
+                    "name": "node",
+                    "type": "FormNode?",
+                    "default": "null",
+                    "desc": "Simpul reaktif penyimpanan nilai value yang terpilih sebagai String."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
+                    "name": "value",
+                    "type": "T?",
+                    "default": "null",
+                    "desc": "Nilai bawaan terpilih awal."
+                },
+                {
+                    "name": "onChanged",
+                    "type": "ValueChanged<T?>?",
+                    "default": "null",
+                    "desc": "Penyadap yang bereaksi saat user memilih item dari hasil pencarian modal."
+                },
+                {
+                    "name": "validator",
+                    "type": "FormSelectValidator<T>?",
+                    "default": "null",
+                    "desc": "Validasi item form."
+                },
+                {
+                    "name": "valueTransformer",
+                    "type": "ValueTransformer<T>?",
+                    "default": "null",
+                    "desc": "Modifikasi data sebelum dipilih."
+                },
+                {
+                    "name": "icon",
+                    "type": "IconData?",
+                    "default": "null",
+                    "desc": "Ikon form utama."
+                },
+                {
+                    "name": "prefix",
+                    "type": "dynamic",
+                    "default": "null",
+                    "desc": "Sisipan komponen di kiri."
+                },
+                {
+                    "name": "suffix",
+                    "type": "dynamic",
+                    "default": "null",
+                    "desc": "Sisipan komponen di kanan."
+                },
+                {
+                    "name": "theme",
+                    "type": "FormElementTheme?",
+                    "default": "null",
+                    "desc": "Tema elemen form."
+                },
+                {
+                    "name": "size",
+                    "type": "FormElementSize?",
+                    "default": "null",
+                    "desc": "Skala proporsional elemen form dan Modal Bottom Sheet pencariannya."
+                },
+                {
+                    "name": "hintText",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Teks placeholder saat belum ada yang terpilih."
+                },
+                {
+                    "name": "enabled",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Status hidup/mati form."
+                },
+                {
+                    "name": "displayBuilder",
+                    "type": "String Function(T rawValue)?",
+                    "default": "null",
+                    "desc": "Mesin kosmetik untuk mengkustomisasi tampilan label di form utama."
+                },
+                {
+                    "name": "noBackground",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Melenyapkan latar box utama."
+                },
+                {
+                    "name": "noBorder",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Mematikan garis tepi box utama."
+                },
+                {
+                    "name": "noPadding",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Menghancurkan ruang bernapas di dalam box."
+                },
+                {
+                    "name": "noBorderRadius",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Memaksa sudut box menjadi siku."
+                }
+            ],
+            "additionalInfo": {
+                "globalSizing": "Mendukung sistem ukuran (size) berbasis FormElementSize. Juga mempengaruhi skala di dalam modal (font list, icon search, tinggi tombol).",
+                "globalDecoration": "Semua widget memiliki style otomatis dari FormStyle dan FormHelperWidget.decoration."
+            },
+            "specialNotes": [
+                "Menggunakan struktur Modal Bottom Sheet yang terintegrasi secara internal untuk fungsi search string.",
+                "Kini terintegrasi penuh dengan model data FormSelectItem, sehingga dapat saling bertukar tipe UI (ke Select atau SelectMultiple) tanpa perlu merombak sumber data array."
+            ],
+            "code": "FormHelperWidget.Select2<String>(\n  label: 'Provinsi',\n  node: _formCtrl.node('provinsi'),\n  items: [\n    FormSelectItem('ID-AC', 'Aceh'),\n    FormSelectItem('ID-BA', 'Bali'),\n  ],\n)"
+        },
+        {
+            "id": "select_multi",
+            "group": "Selection & Dropdown",
+            "name": "Select Multiple (Searchable)",
+            "icon": "fa-solid fa-list-check",
+            "description": "Dropdown pencarian untuk memilih banyak item sekaligus (Multi-select). Menggunakan modal BottomSheet dengan fitur pencarian real-time dan mekanisme 'Simpan' untuk memastikan data hanya terupdate setelah pengguna yakin dengan pilihannya. Kini terintegrasi dengan model universal FormSelectItem dan mendukung validasi terisolasi.",
+            "mandatoryProps": [
+                {
+                    "name": "items",
+                    "type": "List<FormSelectItem<T>>",
+                    "default": "",
+                    "desc": "Array objek FormSelectItem universal yang berisi nilai (value) dan label tampilan."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "key",
+                    "type": "Key?",
+                    "default": "null",
+                    "desc": "Kunci unik widget."
+                },
+                {
+                    "name": "label",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Label teks mengambang di atas form."
+                },
+                {
+                    "name": "node",
+                    "type": "FormNode?",
+                    "default": "null",
+                    "desc": "Simpul reaktif penyimpan nilai terpilih sebagai string yang digabung dengan separator."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
+                    "name": "values",
+                    "type": "List<T>?",
+                    "default": "null",
+                    "desc": "Daftar nilai awal terpilih jika tidak menggunakan node."
+                },
+                {
+                    "name": "onChanged",
+                    "type": "ValueChanged<List<T>>?",
+                    "default": "null",
+                    "desc": "Penyadap yang bereaksi setelah user menekan tombol 'Simpan' di modal."
+                },
+                {
+                    "name": "validator",
+                    "type": "FormValidator<List<T>>?",
+                    "default": "null",
+                    "desc": "Fungsi validasi error berdasarkan array nilai yang terpilih."
+                },
+                {
+                    "name": "valueTransformer",
+                    "type": "ValueTransformer<List<T>>?",
+                    "default": "null",
+                    "desc": "Memodifikasi List data terpilih sebelum diproses node."
+                },
+                {
+                    "name": "icon",
+                    "type": "IconData?",
+                    "default": "null",
+                    "desc": "Ikon visual di kiri."
+                },
+                {
+                    "name": "prefix",
+                    "type": "dynamic",
+                    "default": "null",
+                    "desc": "Sisipan kiri."
+                },
+                {
+                    "name": "suffix",
+                    "type": "dynamic",
+                    "default": "null",
+                    "desc": "Sisipan kanan."
+                },
+                {
+                    "name": "theme",
+                    "type": "FormElementTheme?",
+                    "default": "null",
+                    "desc": "Tema elemen form."
+                },
+                {
+                    "name": "size",
+                    "type": "FormElementSize?",
+                    "default": "null",
+                    "desc": "Skala ukuran form dan popup bottom sheet pencariannya."
+                },
+                {
+                    "name": "hintText",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Teks placeholder."
+                },
+                {
+                    "name": "enabled",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Status form. Jika false, modal pencarian tidak akan terbuka."
+                },
+                {
+                    "name": "separator",
+                    "type": "String",
+                    "default": ",",
+                    "desc": "Pemisah string dalam controller saat digabung."
+                },
+                {
+                    "name": "displayBuilder",
+                    "type": "String Function(T rawValue)?",
+                    "default": "null",
+                    "desc": "Mesin kosmetik untuk menampilkan nilai di form utama (format teks ringkas untuk tiap item)."
+                },
+                {
+                    "name": "noBackground",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Melenyapkan warna latar."
+                },
+                {
+                    "name": "noBorder",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Mematikan seluruh garis tepi box utama."
+                },
+                {
+                    "name": "noPadding",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Menghancurkan ruang bernapas di dalam box."
+                },
+                {
+                    "name": "noBorderRadius",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Memaksa sudut box menjadi siku."
+                }
+            ],
+            "additionalInfo": {
+                "globalSizing": "Mendukung sistem ukuran (size) berbasis FormElementSize.",
+                "globalDecoration": "Semua widget memiliki style otomatis dari FormStyle dan FormHelperWidget.decoration."
+            },
+            "specialNotes": [
+                "Menggunakan struktur Modal Bottom Sheet yang terintegrasi secara internal.",
+                "Kini terintegrasi penuh dengan model data FormSelectItem, sehingga dapat saling bertukar tipe UI (ke Select atau Select2) tanpa perlu merombak sumber data array."
+            ],
+            "code": "FormHelperWidget.SelectMultiple<String>(\n  label: 'Supplier Terkait',\n  node: _formCtrl.node('suppliers'),\n  items: [\n    FormSelectItem('SUP-01', 'PT. Maju Jaya'),\n    FormSelectItem('SUP-02', 'CV. Berkah Abadi'),\n  ],\n)"
         },
         {
             "id": "date",
@@ -5714,300 +6013,6 @@
                 "Memiliki _smartValidator bawaan yang otomatis memvalidasi parameter min dan max."
             ],
             "code": "FormHelperWidget.Number(\n  label: 'Stok Barang',\n  node: _formCtrl.node('stock'),\n  min: 1,\n  max: 999,\n  allowDecimal: false,\n)"
-        },
-        {
-            "id": "select2",
-            "group": "Selection & Dropdown",
-            "name": "Select2 (Searchable)",
-            "icon": "fa-solid fa-magnifying-glass-arrow-right",
-            "description": "Dropdown searchable tingkat Enterprise. Saat diklik, widget akan membuka modal BottomSheet yang dilengkapi dengan kolom pencarian (filter) real-time. Sempurna untuk menangani daftar pilihan yang sangat panjang (ratusan item) agar user tidak kesulitan mencari.",
-            "mandatoryProps": [
-                {
-                    "name": "items",
-                    "type": "List<Select2Item<T>>",
-                    "default": "",
-                    "desc": "Array objek Select2Item yang berisi nilai (value) dan label tampilan."
-                }
-            ],
-            "optionalProps": [
-                {
-                    "name": "key",
-                    "type": "Key?",
-                    "default": "null",
-                    "desc": "Kunci unik widget."
-                },
-                {
-                    "name": "label",
-                    "type": "String?",
-                    "default": "null",
-                    "desc": "Label teks mengambang di atas form."
-                },
-                {
-                    "name": "node",
-                    "type": "FormNode?",
-                    "default": "null",
-                    "desc": "Simpul reaktif penyimpanan nilai value yang terpilih sebagai String."
-                },
-                {
-                    "name": "showErrorMessage",
-                    "type": "bool",
-                    "default": "true",
-                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
-                },
-                {
-                    "name": "value",
-                    "type": "T?",
-                    "default": "null",
-                    "desc": "Nilai bawaan terpilih awal."
-                },
-                {
-                    "name": "onChanged",
-                    "type": "ValueChanged<T?>?",
-                    "default": "null",
-                    "desc": "Penyadap yang bereaksi saat user memilih item dari hasil pencarian modal."
-                },
-                {
-                    "name": "validator",
-                    "type": "FormSelectValidator<T>?",
-                    "default": "null",
-                    "desc": "Validasi item form."
-                },
-                {
-                    "name": "valueTransformer",
-                    "type": "ValueTransformer<T>?",
-                    "default": "null",
-                    "desc": "Modifikasi data sebelum dipilih."
-                },
-                {
-                    "name": "icon",
-                    "type": "IconData?",
-                    "default": "null",
-                    "desc": "Ikon form utama."
-                },
-                {
-                    "name": "prefix",
-                    "type": "dynamic",
-                    "default": "null",
-                    "desc": "Sisipan komponen di kiri."
-                },
-                {
-                    "name": "suffix",
-                    "type": "dynamic",
-                    "default": "null",
-                    "desc": "Sisipan komponen di kanan."
-                },
-                {
-                    "name": "theme",
-                    "type": "FormElementTheme?",
-                    "default": "null",
-                    "desc": "Tema elemen form."
-                },
-                {
-                    "name": "size",
-                    "type": "FormElementSize?",
-                    "default": "null",
-                    "desc": "Skala proporsional elemen form dan Modal Bottom Sheet pencariannya."
-                },
-                {
-                    "name": "hintText",
-                    "type": "String?",
-                    "default": "null",
-                    "desc": "Teks placeholder saat belum ada yang terpilih."
-                },
-                {
-                    "name": "enabled",
-                    "type": "bool",
-                    "default": "true",
-                    "desc": "Status hidup/mati form."
-                },
-                {
-                    "name": "displayBuilder",
-                    "type": "String Function(T rawValue)?",
-                    "default": "null",
-                    "desc": "Mesin kosmetik untuk mengkustomisasi tampilan label di form utama."
-                },
-                {
-                    "name": "noBackground",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Kosmetik: Melenyapkan latar box utama."
-                },
-                {
-                    "name": "noBorder",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Kosmetik: Mematikan garis tepi box utama."
-                },
-                {
-                    "name": "noPadding",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Kosmetik: Menghancurkan ruang bernapas di dalam box."
-                },
-                {
-                    "name": "noBorderRadius",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Kosmetik: Memaksa sudut box menjadi siku."
-                }
-            ],
-            "additionalInfo": {
-                "globalSizing": "Mendukung sistem ukuran (size) berbasis FormElementSize. Juga mempengaruhi skala di dalam modal (font list, icon search, tinggi tombol).",
-                "globalDecoration": "Semua widget memiliki style otomatis dari FormStyle dan FormHelperWidget.decoration."
-            },
-            "specialNotes": [
-                "Menggunakan struktur Modal Bottom Sheet yang terintegrasi secara internal untuk fungsi search string."
-            ],
-            "code": "FormHelperWidget.Select2<String>(\n  label: 'Provinsi',\n  node: _formCtrl.node('provinsi'),\n  items: [\n    Select2Item('ID-AC', 'Aceh'),\n    Select2Item('ID-BA', 'Bali'),\n  ],\n)"
-        },
-        {
-            "id": "select_multi",
-            "group": "Selection & Dropdown",
-            "name": "Select Multiple (Searchable)",
-            "icon": "fa-solid fa-list-check",
-            "description": "Dropdown pencarian untuk memilih banyak item sekaligus (Multi-select). Menggunakan modal BottomSheet dengan fitur pencarian real-time dan mekanisme 'Simpan' untuk memastikan data hanya terupdate setelah pengguna yakin dengan pilihannya.",
-            "mandatoryProps": [
-                {
-                    "name": "items",
-                    "type": "List<Select2Item<T>>",
-                    "default": "",
-                    "desc": "Daftar sumber data yang dapat dipilih."
-                }
-            ],
-            "optionalProps": [
-                {
-                    "name": "key",
-                    "type": "Key?",
-                    "default": "null",
-                    "desc": "Kunci unik widget."
-                },
-                {
-                    "name": "label",
-                    "type": "String?",
-                    "default": "null",
-                    "desc": "Label teks mengambang di atas form."
-                },
-                {
-                    "name": "node",
-                    "type": "FormNode?",
-                    "default": "null",
-                    "desc": "Simpul reaktif penyimpan nilai terpilih sebagai string yang digabung dengan separator."
-                },
-                {
-                    "name": "showErrorMessage",
-                    "type": "bool",
-                    "default": "true",
-                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
-                },
-                {
-                    "name": "values",
-                    "type": "List<T>?",
-                    "default": "null",
-                    "desc": "Daftar nilai awal terpilih jika tidak menggunakan node."
-                },
-                {
-                    "name": "onChanged",
-                    "type": "ValueChanged<List<T>>?",
-                    "default": "null",
-                    "desc": "Penyadap yang bereaksi setelah user menekan tombol 'Simpan' di modal."
-                },
-                {
-                    "name": "validator",
-                    "type": "FormValidator<String>?",
-                    "default": "null",
-                    "desc": "Fungsi validasi error."
-                },
-                {
-                    "name": "valueTransformer",
-                    "type": "ValueTransformer<List<T>>?",
-                    "default": "null",
-                    "desc": "Memodifikasi List data terpilih sebelum diproses node."
-                },
-                {
-                    "name": "icon",
-                    "type": "IconData?",
-                    "default": "null",
-                    "desc": "Ikon visual di kiri."
-                },
-                {
-                    "name": "prefix",
-                    "type": "dynamic",
-                    "default": "null",
-                    "desc": "Sisipan kiri."
-                },
-                {
-                    "name": "suffix",
-                    "type": "dynamic",
-                    "default": "null",
-                    "desc": "Sisipan kanan."
-                },
-                {
-                    "name": "theme",
-                    "type": "FormElementTheme?",
-                    "default": "null",
-                    "desc": "Tema elemen form."
-                },
-                {
-                    "name": "size",
-                    "type": "FormElementSize?",
-                    "default": "null",
-                    "desc": "Skala ukuran form dan popup bottom sheet pencariannya."
-                },
-                {
-                    "name": "hintText",
-                    "type": "String?",
-                    "default": "null",
-                    "desc": "Teks placeholder."
-                },
-                {
-                    "name": "enabled",
-                    "type": "bool",
-                    "default": "true",
-                    "desc": "Status form. Jika false, modal pencarian tidak akan terbuka."
-                },
-                {
-                    "name": "separator",
-                    "type": "String",
-                    "default": ",",
-                    "desc": "Pemisah string dalam controller saat digabung."
-                },
-                {
-                    "name": "displayBuilder",
-                    "type": "String Function(T rawValue)?",
-                    "default": "null",
-                    "desc": "Mesin kosmetik untuk menampilkan nilai di form utama (format teks ringkas untuk tiap item)."
-                },
-                {
-                    "name": "noBackground",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Kosmetik: Melenyapkan warna latar."
-                },
-                {
-                    "name": "noBorder",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Kosmetik: Mematikan seluruh garis tepi box utama."
-                },
-                {
-                    "name": "noPadding",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Kosmetik: Menghancurkan ruang bernapas di dalam box."
-                },
-                {
-                    "name": "noBorderRadius",
-                    "type": "bool",
-                    "default": "false",
-                    "desc": "Kosmetik: Memaksa sudut box menjadi siku."
-                }
-            ],
-            "additionalInfo": {
-                "globalSizing": "Mendukung sistem ukuran (size) berbasis FormElementSize.",
-                "globalDecoration": "Semua widget memiliki style otomatis dari FormStyle dan FormHelperWidget.decoration."
-            },
-            "specialNotes": [],
-            "code": "FormHelperWidget.SelectMultiple<String>(\n  label: 'Supplier Terkait',\n  node: _formCtrl.node('suppliers'),\n  items: [\n    Select2Item('SUP-01', 'PT. Maju Jaya'),\n    Select2Item('SUP-02', 'CV. Berkah Abadi'),\n  ],\n)"
         },
         {
             "id": "autocomplete",
