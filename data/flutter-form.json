@@ -4872,13 +4872,13 @@
             "group": "Radio, Checkbox & Switch",
             "name": "Radio Group",
             "icon": "fa-regular fa-circle-dot",
-            "description": "Grup Radio reaktif untuk memilih satu opsi dari daftar yang tersedia. Dikendalikan secara instan oleh FormNode. Mendukung 'Custom Child' yang memungkinkan pengembang merender UI apa pun di dalam setiap opsi radio.",
+            "description": "Grup Radio reaktif untuk memilih satu opsi dari daftar yang tersedia. Dikendalikan secara instan oleh FormNode. Kini terintegrasi penuh dengan model universal FormSelectItem, mendukung injeksi 'child' yang memungkinkan pengembang merender UI kustom apa pun di dalam setiap opsi radio.",
             "mandatoryProps": [
                 {
                     "name": "items",
-                    "type": "List<FormRadioItem<T>>",
+                    "type": "List<FormSelectItem<T>>",
                     "default": "",
-                    "desc": "Array pilihan yang dibungkus dalam FormRadioItem (memuat value, label, sublabel, atau customChild)."
+                    "desc": "Array pilihan yang dibungkus dalam FormSelectItem universal (memuat value, label, sublabel, atau child)."
                 }
             ],
             "optionalProps": [
@@ -5008,9 +5008,9 @@
                 "globalDecoration": "Semua widget memiliki style otomatis dari FormStyle dan FormHelperWidget.decoration."
             },
             "specialNotes": [
-                "Menggunakan customChild memungkinkan developer untuk membungkus radio ke dalam container custom penuh (misal: Card dengan gambar)."
+                "Menggunakan properti 'child' pada FormSelectItem memungkinkan developer untuk membungkus radio ke dalam container custom penuh (misal: Card dengan gambar)."
             ],
-            "code": "FormHelperWidget.Radio<String>(\n  label: 'Pilih Metode Pembayaran',\n  node: _formCtrl.node('metode_bayar'),\n  columns: 1,\n  items: [\n    FormRadioItem(value: 'cod', label: 'Cash on Delivery'),\n    FormRadioItem(value: 'tf', label: 'Transfer Bank'),\n  ],\n)"
+            "code": "FormHelperWidget.Radio<String>(\n  label: 'Pilih Metode Pembayaran',\n  node: _formCtrl.node('metode_bayar'),\n  columns: 1,\n  items: const [\n    FormSelectItem('cod', 'Cash on Delivery'),\n    FormSelectItem('tf', 'Transfer Bank'),\n  ],\n)"
         },
         {
             "id": "colorpicker",
@@ -6164,13 +6164,13 @@
             "group": "Chips & Choice",
             "name": "ChoiceSingle",
             "icon": "fa-regular fa-hand-pointer",
-            "description": "Alternatif UI dari Radio/Dropdown yang jauh lebih interaktif. Ditampilkan dalam bentuk deretan Chip/Kapsul reaktif. Mengizinkan satu pilihan mutlak dengan animasi transisi micro-interaction.",
+            "description": "Alternatif UI dari Radio/Dropdown yang jauh lebih interaktif. Ditampilkan dalam bentuk deretan Chip/Kapsul reaktif. Mengizinkan satu pilihan mutlak dengan animasi transisi micro-interaction. Kini terintegrasi penuh dengan model data universal FormSelectItem.",
             "mandatoryProps": [
                 {
                     "name": "items",
-                    "type": "List<FormChoiceItem<T>>",
+                    "type": "List<FormSelectItem<T>>",
                     "default": "",
-                    "desc": "Array pilihan yang dibungkus dalam FormChoiceItem (value dan label)."
+                    "desc": "Array pilihan yang dibungkus dalam FormSelectItem universal (mendukung value, label, sublabel, dan injeksi widget anak)."
                 }
             ],
             "optionalProps": [
@@ -6212,7 +6212,7 @@
                 },
                 {
                     "name": "validator",
-                    "type": "String? Function(T? value)?",
+                    "type": "FormValidator<T?>?",
                     "default": "null",
                     "desc": "Fungsi validasi."
                 },
@@ -6299,21 +6299,23 @@
                 "globalSizing": "Mendukung sistem ukuran (size) berbasis FormElementSize.",
                 "globalDecoration": "Semua widget memiliki style otomatis dari FormStyle dan FormHelperWidget.decoration."
             },
-            "specialNotes": [],
-            "code": "FormHelperWidget.ChoiceSingle<String>(\n  label: 'Ukuran',\n  node: _formCtrl.node('ukuran'),\n  items: [\n    FormChoiceItem('S', 'Small'),\n    FormChoiceItem('M', 'Medium'),\n  ],\n)"
+            "specialNotes": [
+                "Kini terintegrasi penuh dengan model data FormSelectItem, sehingga array data dapat dengan mudah dilempar ke komponen lain tanpa modifikasi."
+            ],
+            "code": "FormHelperWidget.ChoiceSingle<String>(\n  label: 'Ukuran',\n  node: _formCtrl.node('ukuran'),\n  items: const [\n    FormSelectItem('S', 'Small'),\n    FormSelectItem('M', 'Medium'),\n  ],\n)"
         },
         {
             "id": "choice",
             "group": "Chips & Choice",
             "name": "Choice",
             "icon": "fa-regular fa-hand-pointer",
-            "description": "Alternatif UI dari Checkbox yang jauh lebih interaktif. Ditampilkan dalam bentuk deretan Chip/Kapsul reaktif. Mengizinkan pemilihan ganda (multi-select) yang disimpan sebagai gabungan string.",
+            "description": "Alternatif UI dari Checkbox yang jauh lebih interaktif. Ditampilkan dalam bentuk deretan Chip/Kapsul reaktif. Mengizinkan pemilihan ganda (multi-select) yang disimpan sebagai gabungan string. Kini terintegrasi penuh dengan model data universal FormSelectItem.",
             "mandatoryProps": [
                 {
                     "name": "items",
-                    "type": "List<FormChoiceItem<T>>",
+                    "type": "List<FormSelectItem<T>>",
                     "default": "",
-                    "desc": "Array pilihan FormChoiceItem."
+                    "desc": "Array pilihan yang dibungkus dalam FormSelectItem universal."
                 }
             ],
             "optionalProps": [
@@ -6355,9 +6357,9 @@
                 },
                 {
                     "name": "validator",
-                    "type": "FormValidator<String>?",
+                    "type": "FormValidator<List<T>>?",
                     "default": "null",
-                    "desc": "Fungsi validasi form."
+                    "desc": "Fungsi validasi form berdasarkan array nilai yang terpilih."
                 },
                 {
                     "name": "valueTransformer",
@@ -6448,8 +6450,11 @@
                 "globalSizing": "Mendukung sistem ukuran (size) berbasis FormElementSize.",
                 "globalDecoration": "Semua widget memiliki style otomatis dari FormStyle dan FormHelperWidget.decoration."
             },
-            "specialNotes": [],
-            "code": "FormHelperWidget.Choice<int>(\n  label: 'Ekstrakurikuler',\n  node: _formCtrl.node('ekskul'),\n  items: [\n    FormChoiceItem(1, 'Futsal'),\n    FormChoiceItem(2, 'Basket'),\n  ],\n)"
+            "specialNotes": [
+                "Tipe validator telah diperbaiki menjadi FormValidator<List<T>>? agar sesuai dengan sifat array dari data yang dikembalikan.",
+                "Kini terintegrasi penuh dengan model data FormSelectItem, sehingga array data dapat dengan mudah dilempar ke komponen lain tanpa modifikasi."
+            ],
+            "code": "FormHelperWidget.Choice<int>(\n  label: 'Ekstrakurikuler',\n  node: _formCtrl.node('ekskul'),\n  items: const [\n    FormSelectItem(1, 'Futsal'),\n    FormSelectItem(2, 'Basket'),\n  ],\n)"
         },
         {
             "id": "chip",

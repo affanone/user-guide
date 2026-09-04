@@ -3775,14 +3775,21 @@
                     "type": "Object? (T?) Extension",
                     "default": "fallback",
                     "desc": "Menyediakan nilai cadangan murni hanya jika data bernilai null. Digunakan secara eksklusif untuk tipe data yang tidak memiliki konsep 'kosong' (seperti int, double, atau bool)."
+                },
+                {
+                    "name": "isNullOrEmpty",
+                    "type": "Object? Extension (Getter)",
+                    "default": "bool",
+                    "desc": "Properti getter ringkas yang mengevaluasi apakah suatu objek bernilai null, string kosong (termasuk spasi acak), list kosong, atau map kosong. Angka 0 akan dikembalikan sebagai false."
                 }
             ],
             "behaviors": [],
             "specialNotes": [
                 "Keuntungan Performa: Karena tidak menggunakan Generic Type checking universal, Dart compiler akan melakukan inlining langsung ke alamat memori. Sangat aman dipanggil ribuan kali di dalam fungsi render UI (seperti ListView.builder).",
-                "Angka 0 dan boolean false BUKAN nilai kosong. Jangan gunakan ifEmpty untuk angka, gunakan ifNull."
+                "Angka 0 dan boolean false BUKAN nilai kosong. Jangan gunakan ifEmpty untuk angka, gunakan ifNull.",
+                "isNullOrEmpty bertindak sebagai getter (properti), sehingga pemanggilannya tidak memerlukan tanda kurung ()."
             ],
-            "code": "String? name = '   ';\nString safeName = name.ifEmpty('Tanpa Nama');\n// Output: 'Tanpa Nama'\n\nList<String>? tags = [];\nList<String> safeTags = tags.ifEmpty(['Umum']);\n// Output: ['Umum']\n\nint? count = 0;\nint safeCount = count.ifNull(10);\n// Output: 0 (Karena 0 tidak dianggap null/kosong)"
+            "code": "String? name = '   ';\nString safeName = name.ifEmpty('Tanpa Nama');\n// Output: 'Tanpa Nama'\n\nList<String>? tags = [];\nList<String> safeTags = tags.ifEmpty(['Umum']);\n// Output: ['Umum']\n\nint? count = 0;\nint safeCount = count.ifNull(10);\n// Output: 0 (Karena 0 tidak dianggap null/kosong)\n\nString? input = '   ';\nprint(input.isNullOrEmpty);\n// Output: true"
         },
         {
             "id": "timezone-synchronizer",
