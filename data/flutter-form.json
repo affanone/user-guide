@@ -234,7 +234,7 @@
             "group": "Core",
             "name": "FormNode (Reactive Leaf Accessor)",
             "icon": "fa-solid fa-circle-nodes",
-            "description": "Accessor fundamental (leaf) untuk merepresentasikan state tunggal di dalam FormHelperController. Bertindak sebagai simpul reaktif yang mengikat UI dengan state data secara tersentralisasi. Dilengkapi Smart Event Registry untuk mencegah duplikasi listener dan memory leak.",
+            "description": "Accessor fundamental (leaf) untuk merepresentasikan state tunggal di dalam FormHelperController. Bertindak sebagai simpul reaktif yang mengikat UI dengan state data secara tersentralisasi. Dilengkapi Smart Event Registry untuk mencegah duplikasi listener, memory leak, serta kunci akses UI (fieldKey) untuk validasi terisolasi.",
             "mandatoryProps": [
                 {
                     "name": "path",
@@ -299,6 +299,7 @@
                     ".hasFocus -> Evaluator state fokus secara real-time. [Tipe: bool, Default: \"false\"]",
                     ".controller -> Akses tingkat rendah ke TextEditingController internal. [Tipe: TextEditingController]",
                     ".focusNode -> Akses tingkat rendah ke FocusNode internal. [Tipe: FocusNode]",
+                    ".fieldKey -> Kunci global (GlobalKey) eksklusif untuk mengeksekusi validasi atau render visual UI secara spesifik dan terisolasi. [Tipe: GlobalKey<FormFieldState>]",
                     ".enabled -> Notifier reaktif untuk status aktif/nonaktif. [Tipe: ValueNotifier<bool>]",
                     ".visible -> Notifier reaktif untuk status visibilitas. [Tipe: ValueNotifier<bool>]",
                     ".isValid -> Pengecekan status validasi tanpa memicu efek UI sampingan (silent check). [Tipe: bool]",
@@ -453,7 +454,8 @@
                 "Atribut konfigurasi (initialValue, isEnabled, dll) hanya dieksekusi pada fase inisialisasi awal pembuatan node.",
                 "Dilarang keras melakukan instansiasi FormNode manual di luar FormHelperController. Selalu gunakan controller.node().",
                 "Smart Event Registry terintegrasi memastikan pembersihan memori absolut saat dispose() dipanggil.",
-                "Validasi pasif (getter `.isValid`) digaransi aman dari efek samping UI (getar tak disengaja)."
+                "Validasi pasif (getter `.isValid`) digaransi aman dari efek samping UI (getar tak disengaja).",
+                "Setiap instansi FormNode dilengkapi properti `.fieldKey` secara otomatis untuk mendukung validasi instan yang difokuskan pada satu form spesifik, misalnya lewat pemanggilan `controller.validate('path')`."
             ],
             "code": "final form = FormHelperController();\n\n@override\nvoid initState() {\n  super.initState();\n  \n  final amountNode = form.node(\n    'amount',\n    initialValue: '10000',\n    isEnabled: true,\n    isVisible: true,\n    shakeOnError: true,\n  );\n\n  amountNode.onValidate = (value) {\n    if (value == null || value.isEmpty) return 'Harga wajib diisi';\n    if (int.tryParse(value) == null) return 'Harus berupa angka';\n    if (int.parse(value) < 1000) return 'Minimal harga 1000';\n    return null;\n  };\n\n  amountNode.addListener((node) {\n    if (!node.hasFocus) {\n      if (!node.isValid) {\n        print('Error terdeteksi: \\${node.errorMessage}');\n        node.shake();\n      }\n    }\n  });\n\n  amountNode.addTextListener((text) {\n    print('Nilai amount berubah menjadi: $text');\n    print('Angka murni: \\${amountNode.getInt(fallback: 0)}');\n  });\n}\n\n@override\nvoid dispose() {\n  form.dispose();\n  super.dispose();\n}"
         },
