@@ -3777,10 +3777,10 @@
                     "desc": "Menyediakan nilai cadangan murni hanya jika data bernilai null. Digunakan secara eksklusif untuk tipe data yang tidak memiliki konsep 'kosong' (seperti int, double, atau bool)."
                 },
                 {
-                    "name": "isNullOrEmpty",
-                    "type": "Object? Extensio",
+                    "name": "isNullOrEmpty({bool considerZeroAsEmpty})",
+                    "type": "Object? Extension Method",
                     "default": "bool",
-                    "desc": "Properti getter ringkas yang mengevaluasi apakah suatu objek bernilai null, string kosong (termasuk spasi acak), list kosong, atau map kosong. Angka 0 akan dikembalikan sebagai false."
+                    "desc": "Fungsi ringkas yang mengevaluasi secara cerdas apakah suatu objek bernilai null, string kosong (termasuk spasi acak), list kosong, atau map kosong. Menyediakan parameter opsional `considerZeroAsEmpty` (default: false) yang jika disetel ke true, akan menganggap tipe angka (num) bernilai 0 atau negatif (<= 0) sebagai kosong."
                 }
             ],
             "behaviors": [],
