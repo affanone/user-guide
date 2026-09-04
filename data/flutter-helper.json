@@ -3778,7 +3778,7 @@
                 },
                 {
                     "name": "isNullOrEmpty",
-                    "type": "Object? Extension (Getter)",
+                    "type": "Object? Extensio",
                     "default": "bool",
                     "desc": "Properti getter ringkas yang mengevaluasi apakah suatu objek bernilai null, string kosong (termasuk spasi acak), list kosong, atau map kosong. Angka 0 akan dikembalikan sebagai false."
                 }
