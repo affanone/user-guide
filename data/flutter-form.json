@@ -912,6 +912,60 @@
             "code": "FormHelperWidget.Button(\n  label: 'Hapus Data',\n  theme: FormButtonTheme.danger,\n  variant: FormButtonVariant.outline,\n  icon: Icons.delete,\n  block: true,\n  isLoading: _isDeleting,\n  onPressed: () => deleteData(),\n)"
         },
         {
+            "id": "button-group",
+            "group": "Action",
+            "name": "Button Group",
+            "icon": "fa-solid fa-layer-group",
+            "description": "Grup tombol tingkat Enterprise yang dikalibrasi mutlak dengan tinggi form input standar. Menyatukan berbagai aksi ke dalam satu baris dengan efek seamless joint (tanpa border ganda) dan clipping radius dinamis pada ujung awal serta akhir. Dilengkapi kecerdasan 'Smart Luminance Contrast' yang secara otomatis mengkalkulasi warna teks/ikon (hitam atau putih) berdasarkan tingkat kecerahan warna background.",
+            "mandatoryProps": [
+                {
+                    "name": "buttons",
+                    "type": "List<ButtonGroupItem>",
+                    "default": "",
+                    "desc": "Array yang berisi konfigurasi masing-masing tombol. Setiap `ButtonGroupItem` mendukung kustomisasi mandiri meliputi: `label`, `icon`, `iconPosition`, `theme`, `color` (warna custom), `tooltip`, `isLoading`, `enabled`, serta event listener (`onPressed`, `onDoubleTap`, `onLongPress`, `onRightClick`)."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "key",
+                    "type": "Key?",
+                    "default": "null",
+                    "desc": "Identifikasi widget."
+                },
+                {
+                    "name": "variant",
+                    "type": "FormButtonVariant",
+                    "default": "FormButtonVariant.solid",
+                    "desc": "Gaya visual yang diterapkan secara global untuk seluruh tombol di dalam grup: solid, outline, soft, atau text."
+                },
+                {
+                    "name": "size",
+                    "type": "FormElementSize?",
+                    "default": "null",
+                    "desc": "Dimensi skala rasio (xs, sm, md, lg, xl). Secara mutlak mengadopsi proporsi tinggi, padding, dan ukuran ikon yang sama persis dengan komponen FormHelperWidget.Button standar."
+                },
+                {
+                    "name": "scale",
+                    "type": "double?",
+                    "default": "null",
+                    "desc": "Pengganda ukuran kustom (contoh: 1.2 untuk 120%). Override nilai size."
+                },
+                {
+                    "name": "block",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Memaksa grup tombol memenuhi lebar parent (width: 100%). Lebar masing-masing tombol di dalamnya akan terbagi rata (Expanded)."
+                }
+            ],
+            "additionalInfo": {},
+            "specialNotes": [
+                "Smart Luminance: Jika pengembang menyuntikkan properti 'color' kustom (misal: Colors.yellow) pada ButtonGroupItem, sistem akan mengubah warna ikon dan teks di dalamnya menjadi gelap agar tetap terbaca.",
+                "Anti-Double Border: Batas (border) antar tombol yang saling bersebelahan secara otomatis dipangkas menjadi 1px agar sambungan terlihat mulus layaknya UI Enterprise.",
+                "Setiap objek ButtonGroupItem wajib menyertakan setidaknya satu buah 'label' atau 'icon'."
+            ],
+            "code": "FormHelperWidget.ButtonGroup(\n  size: FormElementSize.md,\n  variant: FormButtonVariant.solid,\n  buttons: [\n    ButtonGroupItem(\n      label: 'Kiri',\n      icon: Icons.format_align_left,\n      theme: FormElementTheme.secondary,\n      onPressed: () {},\n    ),\n    ButtonGroupItem(\n      label: 'Tengah',\n      theme: FormElementTheme.primary,\n      onPressed: () {},\n    ),\n    ButtonGroupItem(\n      label: 'Kanan',\n      icon: Icons.format_align_right,\n      iconPosition: FormButtonIconPosition.suffix,\n      color: Colors.yellow, // Teks otomatis hitam!\n      onPressed: () {},\n    ),\n  ],\n)"
+        },
+        {
             "id": "text",
             "group": "Input Teks & Angka",
             "name": "Text Field",
