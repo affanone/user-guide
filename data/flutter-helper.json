@@ -1873,115 +1873,89 @@
         {
             "id": "PulseWidget",
             "group": "Widget",
-            "name": "Shape-Shifting Pulse Animation",
+            "name": "Dissolving Wave Pulse Animation",
             "icon": "fa-solid fa-tower-broadcast",
-            "description": "Widget animasi berdenyut (Pulse) tingkat lanjut dengan fitur 'Shape-Shifting'. Gelombang pulse tidak hanya terbatas pada lingkaran, namun bisa dikonfigurasi menjadi Kotak Membulat (Rounded Box) atau bahkan menduplikasi bentuk abstrak dari widget child secara presisi (seperti pola Bintang, Logo, atau Teks). Beroperasi dengan performa 60fps bebas memory-leak melalui arsitektur dual-rendering (CustomPainter untuk bentuk standar & Matriks Transformasi untuk kloning).",
+            "description": "Widget animasi berdenyut (Pulse) efisien dengan efek gelombang padat (solid dissolving wave) yang mendukung berbagai arah pergerakan (outward, inward, inPlace) serta kompensasi batas kustom (boundsCompensation) untuk presisi geometri absolut tanpa memory leak.",
             "mandatoryProps": [
                 {
                     "name": "child",
                     "type": "Widget",
                     "default": "",
-                    "desc": "Widget utama yang berada di pusat animasi pulse. Bisa berupa Icon, FloatingActionButton, Avatar, Container, atau widget kustom lainnya."
+                    "desc": "Widget utama yang berada di pusat animasi pulse."
                 }
             ],
             "optionalProps": [
                 {
-                    "name": "pulseShape",
-                    "type": "PulseShape",
-                    "default": "PulseShape.circle",
-                    "desc": "Bentuk dari gelombang pulse. Pilih 'circle' untuk lingkaran murni, 'box' untuk kotak (bisa dikombinasi dengan borderRadius), atau 'childClone' untuk menduplikasi bentuk bayangan child secara identik."
-                },
-                {
-                    "name": "pulseStyle",
-                    "type": "PulseStyle",
-                    "default": "PulseStyle.solid",
-                    "desc": "Gaya pewarnaan (solid, outline, atau glow). Catatan: Opsi ini hanya berlaku penuh pada bentuk 'circle' dan 'box'. Pada mode 'childClone', gaya akan selalu berupa solid clone."
-                },
-                {
-                    "name": "borderRadius",
-                    "type": "BorderRadiusGeometry?",
-                    "default": "null",
-                    "desc": "Kelengkungan sudut (border radius). Parameter ini WAJIB atau hanya bekerja jika pulseShape diatur sebagai PulseShape.box."
-                },
-                {
-                    "name": "color",
-                    "type": "Color?",
-                    "default": "null",
-                    "desc": "Warna gelombang. Jika null, sistem akan mengekstrak otomatis dari child (jika itu Icon) atau memakai Theme primary color."
-                },
-                {
-                    "name": "minSize",
+                    "name": "expansion",
                     "type": "double",
-                    "default": "24.0",
-                    "desc": "Ukuran skala atau diameter awal gelombang sebelum mulai memuai."
-                },
-                {
-                    "name": "maxSize",
-                    "type": "double",
-                    "default": "64.0",
-                    "desc": "Ukuran area batas frame dan diameter maksimal gelombang saat memudar habis."
+                    "default": "28.0",
+                    "desc": "Seberapa jauh gelombang melebar keluar atau menyusut ke dalam (dalam pixel)."
                 },
                 {
                     "name": "duration",
                     "type": "Duration",
-                    "default": "Duration(milliseconds: 2000)",
-                    "desc": "Durasi satu siklus animasi penuh. Semakin lama angkanya, semakin pelan dan terlihat premium."
-                },
-                {
-                    "name": "ringsCount",
-                    "type": "int",
-                    "default": "2",
-                    "desc": "Jumlah gelombang berlapis yang dipancarkan secara bersamaan dengan jeda (staggered)."
-                },
-                {
-                    "name": "repeat",
-                    "type": "bool",
-                    "default": "true",
-                    "desc": "Jika true, animasi berulang selamanya. Jika false, hanya akan berkedip sesuai hitungan parameter 'pulseCount'."
+                    "default": "Duration(milliseconds: 1600)",
+                    "desc": "Durasi satu siklus animasi penuh."
                 },
                 {
                     "name": "pulseCount",
-                    "type": "int",
-                    "default": "3",
-                    "desc": "Batas jumlah kedipan jika animasi diatur untuk tidak berulang (repeat = false)."
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Jumlah gelombang (null = berulang selamanya)."
                 },
                 {
-                    "name": "enabled",
-                    "type": "bool",
-                    "default": "true",
-                    "desc": "Saklar play/pause. Jika false, controller otomatis mati untuk menghemat memori."
+                    "name": "delay",
+                    "type": "Duration",
+                    "default": "Duration.zero",
+                    "desc": "Jeda waktu antar gelombang."
+                },
+                {
+                    "name": "color",
+                    "type": "Color",
+                    "default": "Colors.amber",
+                    "desc": "Warna dasar gelombang."
+                },
+                {
+                    "name": "borderRadius",
+                    "type": "BorderRadiusGeometry",
+                    "default": "BorderRadius.all(Radius.circular(12))",
+                    "desc": "Kelengkungan sudut (border radius) bentuk gelombang."
+                },
+                {
+                    "name": "direction",
+                    "type": "PulseDirection",
+                    "default": "PulseDirection.outward",
+                    "desc": "Arah gelombang: 'outward' (keluar), 'inward' (ke dalam), atau 'inPlace' (menetap selebar child)."
+                },
+                {
+                    "name": "boundsCompensation",
+                    "type": "EdgeInsets",
+                    "default": "EdgeInsets.zero",
+                    "desc": "Kompensasi batas LTRB untuk penyesuaian penyusutan atau penambahan geometri secara presisi."
                 }
             ],
             "additionalInfo": {
-                "styling": "Mendukung ColorFiltered dengan BlendMode.srcIn untuk merubah warna clone widget secara siluet, tanpa menghiraukan isi warna child asli.",
-                "rendering": "Dual Engine: Menggunakan CustomPaint (GPU Vector) saat Shape adalah Circle/Box, dan secara dinamis berpindah menggunakan ScaleTransform + Opacity di Widget Tree jika menggunakan mode ChildClone."
+                "rendering": "Single-ticker GPU vector rendering menggunakan CustomPainter dengan optimasi zero-overhead."
             },
             "methods": [],
             "behaviors": [
                 {
-                    "name": "Magic Child Cloning",
-                    "type": "Shape Adaptation",
+                    "name": "Precision Direction Control",
+                    "type": "Geometry",
                     "default": "",
-                    "desc": "Ketika di-set ke PulseShape.childClone, widget membuang Canvas dan menggandakan child target lalu menggunakan Transform.scale dari titik tengah (alignment center) dan ColorFiltered untuk mencetak siluet warna yang 100% akurat dari targetnya."
+                    "desc": "Mendukung mode outward, inward, dan inPlace dengan penguncian posisi presisi terhadap child."
                 },
                 {
-                    "name": "Staggered Memory Safety",
-                    "type": "Garbage Collection",
+                    "name": "Bounds Compensation",
+                    "type": "Geometry",
                     "default": "",
-                    "desc": "Menggunakan single ticker (1 controller) untuk banyak cincin (rings) menggunakan komputasi persentase Modulus (%), mencegah RAM jebol akibat duplikasi AnimationController."
-                },
-                {
-                    "name": "RRect Precision",
-                    "type": "Vector Drawing",
-                    "default": "",
-                    "desc": "Pada mode PulseShape.box, CustomPainter menggunakan rrect.toRRect() untuk memastikan sudut lekukan (radius) tetap proporsional dan tidak pecah saat gelombang membesar (scaling out)."
+                    "desc": "Menyesuaikan offset render secara langsung melalui EdgeInsets untuk mengakomodasi margin/shadow eksternal."
                 }
             ],
             "specialNotes": [
-                "Mode PulseShape.childClone sangat kuat namun sedikit lebih berat dari Canvas. Gunakan mode clone hanya jika child memiliki bentuk abstrak yang tidak bisa digambar oleh kotak/lingkaran biasa (seperti logo rumit atau ikon asimetris).",
-                "Selalu set maxSize sedikit lebih besar agar gelombang bisa 'tumpah' atau melebar dengan bebas tanpa terpotong (clipped)."
+                "Pastikan borderRadius pada PulseWidget selaras dengan bentuk child untuk hasil visual yang sempurna."
             ],
-            "code": "Wrap(\n  spacing: 32,\n  runSpacing: 32,\n  alignment: WrapAlignment.center,\n  children: [\n    // 1. Mode Clone (Bentuk gelombang akurat mengikuti bayangan bintang)\n    PulseWidget(\n      pulseShape: PulseShape.childClone,\n      color: Colors.amber,\n      minSize: 40,\n      maxSize: 90,\n      ringsCount: 3,\n      child: Icon(Icons.star, size: 40, color: Colors.amber),\n    ),\n\n    // 2. Mode Rounded Box (Cocok untuk tombol atau item list)\n    PulseWidget(\n      pulseShape: PulseShape.box,\n      borderRadius: BorderRadius.circular(16),\n      pulseStyle: PulseStyle.outline,\n      strokeWidth: 2,\n      color: Colors.blue,\n      minSize: 50,\n      maxSize: 80,\n      child: Container(\n        width: 50, \n        height: 50,\n        decoration: BoxDecoration(\n          color: Colors.blue,\n          borderRadius: BorderRadius.circular(16),\n        ),\n        child: Icon(Icons.fingerprint, color: Colors.white),\n      ),\n    ),\n\n    // 3. Mode Circle Glow (Cocok untuk indikator Live/Record)\n    PulseWidget(\n      pulseShape: PulseShape.circle,\n      pulseStyle: PulseStyle.glow,\n      color: Colors.redAccent,\n      maxSize: 90,\n      child: FloatingActionButton(\n        backgroundColor: Colors.red,\n        onPressed: () {},\n        child: Icon(Icons.mic, color: Colors.white),\n      ),\n    ),\n  ],\n)"
+            "code": "PulseWidget(\n  direction: PulseDirection.inPlace,\n  borderRadius: BorderRadius.all(Radius.circular(8)),\n  boundsCompensation: EdgeInsets.all(2),\n  child: Container(\n    padding: EdgeInsets.all(16),\n    decoration: BoxDecoration(\n      color: Colors.brown,\n      borderRadius: BorderRadius.all(Radius.circular(8)),\n    ),\n    child: Text('Ditolak Oleh Admin'),\n  ),\n)"
         },
         {
             "id": "PopupWidget",
