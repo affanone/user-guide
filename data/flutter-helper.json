@@ -1800,6 +1800,77 @@
             "code": "Wrap(\n  spacing: 8,\n  runSpacing: 8,\n  children: [\n    PillWidget.primary('TERBARU', icon: Icons.new_releases),\n    PillWidget.success('SELESAI'),\n    // Contoh pill panjang yang dibiarkan terpotong (ellipsis) di ruang sempit\n    PillWidget.warning('PENDING APPROVAL DARI MANAGER', icon: Icons.access_time),\n    // Contoh pill yang dipaksa melebar tanpa terpotong\n    PillWidget.danger('DITOLAK KARENA DATA TIDAK VALID', forceTextWidth: true),\n    PillWidget.info('DRAFT'),\n    // Constructor manual\n    PillWidget(\n      label: 'CUSTOM TAG',\n      color: Colors.purple,\n      icon: Icons.tag,\n      forceTextWidth: false,\n    ),\n  ],\n)"
         },
         {
+            "id": "TooltipWidget",
+            "group": "Alert",
+            "name": "Smart Tooltip",
+            "icon": "fa-solid fa-comment-dots",
+            "description": "Widget Tooltip (Overlay) tingkat lanjut yang cerdas dan adaptif. Dilengkapi dengan sistem deteksi benturan layar (auto-flip & auto-shift), pelepasan memori otomatis (garbage collection) untuk mencegah memory leak, serta mendukung render konten kustom (Teks berbungkus atau Widget kompleks). Merender bentuk balon pesan mulus (union path) dengan ekor segitiga presisi menggunakan CustomPainter.",
+            "mandatoryProps": [
+                {
+                    "name": "content",
+                    "type": "dynamic",
+                    "default": "",
+                    "desc": "Isi konten yang akan dirender di dalam tooltip. Bisa berupa nilai primitif (seperti String/Int) yang akan otomatis dibungkus Text dengan batas lebar (auto-wrap), atau bisa juga sebuah Widget kustom."
+                },
+                {
+                    "name": "child",
+                    "type": "Widget",
+                    "default": "",
+                    "desc": "Widget target (jangkar) tempat tooltip ini akan muncul saat disorot/ditekan."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "position",
+                    "type": "TooltipPosition",
+                    "default": "TooltipPosition.bottom",
+                    "desc": "Posisi default kemunculan tooltip (top, bottom, left, atau right). Catatan: Posisi ini bersifat 'preferred' dan bisa diabaikan/dibalik oleh sistem secara cerdas jika menabrak tepi layar."
+                },
+                {
+                    "name": "inEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Efek animasi kustom saat fase masuk/muncul ke layar. Jika null, akan menggunakan transisi gabungan Fade dan Scale(easeOutBack) bawaan."
+                },
+                {
+                    "name": "outEffect",
+                    "type": "AnimationEffect?",
+                    "default": "null",
+                    "desc": "Efek animasi kustom saat fase keluar/menghilang (reverse). Jika null, akan menggunakan transisi mundur default."
+                }
+            ],
+            "additionalInfo": {
+                "styling": "Tema tooltip terintegrasi otomatis dengan NexoraPillColors.primary dan merespons adaptif terhadap Brightness (Dark/Light mode). Balon digambar via CustomPaint tanpa patahan garis batas di sekitar ekor.",
+                "rendering": "Menggunakan metode double-pass layout. Frame pertama (opacity 0) untuk mengukur ukuran asli konten dinamis; Frame kedua (tampil) dengan posisi akurat pasca-kalkulasi."
+            },
+            "methods": [],
+            "behaviors": [
+                {
+                    "name": "Collision Auto-Flip",
+                    "type": "Layout Correction",
+                    "default": "",
+                    "desc": "Jika Tooltip diposisikan menabrak batas layar secara ekstrem (misal: posisi 'bottom' tapi target sudah menempel di bawah layar), posisinya otomatis dibalik 180 derajat ke sisi sebaliknya."
+                },
+                {
+                    "name": "Edge Auto-Shift",
+                    "type": "Layout Correction",
+                    "default": "",
+                    "desc": "Mencegah tooltip tenggelam ke samping kiri/kanan/atas. Badan tooltip akan digeser (clamp) menjauhi tepi layar, tetapi ekor segitiganya tetap menunjuk tepat ke tengah child target."
+                },
+                {
+                    "name": "Safe Overlay Lifecycle",
+                    "type": "Memory Management",
+                    "default": "",
+                    "desc": "Overlay akan dihancurkan melalui fungsi hide() yang memicu animasi reverse sebelum mencabut layer. Pada kondisi pembersihan ekstrem (dispose/pindah halaman layar), Overlay langsung dicabut secara paksa."
+                }
+            ],
+            "specialNotes": [
+                "Widget ini merender ekornya dengan melakukan PathOperation.union antara Path kotak (RRect) dan Path segitiga. Hal ini mencegah munculnya 'glitch' atau garis border yang melintasi leher segitiga.",
+                "Memiliki proteksi dari Spam-Hover (Mouse bergerak cepat). Mencegah duplikasi overlay layer yang dapat merusak memori RAM perangkat."
+            ],
+            "code": "Wrap(\n  spacing: 24,\n  children: [\n    // Contoh dasar (Otomatis text-wrap)\n    TooltipWidget(\n      content: 'Peringatan! Stok bahan baku di gudang menipis.',\n      position: TooltipPosition.top,\n      child: Icon(Icons.warning, color: Colors.amber),\n    ),\n    \n    // Contoh konten Widget kompleks\n    TooltipWidget(\n      content: Column(\n        mainAxisSize: MainAxisSize.min,\n        crossAxisAlignment: CrossAxisAlignment.start,\n        children: [\n          Text('Status: Aktif', style: TextStyle(fontWeight: FontWeight.bold)),\n          Text('Terakhir Sinkron: 10 menit lalu', style: TextStyle(fontSize: 10)),\n        ],\n      ),\n      position: TooltipPosition.right,\n      child: FormHelperWidget.Button(label: 'Detail Server'),\n    ),\n  ],\n)"
+        },
+        {
             "id": "PopupWidget",
             "group": "Widget",
             "name": "Popup Reaktif",
