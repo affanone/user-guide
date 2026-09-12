@@ -1721,7 +1721,7 @@
             "group": "Widget",
             "name": "Pill Badge Widget",
             "icon": "fa-solid fa-capsules",
-            "description": "Widget visual ringan berbentuk kapsul (pill) yang digunakan untuk menampilkan tag, lencana status (badge), atau kategori. Didesain dengan warna latar transparan tipis (12% opacity) dan border samar untuk menghasilkan tampilan modern yang tidak mendominasi hirarki visual. Menyediakan factory methods siap pakai untuk semantik warna umum (success, warning, info, dll).",
+            "description": "Widget visual ringan berbentuk kapsul (pill) yang digunakan untuk menampilkan tag, lencana status (badge), atau kategori. Didesain dengan warna latar transparan tipis (12% opacity) dan border samar. Dilengkapi dengan proteksi overflow otomatis (ellipsis) untuk penggunaan di dalam ruang yang sempit, serta menyediakan factory methods siap pakai untuk semantik warna umum.",
             "mandatoryProps": [
                 {
                     "name": "label",
@@ -1742,6 +1742,12 @@
                     "type": "IconData?",
                     "default": "null",
                     "desc": "Ikon opsional yang akan ditampilkan di sebelah kiri teks label. Ukurannya dikunci kecil (12px) agar sejajar dengan tinggi font."
+                },
+                {
+                    "name": "forceTextWidth",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah lebar wadah dipaksa mengikuti panjang teks seutuhnya. Jika false (default), teks dibungkus dengan Flexible sehingga dapat menyusut dan menampilkan elipsis (...) saat berada di ruang yang sempit."
                 }
             ],
             "additionalInfo": {
@@ -1752,7 +1758,7 @@
                     "name": "primary",
                     "type": "static Widget",
                     "default": "",
-                    "desc": "Helper untuk membuat PillWidget dengan warna tema utama (Colors.deepOrange). Menerima parameter string (teks) dan parameter named opsional untuk ikon."
+                    "desc": "Helper untuk membuat PillWidget dengan warna tema utama (Colors.deepOrange). Menerima parameter string (teks), serta parameter named opsional untuk ikon dan forceTextWidth."
                 },
                 {
                     "name": "success",
@@ -1781,17 +1787,17 @@
             ],
             "behaviors": [
                 {
-                    "name": "Intrinsic Shrink Wrapping",
+                    "name": "Intrinsic Shrink Wrapping & Overflow Handling",
                     "type": "UI Layout",
                     "default": "",
-                    "desc": "PillWidget menggunakan Row dengan mainAxisSize: MainAxisSize.min, yang berarti ukuran lebarnya akan secara dinamis menyusut mengikuti panjang teks label ditambah padding, mencegahnya merentang menutupi lebar layar secara penuh."
+                    "desc": "PillWidget menggunakan Row dengan mainAxisSize: MainAxisSize.min agar menyusut mengikuti teks. Jika forceTextWidth bernilai false (default), teks dibungkus Flexible dengan maxLines: 1 dan TextOverflow.ellipsis, mencegah error 'Right Overflowed' di layar atau container sempit (seperti tabel)."
                 }
             ],
             "specialNotes": [
                 "Widget ini bergantung pada package `google_fonts` untuk me-render font 'Poppins'.",
                 "Komponen ini tidak memproses deteksi klik (onTap). Jika Anda memerlukan behavior chip yang dapat ditekan, Anda harus membungkus PillWidget ini secara manual dengan InkWell atau GestureDetector."
             ],
-            "code": "Wrap(\n  spacing: 8,\n  runSpacing: 8,\n  children: [\n    PillWidget.primary('TERBARU', icon: Icons.new_releases),\n    PillWidget.success('SELESAI'),\n    PillWidget.warning('PENDING', icon: Icons.access_time),\n    PillWidget.danger('DITOLAK'),\n    PillWidget.info('DRAFT'),\n    // Constructor manual\n    PillWidget(\n      label: 'CUSTOM TAG',\n      color: Colors.purple,\n      icon: Icons.tag,\n    ),\n  ],\n)"
+            "code": "Wrap(\n  spacing: 8,\n  runSpacing: 8,\n  children: [\n    PillWidget.primary('TERBARU', icon: Icons.new_releases),\n    PillWidget.success('SELESAI'),\n    // Contoh pill panjang yang dibiarkan terpotong (ellipsis) di ruang sempit\n    PillWidget.warning('PENDING APPROVAL DARI MANAGER', icon: Icons.access_time),\n    // Contoh pill yang dipaksa melebar tanpa terpotong\n    PillWidget.danger('DITOLAK KARENA DATA TIDAK VALID', forceTextWidth: true),\n    PillWidget.info('DRAFT'),\n    // Constructor manual\n    PillWidget(\n      label: 'CUSTOM TAG',\n      color: Colors.purple,\n      icon: Icons.tag,\n      forceTextWidth: false,\n    ),\n  ],\n)"
         },
         {
             "id": "PopupWidget",
