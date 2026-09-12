@@ -1804,13 +1804,13 @@
             "group": "Widget",
             "name": "Smart Tooltip",
             "icon": "fa-solid fa-comment-dots",
-            "description": "Widget Tooltip (Overlay) tingkat lanjut yang cerdas dan adaptif. Dilengkapi dengan sistem deteksi benturan layar (auto-flip & auto-shift), pelepasan memori otomatis (garbage collection) untuk mencegah memory leak, serta mendukung render konten kustom (Teks berbungkus atau Widget kompleks). Merender bentuk balon pesan mulus (union path) dengan ekor segitiga presisi menggunakan CustomPainter.",
+            "description": "Widget Tooltip (Overlay) tingkat lanjut yang cerdas dan adaptif. Dilengkapi dengan sistem pewarnaan dinamis, deteksi benturan layar (auto-flip & auto-shift), pelepasan memori otomatis untuk mencegah memory leak, serta mendukung render konten kustom. Merender bentuk balon pesan mulus dengan ekor segitiga presisi menggunakan CustomPainter.",
             "mandatoryProps": [
                 {
                     "name": "content",
                     "type": "dynamic",
                     "default": "",
-                    "desc": "Isi konten yang akan dirender di dalam tooltip. Bisa berupa nilai primitif (seperti String/Int) yang akan otomatis dibungkus Text dengan batas lebar (auto-wrap), atau bisa juga sebuah Widget kustom."
+                    "desc": "Isi konten yang akan dirender di dalam tooltip. Bisa berupa nilai primitif (seperti String/Int) yang otomatis dibungkus Text, atau sebuah Widget kustom."
                 },
                 {
                     "name": "child",
@@ -1824,58 +1824,76 @@
                     "name": "position",
                     "type": "TooltipPosition",
                     "default": "TooltipPosition.bottom",
-                    "desc": "Posisi default kemunculan tooltip (top, bottom, left, atau right). Catatan: Posisi ini bersifat 'preferred' dan bisa diabaikan/dibalik oleh sistem secara cerdas jika menabrak tepi layar."
+                    "desc": "Posisi default kemunculan tooltip (top, bottom, left, atau right). Catatan: Posisi ini bersifat 'preferred' dan bisa dibalik oleh sistem jika menabrak tepi layar."
+                },
+                {
+                    "name": "theme",
+                    "type": "TooltipTheme?",
+                    "default": "TooltipTheme.primary",
+                    "desc": "Tema warna dasar tooltip menggunakan pusat manajemen warna Nexora (TooltipTheme enum). Properti ini akan diabaikan jika 'color' diisi."
+                },
+                {
+                    "name": "color",
+                    "type": "Color?",
+                    "default": "null",
+                    "desc": "Warna kustom spesifik untuk background tooltip. Jika diisi, ia memiliki prioritas tertinggi dan akan secara otomatis menimpa (override) pengaturan 'theme'."
                 },
                 {
                     "name": "inEffect",
                     "type": "AnimationEffect?",
                     "default": "null",
-                    "desc": "Efek animasi kustom saat fase masuk/muncul ke layar. Jika null, akan menggunakan transisi gabungan Fade dan Scale(easeOutBack) bawaan."
+                    "desc": "Efek animasi kustom saat fase masuk/muncul ke layar. Jika null, menggunakan transisi Fade dan Scale(easeOutBack) bawaan."
                 },
                 {
                     "name": "outEffect",
                     "type": "AnimationEffect?",
                     "default": "null",
-                    "desc": "Efek animasi kustom saat fase keluar/menghilang (reverse). Jika null, akan menggunakan transisi mundur default."
+                    "desc": "Efek animasi kustom saat fase keluar/menghilang (reverse). Jika null, menggunakan transisi mundur default."
                 }
             ],
             "additionalInfo": {
-                "styling": "Tema tooltip terintegrasi otomatis dengan NexoraPillColors.primary dan merespons adaptif terhadap Brightness (Dark/Light mode). Balon digambar via CustomPaint tanpa patahan garis batas di sekitar ekor.",
-                "rendering": "Menggunakan metode double-pass layout. Frame pertama (opacity 0) untuk mengukur ukuran asli konten dinamis; Frame kedua (tampil) dengan posisi akurat pasca-kalkulasi."
+                "styling": "Sistem pewarnaan pintar terintegrasi dengan NexoraTooltipColors. Tooltip dapat beradaptasi terhadap Brightness (Dark/Light mode). Balon digambar via CustomPaint tanpa patahan garis batas.",
+                "rendering": "Menggunakan metode double-pass layout. Frame pertama (opacity 0) untuk mengukur dimensi konten dinamis; Frame kedua (tampil) dengan posisi akurat pasca-kalkulasi."
             },
             "methods": [],
             "behaviors": [
                 {
+                    "name": "Adaptive Text Luminance",
+                    "type": "Styling",
+                    "default": "",
+                    "desc": "Secara otomatis menganalisa nilai terang (luminance) dari base background color. Jika background sangat terang (seperti warna kuning/putih), teks bawaan otomatis menjadi warna gelap agar tetap terbaca. Sebaliknya, menjadi putih jika background gelap."
+                },
+                {
                     "name": "Collision Auto-Flip",
                     "type": "Layout Correction",
                     "default": "",
-                    "desc": "Jika Tooltip diposisikan menabrak batas layar secara ekstrem (misal: posisi 'bottom' tapi target sudah menempel di bawah layar), posisinya otomatis dibalik 180 derajat ke sisi sebaliknya."
+                    "desc": "Jika Tooltip diposisikan menabrak batas layar secara ekstrem, posisinya otomatis dibalik 180 derajat ke sisi sebaliknya."
                 },
                 {
                     "name": "Edge Auto-Shift",
                     "type": "Layout Correction",
                     "default": "",
-                    "desc": "Mencegah tooltip tenggelam ke samping kiri/kanan/atas. Badan tooltip akan digeser (clamp) menjauhi tepi layar, tetapi ekor segitiganya tetap menunjuk tepat ke tengah child target."
+                    "desc": "Mencegah tooltip tenggelam ke luar tepi layar. Badan tooltip digeser menjauhi tepi layar, namun panah segitiganya tetap menunjuk akurat ke tengah elemen target."
                 },
                 {
                     "name": "Safe Overlay Lifecycle",
                     "type": "Memory Management",
                     "default": "",
-                    "desc": "Overlay akan dihancurkan melalui fungsi hide() yang memicu animasi reverse sebelum mencabut layer. Pada kondisi pembersihan ekstrem (dispose/pindah halaman layar), Overlay langsung dicabut secara paksa."
+                    "desc": "Mencegah Memory Leak dan spam hover. Overlay dicabut aman melalui animasi mundur (hide) atau pembersihan ekstrem secara instan pada metode dispose."
                 }
             ],
             "specialNotes": [
-                "Widget ini merender ekornya dengan melakukan PathOperation.union antara Path kotak (RRect) dan Path segitiga. Hal ini mencegah munculnya 'glitch' atau garis border yang melintasi leher segitiga.",
-                "Memiliki proteksi dari Spam-Hover (Mouse bergerak cepat). Mencegah duplikasi overlay layer yang dapat merusak memori RAM perangkat."
+                "Widget ini merender ekornya dengan melakukan PathOperation.union antara Path kotak (RRect) dan Path segitiga. Hal ini mencegah munculnya 'glitch' atau garis tembus di sekitar pangkal segitiga.",
+                "Prioritas pewarnaan berjalan secara hierarkis: Custom Color -> TooltipTheme -> NexoraTooltipColors.primary."
             ],
-            "code": "Wrap(\n  spacing: 24,\n  children: [\n    // Contoh dasar (Otomatis text-wrap)\n    TooltipWidget(\n      content: 'Peringatan! Stok bahan baku di gudang menipis.',\n      position: TooltipPosition.top,\n      child: Icon(Icons.warning, color: Colors.amber),\n    ),\n    \n    // Contoh konten Widget kompleks\n    TooltipWidget(\n      content: Column(\n        mainAxisSize: MainAxisSize.min,\n        crossAxisAlignment: CrossAxisAlignment.start,\n        children: [\n          Text('Status: Aktif', style: TextStyle(fontWeight: FontWeight.bold)),\n          Text('Terakhir Sinkron: 10 menit lalu', style: TextStyle(fontSize: 10)),\n        ],\n      ),\n      position: TooltipPosition.right,\n      child: FormHelperWidget.Button(label: 'Detail Server'),\n    ),\n  ],\n)"
+            "code": "Wrap(\n  spacing: 24,\n  children: [\n    // 1. Contoh Default Theme (Otomatis Primary)\n    TooltipWidget(\n      content: 'Halo, saya tooltip dengan tema Primary.',\n      position: TooltipPosition.top,\n      child: const Text('Hover Me (Default)'),\n    ),\n    \n    // 2. Menggunakan TooltipTheme (Warning)\n    TooltipWidget(\n      content: 'Perhatian, ini adalah aksi berbahaya!',\n      position: TooltipPosition.bottom,\n      theme: TooltipTheme.warning,\n      child: const Text('Hover Me (Warning)'),\n    ),\n\n    // 3. Menggunakan Custom Color (Override Theme)\n    TooltipWidget(\n      content: 'Warna ungu kustom khusus.',\n      position: TooltipPosition.right,\n      theme: TooltipTheme.danger, // Akan diabaikan karena ada color\n      color: Colors.purple.shade300,\n      child: const Text('Hover Me (Custom Color)'),\n    ),\n\n    // 4. Contoh konten Widget kompleks\n    TooltipWidget(\n      content: Column(\n        mainAxisSize: MainAxisSize.min,\n        crossAxisAlignment: CrossAxisAlignment.start,\n        children: const [\n          Text('Status: Aktif', style: TextStyle(fontWeight: FontWeight.bold)),\n          Text('Terakhir Sinkron: 10 menit lalu', style: TextStyle(fontSize: 10)),\n        ],\n      ),\n      position: TooltipPosition.right,\n      theme: TooltipTheme.success,\n      child: FormHelperWidget.Button(label: 'Detail Server'),\n    ),\n  ],\n)"
         },
         {
             "id": "PulseWidget",
             "group": "Widget",
             "name": "Pulse Animation",
             "icon": "fa-solid fa-tower-broadcast",
-            "description": "Widget animasi berdenyut (Pulse) efisien dengan efek gelombang padat (solid dissolving wave) yang mendukung berbagai arah pergerakan (outward, inward, inPlace) serta kompensasi batas kustom (boundsCompensation) untuk presisi geometri absolut tanpa memory leak.",
+            "description": "Widget animasi berdenyut (Pulse) efisien dengan efek gelombang padat (solid dissolving wave) yang mendukung berbagai arah pergerakan (outward, inward, inPlace) serta kompensasi batas kustom (boundsCompensation) untuk presisi geometri absolut tanpa memory leak. Terintegrasi dengan sistem tema Nexora untuk pewarnaan yang adaptif.",
             "mandatoryProps": [
                 {
                     "name": "child",
@@ -1910,10 +1928,16 @@
                     "desc": "Jeda waktu antar gelombang."
                 },
                 {
+                    "name": "theme",
+                    "type": "PulseTheme?",
+                    "default": "PulseTheme.primary",
+                    "desc": "Tema warna dasar gelombang menggunakan sistem warna Nexora (PulseTheme enum). Diabaikan jika properti 'color' diisi."
+                },
+                {
                     "name": "color",
-                    "type": "Color",
-                    "default": "Colors.amber",
-                    "desc": "Warna dasar gelombang."
+                    "type": "Color?",
+                    "default": "null",
+                    "desc": "Warna kustom spesifik untuk gelombang. Jika diisi, ia memiliki prioritas tertinggi dan akan secara otomatis menimpa (override) pengaturan 'theme'."
                 },
                 {
                     "name": "borderRadius",
@@ -1950,12 +1974,19 @@
                     "type": "Geometry",
                     "default": "",
                     "desc": "Menyesuaikan offset render secara langsung melalui EdgeInsets untuk mengakomodasi margin/shadow eksternal."
+                },
+                {
+                    "name": "Hierarchical Styling",
+                    "type": "Styling",
+                    "default": "",
+                    "desc": "Mendukung pewarnaan melalui tema global (PulseTheme) yang tersentralisasi, atau warna absolut (Color) untuk kontrol spesifik."
                 }
             ],
             "specialNotes": [
-                "Pastikan borderRadius pada PulseWidget selaras dengan bentuk child untuk hasil visual yang sempurna."
+                "Pastikan borderRadius pada PulseWidget selaras dengan bentuk child untuk hasil visual yang sempurna.",
+                "Prioritas pewarnaan berjalan secara hierarkis: Custom Color -> PulseTheme -> NexoraPulseColors.primary."
             ],
-            "code": "PulseWidget(\n  direction: PulseDirection.inPlace,\n  borderRadius: BorderRadius.all(Radius.circular(8)),\n  boundsCompensation: EdgeInsets.all(2),\n  child: Container(\n    padding: EdgeInsets.all(16),\n    decoration: BoxDecoration(\n      color: Colors.brown,\n      borderRadius: BorderRadius.all(Radius.circular(8)),\n    ),\n    child: Text('Ditolak Oleh Admin'),\n  ),\n)"
+            "code": "Wrap(\n  spacing: 24,\n  children: [\n    // 1. Menggunakan PulseTheme (Danger)\n    PulseWidget(\n      direction: PulseDirection.inPlace,\n      theme: PulseTheme.danger,\n      borderRadius: BorderRadius.all(Radius.circular(8)),\n      boundsCompensation: EdgeInsets.all(2),\n      child: Container(\n        padding: EdgeInsets.all(16),\n        decoration: BoxDecoration(\n          color: Colors.red,\n          borderRadius: BorderRadius.all(Radius.circular(8)),\n        ),\n        child: Text('Ditolak Oleh Admin', style: TextStyle(color: Colors.white)),\n      ),\n    ),\n\n    // 2. Menggunakan Custom Color (Override Theme)\n    PulseWidget(\n      direction: PulseDirection.outward,\n      theme: PulseTheme.primary, // Akan diabaikan karena ada color\n      color: Colors.purple.shade400,\n      expansion: 20.0,\n      borderRadius: BorderRadius.all(Radius.circular(24)),\n      child: FloatingActionButton(\n        onPressed: () {},\n        backgroundColor: Colors.purple,\n        child: Icon(Icons.mic),\n      ),\n    ),\n  ],\n)"
         },
         {
             "id": "PopupWidget",
