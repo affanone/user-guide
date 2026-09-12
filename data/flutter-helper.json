@@ -3787,6 +3787,12 @@
                     "type": "Object? Extension Method",
                     "default": "bool",
                     "desc": "Fungsi ringkas yang mengevaluasi secara cerdas apakah suatu objek bernilai null, string kosong (termasuk spasi acak), list kosong, atau map kosong. Menyediakan parameter opsional `considerZeroAsEmpty` (default: false) yang jika disetel ke true, akan menganggap tipe angka (num) bernilai 0 atau negatif (<= 0) sebagai kosong."
+                },
+                {
+                    "name": "isNotNullOrNotEmpty(({bool considerZeroAsEmpty})",
+                    "type": "Object? Extension Method",
+                    "default": "bool",
+                    "desc": "Kebalikan dari isNullOrEmpty(), fungsi ini mengevaluasi secara cerdas apakah suatu objek bernilai tidak null, string tidak kosong (termasuk spasi acak), list tidak kosong, atau map tidak kosong. Menyediakan parameter opsional `considerZeroAsEmpty` (default: false) yang jika disetel ke true, akan menganggap tipe angka (num) bernilai 0 atau negatif (<= 0) sebagai kosong."
                 }
             ],
             "behaviors": [],
