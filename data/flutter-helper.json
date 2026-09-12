@@ -1873,7 +1873,7 @@
         {
             "id": "PulseWidget",
             "group": "Widget",
-            "name": "Dissolving Wave Pulse Animation",
+            "name": "Pulse Animation",
             "icon": "fa-solid fa-tower-broadcast",
             "description": "Widget animasi berdenyut (Pulse) efisien dengan efek gelombang padat (solid dissolving wave) yang mendukung berbagai arah pergerakan (outward, inward, inPlace) serta kompensasi batas kustom (boundsCompensation) untuk presisi geometri absolut tanpa memory leak.",
             "mandatoryProps": [
