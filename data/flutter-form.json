@@ -819,6 +819,18 @@
                     "desc": "Ikon bawaan di sebelah kiri teks (atau di tengah jika isIconOnly true)."
                 },
                 {
+                    "name": "prefix",
+                    "type": "dynamic",
+                    "default": "null",
+                    "desc": "Elemen dinamis (String atau Widget) yang ditampilkan di posisi paling kiri tombol, sebelum ikon dan label. Jika diisi dengan teks (String), otomatis akan disesuaikan dengan gaya teks label."
+                },
+                {
+                    "name": "suffix",
+                    "type": "dynamic",
+                    "default": "null",
+                    "desc": "Elemen dinamis (String atau Widget) yang ditampilkan di posisi paling kanan tombol, setelah label dan ikon. Jika diisi dengan teks (String), otomatis akan disesuaikan dengan gaya teks label."
+                },
+                {
                     "name": "iconPosition",
                     "type": "FormButtonIconPosition",
                     "default": "FormButtonIconPosition.prefix",
@@ -922,7 +934,7 @@
                     "name": "buttons",
                     "type": "List<ButtonGroupItem>",
                     "default": "",
-                    "desc": "Array yang berisi konfigurasi masing-masing tombol. Setiap `ButtonGroupItem` mendukung kustomisasi mandiri meliputi: `label`, `icon`, `iconPosition`, `theme`, `color` (warna custom), `tooltip`, `isLoading`, `enabled`, serta event listener (`onPressed`, `onDoubleTap`, `onLongPress`, `onRightClick`)."
+                    "desc": "Array yang berisi konfigurasi masing-masing tombol. Setiap `ButtonGroupItem` mendukung kustomisasi mandiri meliputi: `label`, `icon`, `prefix`,`suffix`, `trailing`,`leading`,`trailing`, `iconPosition`, `theme`, `color` (warna custom), `tooltip`, `isLoading`, `enabled`, serta event listener (`onPressed`, `onDoubleTap`, `onLongPress`, `onRightClick`)."
                 }
             ],
             "optionalProps": [
