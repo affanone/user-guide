@@ -300,7 +300,7 @@
             "group": "Alert",
             "name": "Modal Premium",
             "icon": "fa-solid fa-window-maximize",
-            "description": "Widget pengelola dialog (modal) tingkat lanjut. Menyediakan API .modal<T>() yang dibungkus rapi dengan Header, Scrollable Body, Actions, dan Loading Spinner otomatis. Dilengkapi dengan Controller cerdas (ModalControl) bersistem Event Registry terpusat yang mendukung registrasi aksi dinamis dari dalam widget anak (child), override otomatis berdasarkan key, dan perlindungan Anti-Memory Leak yang mutlak saat modal dihancurkan.",
+            "description": "Widget pengelola dialog (modal) tingkat lanjut. Menyediakan API .modal<T>() yang dibungkus rapi dengan Header, Scrollable Body, Actions, dan Loading Spinner otomatis. Dilengkapi dengan Controller cerdas (ModalControl) bersistem Event Registry terpusat yang mendukung eksekusi ganda berurutan (Double Execution Pipeline), transfer kargo data (payload), override otomatis berdasarkan key, perlindungan Anti-Memory Leak yang mutlak, serta penahanan state melalui pelemparan Exception.",
             "mandatoryProps": [
                 {
                     "name": "context",
@@ -320,7 +320,7 @@
                     "name": "builder",
                     "type": "Widget Function(BuildContext ctx, ModalControl control, StateSetter stateModal)?",
                     "default": "null",
-                    "desc": "Konten dinamis utama. Menyediakan akses ke ModalControl yang dapat dilempar ke widget anak (misal: PageKhusus) agar widget anak dapat mendaftarkan logika internalnya via control.onConfirm()."
+                    "desc": "Konten dinamis utama. Menyediakan akses ke ModalControl yang dapat dilempar ke widget anak (misal: PageKhusus) agar widget anak dapat mendaftarkan logika internalnya via control.onConfirm() serta menitipkan hasil ke control.payload."
                 },
                 {
                     "name": "actions",
@@ -380,7 +380,7 @@
                     "name": "onConfirm",
                     "type": "FutureOr<void> Function(BuildContext ctx, ModalConfirmControl<T> control, StateSetter stateModal)?",
                     "default": "null",
-                    "desc": "Callback konfirmasi bawaan modal. Jika widget anak mendaftarkan fungsinya via ModalControl, fungsi anak akan dieksekusi terlebih dahulu. Setelah selesai, barulah fungsi onConfirm milik modal dijalankan. Menyediakan akses ke ModalConfirmControl untuk meneruskan hasil akhir."
+                    "desc": "Callback konfirmasi bawaan modal (Fungsi Luar). Dieksekusi otomatis SETELAH semua fungsi dari widget anak (Inner Confirms) selesai berjalan dengan sukses. Menyediakan objek ModalConfirmControl yang kini dilengkapi parameter 'payload' (berisi kargo data dari widget anak) untuk diteruskan via control.next(data)."
                 },
                 {
                     "name": "showCancelButton",
@@ -439,36 +439,41 @@
             ],
             "behaviors": [
                 {
-                    "name": "Double Execution Pipeline",
+                    "name": "Double Execution & Payload Carrier",
                     "type": "Event Flow",
                     "default": "",
-                    "desc": "Saat tombol konfirmasi ditekan, Controller akan memanggil executeInnerConfirms() terlebih dahulu (menjalankan semua fungsi yang didaftarkan oleh widget anak), barulah parameter onConfirm utama milik modal akan dieksekusi."
+                    "desc": "Saat tombol OK ditekan, sistem menjalankan Inner Confirms (fungsi validasi widget anak). Jika lolos, widget anak dapat menitipkan data ke 'control.payload = data'. Setelah itu, modal mengeksekusi onConfirm luar yang bisa mengambil data tersebut melalui 'confirmControl.payload'."
+                },
+                {
+                    "name": "Silent Exception Halting",
+                    "type": "Safety Constraint",
+                    "default": "",
+                    "desc": "Untuk mencegah modal tertutup saat validasi di dalam widget anak gagal, widget anak cukup melempar 'throw Exception()'. Modal secara cerdas akan menelan (swallow) error tersebut agar console bersih, mereset state loading, dan menggagalkan penutupan modal otomatis."
+                },
+                {
+                    "name": "Smart Delegation Pop",
+                    "type": "Routing Control",
+                    "default": "",
+                    "desc": "Jika 'onConfirm' luar tidak didefinisikan DAN widget anak tidak memiliki fungsi 'Inner Confirms', modal akan otomatis tertutup mereturn T. Namun, jika widget anak memiliki 'Inner Confirms', modal mempercayakan penutupan seutuhnya kepada fungsi anak tersebut."
                 },
                 {
                     "name": "Smart Event Registry & Override",
                     "type": "State Management",
                     "default": "",
-                    "desc": "Widget anak dapat memanggil control.onConfirm(fungsi, key: 'ID'). Penggunaan 'key' memastikan bahwa jika widget anak mengalami rebuild berkali-kali, referensi fungsi hanya akan dioverride (ditimpa), bukan ditumpuk, sehingga logika berjalan dengan presisi tinggi."
+                    "desc": "Widget anak mendaftarkan fungsi via control.onConfirm(fungsi, key: 'ID'). Jika widget anak di-rebuild berulang kali, referensi callback hanya akan dioverride berkat identifikasi 'key', menghindari duplikasi fungsi di memori."
                 },
                 {
                     "name": "Anti-Memory Leak (Auto Dispose)",
                     "type": "Memory Management",
                     "default": "",
-                    "desc": "Modal dibungkus oleh _ModalLifecycleWrapper yang memonitor status widget. Saat modal tertutup dan lepas dari layar, wrapper otomatis memanggil control.dispose() yang secara paksa membersihkan semua Map dan List referensi memori fungsi callback."
-                },
-                {
-                    "name": "State Blocking",
-                    "type": "Safety Constraint",
-                    "default": "",
-                    "desc": "Menjamin keamanan eksekusi fungsi async. Saat beroperasi, state internal isLoading mengunci PopScope dan menonaktifkan klik ganda tombol otomatis."
+                    "desc": "Dibungkus oleh _ModalLifecycleWrapper, sesaat setelah rute ditutup dan widget lepas dari layar, controller memanggil control.dispose() yang membersihkan seluruh Map, List referensi fungsi, dan menyapu bersih isi kargo 'payload'."
                 }
             ],
             "specialNotes": [
-                "Dianjurkan mendaftarkan fungsi anak menggunakan key: control.onConfirm(myFunc, key: 'form_1') agar jika terjadi rebuild, fungsi tidak terduplikasi.",
-                "Anda dapat secara selektif menghapus listener yang terdaftar menggunakan control.removeConfirm('form_1'), atau memanggil control.removeConfirm() tanpa argumen untuk menghapus seluruh pendengar sekaligus.",
-                "Alur akhir dari penutupan (serta pengembalian data T) dipegang penuh oleh onConfirm modal utama via ModalConfirmControl.next(data)."
+                "Selalu daftarkan fungsi anak menggunakan key: control.onConfirm(myFunc, key: 'form_1') agar kebal terhadap rebuild Flutter.",
+                "Widget luar tidak perlu lagi bergantung pada passing function / callback berlapis (spaghetti code). Cukup tangkap data yang dikirimkan anak melalui 'confirmControl.payload' di dalam onConfirm utama."
             ],
-            "code": "final String? result = await ModalWidget.modal<String>(\n  context,\n  title: 'Alokasi Batch Manual',\n  builder: (ctx, control, stateModal) {\n    // Widget anak 'PageKhusus' menerima control untuk mendaftarkan logikanya sendiri.\n    // Di dalam PageKhusus: control.onConfirm(() async { ... }, key: 'validasi_batch');\n    return PageKhusus(\n      control: control,\n    );\n  },\n  onConfirm: (ctx, confirmControl, stateModal) async {\n    // 💡 Eksekusi Sekuensial:\n    // Fungsi bawaan modal ini dipanggil SETELAH semua fungsi terdaftar di dalam 'PageKhusus' selesai berjalan.\n    // Cocok untuk finalisasi aksi tutup dialog dan kirim data akhir.\n    confirmControl.next('ALOKASI_SELESAI');\n  },\n);\n\nif (result == 'ALOKASI_SELESAI') {\n  print('Proses batch berhasil dieksekusi secara berurutan!');\n}"
+            "code": "final Map<String, double>? result = await ModalWidget.modal<Map<String, double>>(\n  context,\n  title: 'Alokasi Batch Manual',\n  builder: (ctx, control, stateModal) {\n    // 💡 TAHAP 1: Di dalam PageKhusus, anak mendaftarkan fungsi & menitipkan data.\n    // control.onConfirm(() {\n    //   if (qty == 0) throw Exception('Cegah modal tertutup');\n    //   control.payload = {'B-001': 50.0};\n    // }, key: 'validasi_batch');\n    return PageKhusus(control: control);\n  },\n  onConfirm: (ctx, confirmControl, stateModal) async {\n    // 💡 TAHAP 2: Outer fungsi dieksekusi HANYA JIKA Tahap 1 sukses tanpa Exception.\n    // Ambil data yang dititipkan oleh PageKhusus melalui kargo payload:\n    final dynamic kargoData = confirmControl.payload;\n    \n    if (kargoData != null) {\n      // Menutup modal dan melemparkan data kembali ke luar (ke variabel 'result')\n      confirmControl.next(kargoData as Map<String, double>);\n    } else {\n      confirmControl.cancel();\n    }\n  },\n);\n\nif (result != null) {\n  print('Proses batch berhasil dieksekusi secara berurutan! Data: $result');\n}"
         },
         {
             "id": "SmartBuilder",
