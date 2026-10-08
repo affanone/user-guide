@@ -353,6 +353,12 @@
                     "desc": "Mengaktifkan mode geser (drag). Mengubah warna barrier menjadi transparan, meniadakan blur/frosted glass, dan memperbesar radius bayangan modal."
                 },
                 {
+                    "name": "padding",
+                    "type": "EdgeInsetsGeometry?",
+                    "default": "null",
+                    "desc": "Mengatur jarak (padding) pada area konten utama (builder) di dalam modal. Jika dibiarkan null, modal akan menggunakan nilai bawaan EdgeInsets.all(24.0). Atur ke EdgeInsets.zero untuk menghilangkan jarak pinggir sepenuhnya."
+                },
+                {
                     "name": "width",
                     "type": "double?",
                     "default": "null",
