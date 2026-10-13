@@ -187,7 +187,7 @@
             "group": "Alert",
             "name": "Modal Bottom Sheet",
             "icon": "fa-solid fa-window-maximize",
-            "description": "Widget utilitas statis kelas premium dengan pola arsitektur 'Type-Safe Factory Builder' dan 'Scoped State Management'. Menghilangkan kebutuhan konfigurasi layout manual dengan menyuntikkan asisten 'ModalLayoutControl'. Mendukung update UI internal secara real-time (Interaktif) tanpa me-rebuild halaman utama. Dilengkapi Sticky Header otomatis, engine gestur interaktif cerdas (Follow Finger, Bounce Back), dan sinkronisasi lintas platform (Desktop/Mouse).",
+            "description": "Widget utilitas statis kelas premium dengan pola arsitektur 'Type-Safe Factory Builder' dan 'Scoped State Management'. Menghilangkan kebutuhan konfigurasi layout manual dengan menyuntikkan asisten 'ModalLayoutControl'. Mendukung update UI internal secara real-time (Interaktif) tanpa me-rebuild halaman utama. Dilengkapi Sticky Header otomatis, Sticky Footer otomatis, engine gestur interaktif cerdas (Follow Finger, Bounce Back), dan sinkronisasi lintas platform (Desktop/Mouse).",
             "mandatoryProps": [
                 {
                     "name": "context",
@@ -214,6 +214,12 @@
                     "type": "Widget?",
                     "default": "null",
                     "desc": "Opsi kustomisasi penuh untuk Sticky Header jika teks judul biasa dirasa kurang. Jika parameter ini diisi, parameter 'title' akan diabaikan."
+                },
+                {
+                    "name": "footer",
+                    "type": "Widget?",
+                    "default": "null",
+                    "desc": "Menambahkan area tetap (sticky) di bagian paling bawah modal yang tidak akan ikut ter-scroll bersama konten utama. Sangat cocok untuk menempatkan tombol aksi permanen seperti 'Simpan', 'Lanjutkan', atau 'Checkout'."
                 },
                 {
                     "name": "closeOnOverlayTap",
@@ -271,10 +277,10 @@
                     "desc": "Menggunakan StatefulBuilder secara internal sehingga developer dapat mengubah state (seperti menambah counter, list, atau loading) langsung di dalam bottom sheet tanpa me-render ulang parent widget."
                 },
                 {
-                    "name": "Smart Sticky Header",
+                    "name": "Smart Sticky Header & Footer",
                     "type": "UI Render",
                     "default": "",
-                    "desc": "Memisahkan area header dan area konten secara fisik. Header (title) akan selalu diam di atas (sticky), sementara bodi konten menggunakan shrink-wrap yang tingginya otomatis menyesuaikan isi maksimal 90% layar."
+                    "desc": "Memisahkan area header, area konten, dan area footer secara fisik. Header dan Footer akan selalu diam (sticky), sementara bodi konten di tengahnya menggunakan shrink-wrap elastis yang menyesuaikan isi (maksimal 90% tinggi layar)."
                 },
                 {
                     "name": "Interactive Gestures Engine",
@@ -293,7 +299,7 @@
                 "Metode Wajib (Restricted Type): Di dalam scope builder, Anda WAJIB mengembalikan salah satu metode dari objek 'layout'. Jika Anda mengembalikan widget biasa (seperti Column) secara langsung, kode akan mengalami error kompilasi.",
                 "Konteks Keamanan: Selalu gunakan parameter 'ctx' yang dilempar oleh builder saat Anda memanggil 'Navigator.pop(ctx)'. Memakai context bawaan halaman berpotensi memicu bug tertutupnya halaman utama."
             ],
-            "code": "// Contoh Pemanggilan Interaktif & Anti-Error\nint counter = 0; // Variabel State Lokal\n\nfinal String? result = await ModalBottomSheetWidget.show(\n  context,\n  title: 'Keranjang Interaktif',\n  builder: (ctx, setModalState, layout) { // <-- INJEKSI STATE & ASISTEN\n    return layout.fromSingleScroll(\n      padding: const EdgeInsets.all(16),\n      child: Column(\n        crossAxisAlignment: CrossAxisAlignment.stretch,\n        children: [\n          Text(\n            'Jumlah Item: $counter',\n            textAlign: TextAlign.center,\n            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n          ),\n          const SizedBox(height: 16),\n          ElevatedButton(\n            onPressed: () {\n              // Refresh KHUSUS area modal saja!\n              setModalState(() => counter++);\n            },\n            child: const Text('Tambah Item'),\n          ),\n          ElevatedButton(\n            onPressed: () => Navigator.pop(ctx, 'Total dibeli: $counter'),\n            child: const Text('Selesai & Tutup'),\n          ),\n        ],\n      ),\n    );\n  },\n);\n\nif (result != null) {\n  print('Pengguna mengonfirmasi: $result');\n}"
+            "code": "// Contoh Pemanggilan Interaktif dengan Sticky Footer\nint counter = 0; // Variabel State Lokal\n\nfinal String? result = await ModalBottomSheetWidget.show(\n  context,\n  title: 'Keranjang Interaktif',\n  // [BARU] Sticky Footer yang akan selalu diam di bawah\n  footer: Container(\n    width: double.infinity,\n    padding: const EdgeInsets.all(16),\n    decoration: BoxDecoration(\n      color: Theme.of(context).scaffoldBackgroundColor,\n      border: const Border(top: BorderSide(color: Colors.black12)),\n    ),\n    child: ElevatedButton(\n      onPressed: () => Navigator.pop(context, 'Total dibeli: $counter'),\n      child: const Text('Selesai & Checkout'),\n    ),\n  ),\n  builder: (ctx, setModalState, layout) { // <-- INJEKSI STATE & ASISTEN\n    return layout.fromSingleScroll(\n      padding: const EdgeInsets.all(16),\n      child: Column(\n        crossAxisAlignment: CrossAxisAlignment.stretch,\n        children: [\n          Text(\n            'Jumlah Item: $counter',\n            textAlign: TextAlign.center,\n            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),\n          ),\n          const SizedBox(height: 16),\n          ElevatedButton(\n            onPressed: () {\n              // Refresh KHUSUS area modal saja!\n              setModalState(() => counter++);\n            },\n            child: const Text('Tambah Item'),\n          ),\n          const SizedBox(height: 24),\n          // Contoh list dummy untuk memastikan konten bisa discroll\n          // sementara footer tetap statis di bawah.\n          ...List.generate(\n            15,\n            (index) => ListTile(\n              leading: const Icon(Icons.shopping_bag_outlined),\n              title: Text('Barang tambahan $index'),\n            ),\n          ),\n        ],\n      ),\n    );\n  },\n);\n\nif (result != null) {\n  print('Pengguna mengonfirmasi: $result');\n}"
         },
         {
             "id": "ModalWidget",
