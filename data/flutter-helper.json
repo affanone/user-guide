@@ -187,7 +187,7 @@
             "group": "Alert",
             "name": "Modal Bottom Sheet",
             "icon": "fa-solid fa-window-maximize",
-            "description": "Widget utilitas statis kelas premium dengan pola arsitektur 'Type-Safe Factory Builder', 'Scoped State Management', dan 'Fallback/Override UI'. Menghilangkan kebutuhan konfigurasi layout manual dengan menyuntikkan asisten 'ModalLayoutControl'. Mendukung update UI internal secara real-time (Interaktif) tanpa me-rebuild halaman utama. Dilengkapi Sticky Header & Footer cerdas, engine gestur interaktif (Follow Finger, Bounce Back), dan sinkronisasi lintas platform (Desktop/Mouse).",
+            "description": "Widget utilitas statis kelas premium dengan pola arsitektur 'Type-Safe Factory Builder', 'Scoped State Management', dan 'Fallback/Override UI'. Menghilangkan kebutuhan konfigurasi layout manual dengan menyuntikkan asisten 'ModalLayoutControl'. Mendukung update UI internal secara real-time (Interaktif) tanpa me-rebuild halaman utama. Dilengkapi Sticky Header & Footer dengan metode Builder layaknya layout.header() dan layout.footer(), engine gestur interaktif cerdas, dan sinkronisasi lintas platform (Desktop/Mouse).",
             "mandatoryProps": [
                 {
                     "name": "context",
@@ -199,7 +199,7 @@
                     "name": "builder",
                     "type": "ModalLayoutResult Function(BuildContext ctx, StateSetter setModalState, ModalLayoutControl layout)",
                     "default": "",
-                    "desc": "Fungsi callback wajib yang mengeksekusi UI Anda. Menyuntikkan context modal murni (ctx) untuk Navigator.pop() yang aman, fungsi (setModalState) untuk me-refresh khusus area modal, dan asisten (layout). Di dalam metode layout (misal: layout.fromChild), Anda dapat menyisipkan parameter 'header' dan 'footer' untuk MENIMPA (override) parameter awal/default dari luar."
+                    "desc": "Fungsi callback wajib yang mengeksekusi UI Anda. Menyuntikkan context modal murni (ctx), fungsi untuk me-refresh area modal (setModalState), dan asisten (layout). Anda dapat menggunakan layout.header(Widget) atau layout.footer(Widget) sebelum mereturn nilai layout.fromX() untuk menimpa parameter dari luar."
                 }
             ],
             "optionalProps": [
@@ -213,13 +213,13 @@
                     "name": "header",
                     "type": "Widget?",
                     "default": "null",
-                    "desc": "Nilai awal/default untuk Sticky Header dari luar. Akan diabaikan (ditimpa) jika metode layout di dalam builder mereturn parameter 'header' yang tidak null."
+                    "desc": "Nilai default untuk Sticky Header statis dari luar. Akan diabaikan (ditimpa) jika Anda memanggil layout.header(...) di dalam builder."
                 },
                 {
                     "name": "footer",
                     "type": "Widget?",
                     "default": "null",
-                    "desc": "Nilai awal/default untuk Sticky Footer dari luar. Sangat praktis untuk kode statis. Namun bisa ditimpa (override) sewaktu-waktu dari dalam scope builder jika terjadi perubahan state (misal: mengganti tombol menjadi loading)."
+                    "desc": "Nilai default untuk Sticky Footer statis dari luar. Akan diabaikan (ditimpa) jika Anda memanggil layout.footer(...) di dalam builder."
                 },
                 {
                     "name": "closeOnOverlayTap",
@@ -249,7 +249,7 @@
             "additionalInfo": {
                 "dependencies": "dart:ui, flutter/material.dart",
                 "StateSetter (setModalState)": "Berfungsi persis seperti setState, namun diisolasi khusus untuk merender ulang area di dalam modal saja tanpa membebani halaman induk.",
-                "Fallback/Override Pattern": "Membaca header/footer dari asisten 'layout' terlebih dahulu. Jika null, sistem akan mundur (fallback) membaca header/footer bawaan dari parameter luar 'show()'.",
+                "Builder Pattern (Header/Footer)": "Panggil layout.header(Widget) dan layout.footer(Widget) HANYA JIKA Anda ingin mengganti/menimpa nilai bawaan dari parameter luar 'show()'. Jika ingin menghapus footer luar secara dinamis, Anda bisa memanggil layout.footer(const SizedBox.shrink()).",
                 "ModalLayoutControl.fromSingleScroll()": "Membungkus konten statis yang panjang (seperti Formulir) dengan SingleChildScrollView.",
                 "ModalLayoutControl.fromListViewBuilder()": "Membuat ListView.builder dengan shrinkWrap dan ClampingScrollPhysics otomatis (Solusi mutlak anti-overflow dan anti-bentrok gestur).",
                 "ModalLayoutControl.fromListViewSeparated()": "Sama seperti builder, namun otomatis menambahkan garis pembatas (Divider) rapi di antara item list.",
@@ -300,7 +300,7 @@
                 "Metode Wajib (Restricted Type): Di dalam scope builder, Anda WAJIB mengembalikan salah satu metode dari objek 'layout'. Jika Anda mengembalikan widget biasa secara langsung, kode akan mengalami error kompilasi.",
                 "Konteks Keamanan: Selalu gunakan parameter 'ctx' yang dilempar oleh builder saat Anda memanggil 'Navigator.pop(ctx)'."
             ],
-            "code": "// Contoh Pola Fallback/Override: Menimpa Footer Awal Saat Loading\nbool isLoading = false;\n\nfinal String? result = await ModalBottomSheetWidget.show(\n  context,\n  title: 'Konfirmasi Penyimpanan',\n  // [1] INITIAL FOOTER: Footer statis yang didefinisikan dari luar\n  footer: Container(\n    width: double.infinity,\n    padding: const EdgeInsets.all(16),\n    decoration: BoxDecoration(\n      color: Theme.of(context).scaffoldBackgroundColor,\n      border: const Border(top: BorderSide(color: Colors.black12)),\n    ),\n    child: const Text('Menunggu persetujuan pengguna...', textAlign: TextAlign.center),\n  ),\n  builder: (ctx, modalState, layout) { // <-- INJEKSI STATE & ASISTEN\n    return layout.fromSingleScroll(\n      // [2] OVERRIDE FOOTER: Menimpa footer luar secara dinamis!\n      // Jika isLoading false (null), UI akan fallback ke Initial Footer di atas.\n      footer: isLoading \n        ? Container(\n            width: double.infinity,\n            padding: const EdgeInsets.all(16),\n            child: const Center(child: CircularProgressIndicator()),\n          )\n        : null, \n\n      padding: const EdgeInsets.all(16),\n      child: Column(\n        crossAxisAlignment: CrossAxisAlignment.stretch,\n        children: [\n          const Text('Apakah Anda yakin ingin menyimpan data ini ke server?'),\n          const SizedBox(height: 24),\n          if (!isLoading) // Sembunyikan tombol utama saat loading berjalan\n            ElevatedButton(\n              onPressed: () async {\n                // Memicu re-render khusus area modal\n                modalState(() => isLoading = true);\n                \n                // Simulasi proses API (contoh: 2 detik)\n                await Future.delayed(const Duration(seconds: 2));\n                \n                if (ctx.mounted) {\n                  Navigator.pop(ctx, 'Berhasil Disimpan');\n                }\n              },\n              child: const Text('Ya, Simpan Sekarang'),\n            ),\n        ],\n      ),\n    );\n  },\n);\n\nif (result != null) {\n  print('Status: $result');\n}"
+            "code": "// Contoh Pola Fallback/Override Menggunakan metode 'layout.footer()'\nbool isLoading = false;\n\nfinal String? result = await ModalBottomSheetWidget.show(\n  context,\n  title: 'Konfirmasi Penyimpanan',\n  // [1] INITIAL FOOTER: Statis dari luar. (Menjadi cadangan)\n  footer: Container(\n    width: double.infinity,\n    padding: const EdgeInsets.all(16),\n    decoration: const BoxDecoration(\n      border: Border(top: BorderSide(color: Colors.black12)),\n    ),\n    child: const Text('Menunggu interaksi Anda...', textAlign: TextAlign.center),\n  ),\n  builder: (ctx, modalState, layout) { // <-- INJEKSI STATE & ASISTEN\n    \n    // [2] OVERRIDE: Timpa Footer statis di atas jika kondisinya loading!\n    if (isLoading) {\n      layout.footer(\n        Container(\n          width: double.infinity,\n          padding: const EdgeInsets.all(16),\n          child: const Center(child: CircularProgressIndicator()),\n        )\n      );\n    } \n    // Jika isLoading == false, kita TIDAK memanggil layout.footer(),\n    // maka sistem akan otomatis membaca fallback Initial Footer dari luar.\n\n    return layout.fromSingleScroll(\n      padding: const EdgeInsets.all(16),\n      child: Column(\n        crossAxisAlignment: CrossAxisAlignment.stretch,\n        children: [\n          const Text('Apakah Anda yakin ingin menyimpan data ini ke server?'),\n          const SizedBox(height: 24),\n          if (!isLoading) // Sembunyikan tombol utama saat loading berjalan\n            ElevatedButton(\n              onPressed: () async {\n                // Memicu re-render khusus area modal\n                modalState(() => isLoading = true);\n                \n                // Simulasi API\n                await Future.delayed(const Duration(seconds: 2));\n                \n                if (ctx.mounted) Navigator.pop(ctx, 'Berhasil');\n              },\n              child: const Text('Ya, Simpan Sekarang'),\n            ),\n        ],\n      ),\n    );\n  },\n);\n\nif (result != null) print('Status: $result');"
         },
         {
             "id": "ModalWidget",
