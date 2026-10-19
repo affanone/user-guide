@@ -7,6 +7,216 @@
     },
     "docsData": [
         {
+            "id": "AppBarWidget",
+            "group": "Navigation",
+            "name": "AppBar Premium",
+            "icon": "fa-solid fa-heading",
+            "description": "Widget AppBar tingkat lanjut yang membungkus AppBar bawaan Flutter dengan fitur pencarian internal terintegrasi (built-in search). Dilengkapi dengan animasi transisi premium (Fade + Slide), mekanisme debounce untuk efisiensi input, dukungan ekstensi bagian bawah dinamis (seperti TabBar), serta terintegrasi langsung dengan sistem keamanan ScreenLock secara otomatis.",
+            "mandatoryProps": [
+                {
+                    "name": "title",
+                    "type": "String",
+                    "default": "",
+                    "desc": "Teks judul utama yang ditampilkan pada AppBar saat tidak dalam mode pencarian."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "actions",
+                    "type": "List<Widget>?",
+                    "default": "null",
+                    "desc": "Kumpulan widget tambahan (biasanya IconButton) yang diletakkan di sisi kanan AppBar. (Catatan: Ikon Search dan Lock dirender secara otomatis di luar list ini)."
+                },
+                {
+                    "name": "onSearchChanged",
+                    "type": "ValueChanged<String>?",
+                    "default": "null",
+                    "desc": "Callback yang dipicu saat teks pencarian diubah. Pemanggilan fungsi ini ditunda oleh mekanisme debounce untuk mencegah spam."
+                },
+                {
+                    "name": "onSearchSubmitted",
+                    "type": "ValueChanged<String>?",
+                    "default": "null",
+                    "desc": "Callback yang dipicu saat user menekan tombol submit/enter pada keyboard di mode pencarian."
+                },
+                {
+                    "name": "onSearchClosed",
+                    "type": "VoidCallback?",
+                    "default": "null",
+                    "desc": "Callback yang dieksekusi saat user keluar dari mode pencarian (menekan tombol back atau clear hingga kosong)."
+                },
+                {
+                    "name": "hintText",
+                    "type": "String",
+                    "default": "'Cari...'",
+                    "desc": "Teks placeholder yang muncul pada TextField saat mode pencarian aktif."
+                },
+                {
+                    "name": "leading",
+                    "type": "Widget?",
+                    "default": "null",
+                    "desc": "Widget kustom di pojok kiri atas. Jika kosong dan rute dapat di-pop, akan otomatis menggunakan BackButton bawaan."
+                },
+                {
+                    "name": "centerTitle",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika true, teks judul akan diposisikan di tengah AppBar."
+                },
+                {
+                    "name": "debounceDuration",
+                    "type": "Duration",
+                    "default": "Duration(milliseconds: 500)",
+                    "desc": "Waktu jeda tunggu sebelum input teks pencarian diteruskan ke onSearchChanged."
+                },
+                {
+                    "name": "animationDuration",
+                    "type": "Duration",
+                    "default": "Duration(milliseconds: 300)",
+                    "desc": "Durasi transisi animasi saat beralih antara judul teks dan form pencarian."
+                },
+                {
+                    "name": "bottom",
+                    "type": "PreferredSizeWidget?",
+                    "default": "null",
+                    "desc": "Widget tambahan di bagian bawah AppBar, sangat cocok untuk menyematkan TabBar."
+                }
+            ],
+            "additionalInfo": {
+                "styling": "Menggunakan tema warna dinamis (Theme.of(context).colorScheme.surface) dengan elevasi 0 dan surfaceTintColor transparan untuk tampilan flat-modern.",
+                "security": "Terintegrasi otomatis dengan ScreenLock.instance. Jika akun pengguna memiliki PIN, ikon kunci akan muncul otomatis di ujung kanan AppBar."
+            },
+            "methods": [
+                {
+                    "name": "preferredSize",
+                    "type": "Size",
+                    "default": "",
+                    "desc": "Overridden getter untuk menghitung ukuran ideal AppBar. Secara dinamis menjumlahkan tinggi kToolbarHeight (standar) dengan tinggi widget bottom (jika ada)."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Smart Search Toggle",
+                    "type": "Auto UI Detection",
+                    "default": "",
+                    "desc": "Fitur pencarian (ikon kaca pembesar) akan diaktifkan secara OTOMATIS jika setidaknya satu dari parameter `onSearchChanged`, `onSearchSubmitted`, atau `onSearchClosed` diisi."
+                },
+                {
+                    "name": "Debounced Search",
+                    "type": "Performance Optimization",
+                    "default": "",
+                    "desc": "Mencegah pemanggilan fungsi pencarian berlebihan (spam API) dengan menahan eksekusi selama `debounceDuration` setelah ketikan terakhir user."
+                },
+                {
+                    "name": "Premium Transitions",
+                    "type": "Animation",
+                    "default": "",
+                    "desc": "Menggunakan AnimatedSwitcher yang dikustomisasi dengan Tween Offset dan Curves.easeOutCubic untuk menghasilkan efek Fade + Slide halus saat berpindah dari Judul ke Form Cari."
+                },
+                {
+                    "name": "Dynamic Sizing",
+                    "type": "Layout Rendering",
+                    "default": "",
+                    "desc": "Mencegah error 'RenderFlex' pada bagian atas layar saat menambahkan TabBar, karena `preferredSize` selalu dihitung akurat menyertakan ukuran `bottom`."
+                }
+            ],
+            "specialNotes": [
+                "Tidak perlu menambahkan manual icon 'Search' ke dalam parameter `actions`. Sistem akan menampilkannya dengan cerdas apabila logic pencarian terdeteksi.",
+                "Saat mode cari aktif, 'leading' otomatis berubah menjadi tombol panah kembali (Back) untuk membatalkan pencarian tanpa perlu menutup halaman."
+            ],
+            "code": "// CONTOH 1: AppBar Biasa + Actions kustom\nreturn Scaffold(\n  appBar: AppBarWidget(\n    title: 'Dashboard',\n    centerTitle: true,\n    actions: [\n      IconButton(icon: Icon(Icons.notifications), onPressed: () {}),\n    ],\n  ),\n);\n\n// CONTOH 2: AppBar dengan Fitur Pencarian Debounce & TabBar (Bottom)\nreturn Scaffold(\n  appBar: AppBarWidget(\n    title: 'Daftar Pengguna',\n    hintText: 'Cari nama karyawan...',\n    onSearchChanged: (query) {\n      // Dipanggil 500ms setelah user berhenti mengetik\n      print('Mencari data: $query');\n    },\n    onSearchClosed: () {\n      print('Pencarian dibatalkan, reset list');\n    },\n    bottom: const TabBar(\n      tabs: [\n        Tab(text: 'Aktif'),\n        Tab(text: 'Nonaktif'),\n      ],\n    ),\n  ),\n);"
+        },
+        {
+            "id": "BodyWidget",
+            "group": "Layout",
+            "name": "Body Widget",
+            "icon": "fa-solid fa-mobile-screen-button",
+            "description": "Widget standar pengelola bentuk dan layout utama halaman (Body). Mewajibkan penggunaan salah satu dari tiga bentuk layout secara eksplisit (.fill, .scroll, atau .list) tanpa menyediakan konstruktor default. Mengelola padding bagian dalam area gulir secara otomatis agar tidak terjadi pemotongan konten (clipping) di tepi layar saat digulir, serta secara cerdas mengatur ruang bawah agar terhindar dari tumpang tindih dengan FloatingActionButton.",
+            "mandatoryProps": [
+                {
+                    "name": "child",
+                    "type": "Widget",
+                    "default": "",
+                    "desc": "Konten tunggal utama halaman. Wajib diisi jika menggunakan constructor BodyWidget.fill atau BodyWidget.scroll."
+                },
+                {
+                    "name": "children",
+                    "type": "List<Widget>",
+                    "default": "",
+                    "desc": "Kumpulan widget (array) yang akan dirender sebagai daftar. Wajib diisi HANYA jika menggunakan constructor BodyWidget.list."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "padding",
+                    "type": "EdgeInsetsGeometry?",
+                    "default": "null",
+                    "desc": "Mengganti padding bawaan halaman. Jika diisi pada .scroll atau .list, nilai ini dipakai apa adanya, dan sistem ruang bawah otomatis (scrollBottom / floatButtonBottom) akan diabaikan."
+                },
+                {
+                    "name": "withFloatButtonWidget",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika true pada mode .scroll / .list, akan memberikan ruang bawah ekstra (80px) agar konten terbawah tidak tertutup oleh Floating Action Button atau tombol blok statis. Diabaikan jika prop 'padding' diisi manual."
+                },
+                {
+                    "name": "controller",
+                    "type": "ScrollController?",
+                    "default": "null",
+                    "desc": "Controller untuk mengendalikan posisi gulir. Hanya berlaku untuk penggunaan constructor .scroll dan .list."
+                }
+            ],
+            "additionalInfo": {
+                "styling": "Padding bawaan (defaultPadding) adalah EdgeInsets.fromLTRB(20, 0, 20, 0) yang berarti jarak kiri-kanan 20px, tanpa padding atas.",
+                "safe_area": "Membungkus seluruh konten dengan SafeArea(top: false) dan mengunci penjajaran melalui Align(alignment: Alignment.topCenter)."
+            },
+            "methods": [
+                {
+                    "name": "BodyWidget.fill",
+                    "type": "Constructor",
+                    "default": "",
+                    "desc": "Mengisi tinggi layar penuh dan TIDAK digulir oleh BodyWidget. Ideal untuk halaman yang memiliki layout Column + Expanded (seperti tabel berpaginasi atau daftar dengan header tetap)."
+                },
+                {
+                    "name": "BodyWidget.scroll",
+                    "type": "Constructor",
+                    "default": "",
+                    "desc": "Membungkus konten (biasanya form atau detail pendek) dengan SingleChildScrollView."
+                },
+                {
+                    "name": "BodyWidget.list",
+                    "type": "Constructor",
+                    "default": "",
+                    "desc": "Langsung mengubah keseluruhan halaman menjadi ListView. Sangat optimal untuk dashboard, pengaturan, atau laporan berbasis kartu."
+                }
+            ],
+            "behaviors": [
+                {
+                    "name": "Inner Scroll Padding",
+                    "type": "Layout Rendering",
+                    "default": "",
+                    "desc": "Pada varian .scroll dan .list, padding disisipkan DI DALAM area gulir. Hal ini membuat konten tergulung mulus tanpa celah kosong dengan AppBar, dan scrollbar menempel tepat di tepi layar."
+                },
+                {
+                    "name": "Bottom Spacing Avoidance",
+                    "type": "Layout Rendering",
+                    "default": "",
+                    "desc": "Secara default menambahkan ruang bawah (scrollBottom = 16) pada area gulir agar item terakhir tidak mentok dengan tepi bawah layar."
+                },
+                {
+                    "name": "MediaQuery Padding Bypass",
+                    "type": "System Adjustment",
+                    "default": "",
+                    "desc": "Karena padding didefinisikan secara eksplisit, ListView tidak akan menambahkan padding otomatis dari MediaQuery (yang seringkali menyebabkan celah aneh di bagian atas pada perangkat ber-notch)."
+                }
+            ],
+            "specialNotes": [
+                "⚠️ LARANGAN FATAL: JANGAN gunakan '.scroll' atau '.list' untuk membungkus widget yang menggunakan `Expanded` (seperti Column yang berisi Expanded).",
+                "Penjelasan Larangan: Area gulir (.scroll / .list) memberikan tinggi tak terbatas (unbounded height constraints). Jika didalamnya terdapat Expanded yang menuntut sisa ruang, akan menyebabkan error layout ('RenderFlex ... incoming height constraints are unbounded'). Gunakan '.fill' untuk kasus ini."
+            ],
+            "code": "// 1. CONTOH .scroll (Untuk form atau halaman detail)\nreturn Scaffold(\n  body: BodyWidget.scroll(\n    withFloatButtonWidget: true, // Beri jarak bawah karena ada FAB\n    child: FormWidget(\n      // isi form\n    ),\n  ),\n  floatingActionButton: FloatingActionButton(...),\n);\n\n// 2. CONTOH .fill (Tepat untuk penggunaan Expanded)\nreturn Scaffold(\n  body: BodyWidget.fill(\n    child: Column(\n      children: [\n        HeaderStatik(),\n        Expanded(\n          // ListView internal akan mengambil sisa ruang\n          child: ListView.builder(...),\n        ),\n      ],\n    ),\n  ),\n);\n\n// 3. CONTOH .list (Untuk halaman yang seluruhnya adalah daftar)\nreturn Scaffold(\n  body: BodyWidget.list(\n    [\n      CardMenu(title: 'Dashboard'),\n      CardMenu(title: 'Laporan'),\n      CardMenu(title: 'Pengaturan'),\n    ],\n  ),\n);"
+        },
+        {
             "id": "AlertWidget",
             "group": "Alert",
             "name": "Alert",
