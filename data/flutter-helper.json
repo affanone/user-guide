@@ -3165,94 +3165,126 @@
             "group": "Helper",
             "name": "Smart Responsive",
             "icon": "fa-solid fa-display",
-            "description": "Kelas utilitas statis untuk mengelola breakpoint dan responsivitas UI secara efisien. Menggunakan `MediaQuery.sizeOf` untuk meminimalisir rebuild rendering tree. Dilengkapi dengan fungsi generik `value<T>` berskala waktu eksekusi O(1) untuk merender tipe data apapun (seperti Widget, double, int, bool) tanpa overhead pembuatan Map atau Looping, memastikan performa aplikasi tetap optimal dan hemat memori pada skala besar.",
+            "description": "Kelas utilitas statis tingkat lanjut untuk mengelola breakpoint dan responsivitas UI secara efisien. Menggunakan `MediaQuery.sizeOf` dan `MediaQuery.orientationOf` untuk meminimalisir rebuild rendering tree. Kini hadir dengan 2 lapis pendekatan responsif: (1) Pendekatan Presisi/Granular menggunakan `value<T>` berdasarkan skala matriks 9 tingkat, dan (2) Pendekatan Makro menggunakan `screenValue<T>` berdasarkan kelas perangkat logis (ScreenType: mobile, tablet, desktop) dengan fallback otomatis.",
             "mandatoryProps": [
                 {
                     "name": "context",
                     "type": "BuildContext",
                     "default": "",
-                    "desc": "Konteks aplikasi saat ini. Wajib disuplai untuk membaca dimensi layar secara real-time melalui MediaQuery."
+                    "desc": "Konteks aplikasi saat ini. Wajib disuplai untuk membaca dimensi dan orientasi layar secara real-time melalui MediaQuery."
                 },
                 {
-                    "name": "initialValue (khusus value<T>)",
+                    "name": "initialValue",
                     "type": "T (Generic)",
                     "default": "",
-                    "desc": "Nilai dasar yang wajib diisi. Berlaku sebagai fallback mutlak dari tipe data yang Anda tentukan jika dimensi layar saat ini tidak memenuhi syarat breakpoint lain yang lebih besar, atau jika seluruh parameter breakpoint dikosongkan."
+                    "desc": "[Khusus value<T> & isResponsive] Nilai dasar fallback mutlak jika tidak ada breakpoint yang terpenuhi."
+                },
+                {
+                    "name": "mobile",
+                    "type": "T (Generic)",
+                    "default": "",
+                    "desc": "[Khusus screenValue<T>] Nilai wajib untuk layar kelas mobile (sisi terpendek < 600dp). Menjadi fallback paling akhir jika nilai tablet atau desktop tidak disuplai."
                 }
             ],
             "optionalProps": [
                 {
-                    "name": "width",
-                    "type": "double",
+                    "name": "tablet / desktop",
+                    "type": "T?",
                     "default": "null",
-                    "desc": "Digunakan khusus pada method `breakpoint`. Jika diisi, akan mengabaikan dimensi dari `context` dan menggunakan nilai statis ini untuk kalkulasi."
+                    "desc": "[Khusus screenValue<T>] Nilai opsional untuk kelas layar tablet atau desktop. Jika dikosongkan, nilai akan otomatis di-fallback/menurun ke kelas di bawahnya (desktop -> tablet -> mobile)."
                 },
                 {
                     "name": "xxs, xs, sm, md, lg, xl, xxl, xxxl",
                     "type": "T? / bool?",
                     "default": "null",
-                    "desc": "Parameter opsional untuk menetapkan spesifik nilai atau state pada titik henti (breakpoint) layar tertentu."
+                    "desc": "[Khusus value<T>] Parameter opsional untuk menetapkan spesifik nilai pada titik henti (breakpoint) resolusi presisi."
+                },
+                {
+                    "name": "width",
+                    "type": "double?",
+                    "default": "null",
+                    "desc": "[Khusus method breakpoint] Jika diisi, akan mengabaikan dimensi dari `context` dan menggunakan nilai statis ini untuk kalkulasi breakpoint."
                 }
             ],
             "additionalInfo": {
                 "dependencies": "flutter/material.dart",
-                "architecture_layer": "Static Helper Class, Generic Type (<T>), O(1) Execution Time"
+                "architecture_layer": "Static Helper Class, Generic Type (<T>), O(1) Execution Time",
+                "screen_type_logic": "Layar dihitung sebagai Mobile jika sisi terpendeknya (shortestSide) < 600dp. Desktop dihitung jika lebar layar >= 1200px (Breakpoint.xl). Tablet berada di antara keduanya."
             },
             "methods": [
                 {
-                    "name": "getWidth(context)",
-                    "returnType": "double",
-                    "desc": "Mendapatkan nilai absolut lebar layar saat ini menggunakan `MediaQuery.sizeOf(context).width`. Berkinerja tinggi dan terhindar dari rebuild tree yang tidak perlu akibat perubahan non-dimensi (seperti kemunculan keyboard)."
+                    "name": "screenType(context)",
+                    "returnType": "ScreenType",
+                    "desc": "Mengembalikan enum ScreenType (mobile, tablet, desktop) berdasarkan aturan rasio absolut layar (bukan sistem operasi). Sebuah jendela Windows yang dikecilkan akan terbaca sebagai 'mobile'."
                 },
                 {
-                    "name": "getHeight(context)",
-                    "returnType": "double",
-                    "desc": "Mendapatkan nilai absolut tinggi layar saat ini menggunakan `MediaQuery.sizeOf(context).height`. Berkinerja tinggi dan terhindar dari rebuild tree yang tidak perlu akibat perubahan non-dimensi (seperti kemunculan keyboard)."
+                    "name": "isMobile(context) / isTablet(context) / isDesktop(context)",
+                    "returnType": "bool",
+                    "desc": "Fungsi pengecekan cepat (boolean) untuk mengetahui kelas logis layar saat ini secara instan."
                 },
                 {
-                    "name": "breakpoint(context, {width})",
-                    "returnType": "Breakpoint",
-                    "desc": "Mendapatkan nilai enum `Breakpoint` aktif secara instan berdasarkan ukuran layar saat ini."
+                    "name": "isPortrait(context) / isLandscape(context)",
+                    "returnType": "bool",
+                    "desc": "Fungsi untuk mendeteksi orientasi layar saat ini secara efisien menggunakan `MediaQuery.orientationOf`."
+                },
+                {
+                    "name": "screenValue<T>(context, {required mobile, tablet, desktop})",
+                    "returnType": "T",
+                    "desc": "Metode makro untuk mengambil nilai generik berdasarkan tipe perangkat (ScreenType). Menawarkan logika fallback otomatis (desktop -> tablet -> mobile) tanpa perulangan rumit."
                 },
                 {
                     "name": "value<T>(context, {required initialValue, xxs...xxxl})",
                     "returnType": "T",
-                    "desc": "Method utama yang bersifat polimorfik. Dapat menerima dan mengembalikan tipe data apapun (Widget, String, double, int) secara dinamis sesuai pergerakan resolusi layar."
+                    "desc": "Metode granular polimorfik. Menerima dan mengembalikan tipe data apapun secara spesifik berdasarkan 9 tingkat breakpoint."
+                },
+                {
+                    "name": "breakpoint(context, {width})",
+                    "returnType": "Breakpoint",
+                    "desc": "Mendapatkan nilai enum `Breakpoint` aktif secara presisi berdasarkan lebar layar saat ini."
+                },
+                {
+                    "name": "getWidth(context) / getHeight(context)",
+                    "returnType": "double",
+                    "desc": "Mendapatkan nilai absolut dimensi layar via `MediaQuery.sizeOf`. Berkinerja tinggi, mengabaikan rebuild karena pop-up keyboard."
                 },
                 {
                     "name": "isResponsive(context, {initialValue, xxs...xxxl})",
                     "returnType": "bool",
-                    "desc": "Fungsi spesifik yang dipertahankan untuk kompatibilitas. Merupakan wrapper yang mengeksekusi `value<bool>` guna mengembalikan state kebenaran (true/false) saja."
+                    "desc": "Wrapper khusus pengembalian boolean dari fungsi `value<T>`."
                 }
             ],
             "behaviors": [
                 {
                     "name": "Rebuild Optimization",
                     "type": "Performance",
-                    "desc": "Secara internal memakai `MediaQuery.sizeOf(context)` alih-alih `MediaQuery.of(context).size`. Ini mencegah widget tree merender ulang seluruh komponen ketika ada perubahan non-dimensi (seperti kemunculan keyboard)."
+                    "default": "",
+                    "desc": "Secara internal memakai `MediaQuery.sizeOf(context)` dan `orientationOf` alih-alih `MediaQuery.of(context)`. Ini mencegah widget tree merender ulang seluruh komponen ketika ada perubahan non-dimensi (seperti inset/kemunculan keyboard)."
                 },
                 {
-                    "name": "O(1) Memory Efficiency",
+                    "name": "Shortest Side Mobile Detection",
+                    "type": "Logic Pattern",
+                    "default": "",
+                    "desc": "Patokan `isMobile` dinilai menggunakan sisi terpendek layar (shortestSide < 600dp), sehingga ponsel yang diputar menjadi landscape (mendatar) tetap dikategorikan sebagai ponsel/mobile secara sistem."
+                },
+                {
+                    "name": "Smart Cascade Fallback",
                     "type": "Architecture",
-                    "desc": "Evaluasi linier kaskade berkinerja tinggi. Otomatis menghindari instansiasi objek Map baru dan menghilangkan proses iterasi loop pada setiap frame UI."
+                    "default": "",
+                    "desc": "Pada `screenValue<T>`, jika Anda berada di layar desktop tetapi parameter `desktop` tidak diisi (null), sistem otomatis melimpahkannya ke parameter `tablet`. Jika tablet kosong juga, maka melimpah ke `mobile`. Evaluasi yang sangat aman."
                 },
                 {
-                    "name": "Generic Polymorphism",
+                    "name": "O(1) Generic Polymorphism",
                     "type": "Scalability",
-                    "desc": "Ekspansi fungsi tanpa batas menggunakan parameter `T`. Satu fungsi bisa menangani manajemen ukuran font, hitungan grid, hingga pergantian layout widget utuh."
-                },
-                {
-                    "name": "Mobile-First Override Approach",
-                    "type": "Logic",
-                    "desc": "Mengevaluasi nilai dari breakpoint terkecil (xxs) hingga ukuran layar saat ini, mengamankan flow perubahan nilai secara proporsional dan konsisten. Jika tidak ada yang sesuai, kembali ke `initialValue`."
+                    "default": "",
+                    "desc": "Ekspansi fungsi tanpa batas dengan Big-O (1) menggunakan parameter generic `T`. Sangat memori-efisien."
                 }
             ],
             "specialNotes": [
-                "Pastikan selalu mendefinisikan tipe data eksplisit pada `<T>` seperti `Responsive.value<double>(...)` untuk menghindari kesalahan kompilasi atau inferensi tipe dari Dart.",
-                "Selalu letakkan pemanggilan fungsi ini langsung di dalam method `build` agar widget dapat bereaksi instan saat resolusi perangkat berubah.",
-                "Tidak perlu menyuplai setiap breakpoint. Cukup suplai `initialValue` dan titik di mana perubahan tata letak diperlukan (misalnya hanya di `md` dan `lg`)."
+                "PANDUAN PEMILIHAN: Gunakan `screenValue<T>` jika Anda membagi layout halaman secara garis besar (misal: BottomNav di mobile, Sidebar di tablet/desktop). Gunakan `value<T>` jika Anda butuh presisi ketat (misal: jumlah kolom grid dari 2, 3, 4, 5 hingga 6 berturut-turut pada tiap breakpoint).",
+                "Wajib selalu mendefinisikan tipe data eksplisit pada `<T>` seperti `Responsive.screenValue<double>(...)` untuk menghindari kesalahan kompilasi dari Dart.",
+                "Selalu letakkan fungsi statis ini di dalam scope fungsi `build(BuildContext context)` agar layout beradaptasi instan saat window di-resize atau rotasi terjadi."
             ],
-            "code": "Widget build(BuildContext context) {\n  final currentWidth = Responsive.getWidth(context);\n\n  final crossAxisCount = Responsive.value<int>(\n    context,\n    initialValue: 2,\n    md: 3,\n    lg: 4,\n    xxl: 6,\n  );\n\n  final padding = Responsive.value<double>(\n    context,\n    initialValue: 16.0,\n    md: 24.0,\n    xl: 32.0,\n  );\n\n  final showSidebar = Responsive.isResponsive(\n    context,\n    initialValue: false,\n    lg: true,\n  );\n\n  return Scaffold(\n    body: GridView.count(\n      padding: EdgeInsets.all(padding),\n      crossAxisCount: crossAxisCount,\n      children: [ /* Komponen Grid */ ],\n    ),\n  );\n}"
+            "code": "// =========================================================================\n// 1. CONTOH PENDEKATAN MAKRO (ScreenType: Mobile, Tablet, Desktop)\n// =========================================================================\nWidget build(BuildContext context) {\n  // Deteksi rotasi instan\n  final isMiring = Responsive.isLandscape(context);\n\n  // Mengatur layout besar aplikasi\n  final Widget mainLayout = Responsive.screenValue<Widget>(\n    context,\n    mobile: Column(children: [HeaderMobile(), BodyPusat()]),\n    tablet: Row(children: [SidebarMini(), Expanded(child: BodyPusat())]),\n    desktop: Row(children: [SidebarFull(), Expanded(child: BodyPusat()), PanelKanan()]),\n  );\n\n  // =========================================================================\n  // 2. CONTOH PENDEKATAN PRESISI / GRANULAR (Breakpoint xxs hingga xxxl)\n  // =========================================================================\n  \n  // Mengatur proporsi grid yang ketat\n  final crossAxisCount = Responsive.value<int>(\n    context,\n    initialValue: 2, // Default (ponsel kecil)\n    md: 3,           // Layar menengah (576px+)\n    lg: 4,           // Layar besar (992px+)\n    xxl: 6,          // Layar sangat besar (1400px+)\n  );\n\n  // Mengatur padding presisi\n  final padding = Responsive.value<double>(\n    context,\n    initialValue: 16.0,\n    md: 24.0,\n    xl: 32.0,\n  );\n\n  return Scaffold(\n    appBar: AppBar(\n      title: Text(isMiring ? 'Mode Mendatar' : 'Mode Berdiri'),\n    ),\n    body: mainLayout,\n  );\n}"
         },
         {
             "id": "CropWidget",
