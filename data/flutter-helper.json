@@ -8,7 +8,7 @@
     "docsData": [
         {
             "id": "AppBarWidget",
-            "group": "Navigation",
+            "group": "Layout",
             "name": "AppBar Premium",
             "icon": "fa-solid fa-heading",
             "description": "Widget AppBar tingkat lanjut yang membungkus AppBar bawaan Flutter dengan fitur pencarian internal terintegrasi (built-in search). Dilengkapi dengan animasi transisi premium (Fade + Slide), mekanisme debounce untuk efisiensi input, dukungan ekstensi bagian bawah dinamis (seperti TabBar), serta terintegrasi langsung dengan sistem keamanan ScreenLock secara otomatis.",
