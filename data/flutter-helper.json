@@ -217,6 +217,101 @@
             "code": "// 1. CONTOH .scroll (Untuk form atau halaman detail)\nreturn Scaffold(\n  body: BodyWidget.scroll(\n    withFloatButtonWidget: true, // Beri jarak bawah karena ada FAB\n    child: FormWidget(\n      // isi form\n    ),\n  ),\n  floatingActionButton: FloatingActionButton(...),\n);\n\n// 2. CONTOH .fill (Tepat untuk penggunaan Expanded)\nreturn Scaffold(\n  body: BodyWidget.fill(\n    child: Column(\n      children: [\n        HeaderStatik(),\n        Expanded(\n          // ListView internal akan mengambil sisa ruang\n          child: ListView.builder(...),\n        ),\n      ],\n    ),\n  ),\n);\n\n// 3. CONTOH .list (Untuk halaman yang seluruhnya adalah daftar)\nreturn Scaffold(\n  body: BodyWidget.list(\n    [\n      CardMenu(title: 'Dashboard'),\n      CardMenu(title: 'Laporan'),\n      CardMenu(title: 'Pengaturan'),\n    ],\n  ),\n);"
         },
         {
+            "id": "LayoutFlexWidget",
+            "group": "Layout",
+            "name": "Layout Flex Widget",
+            "icon": "fa-solid fa-layer-group",
+            "description": "Widget cerdas (smart widget) yang menggabungkan kemampuan Column, Row, dan Wrap ke dalam satu antarmuka yang fleksibel. Mengurangi penulisan boilerplate code secara signifikan dengan menangani jarak antar item (spacing) secara otomatis, mencegah error overflow melalui fitur auto-scroll, serta dapat bertransformasi menjadi layout lipat (Wrap) hanya dengan mengubah konfigurasi boolean.",
+            "mandatoryProps": [
+                {
+                    "name": "children",
+                    "type": "List<Widget>",
+                    "default": "",
+                    "desc": "Kumpulan widget (array) yang akan dirender di dalam layout. Wajib diisi."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "isRow",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika true, arah layout akan menyamping (Horizontal/Row). Jika false, arah layout akan menurun (Vertical/Column)."
+                },
+                {
+                    "name": "isWrap",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika true, layout akan menggunakan Wrap. Elemen yang melebihi batas layar akan otomatis turun ke baris/kolom berikutnya. Disarankan mengatur isRow: true jika ini diaktifkan untuk perilaku standar (Chip/Tags)."
+                },
+                {
+                    "name": "isScrollable",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika true, secara otomatis membungkus layout dengan SingleChildScrollView untuk mencegah error 'RenderFlex overflowed'. Arah gulir (axis) akan menyesuaikan dengan properti isRow."
+                },
+                {
+                    "name": "spacing",
+                    "type": "double",
+                    "default": "0.0",
+                    "desc": "Jarak (gap) antar widget. Pada Flex (Column/Row), ini menyisipkan jarak tanpa perlu SizedBox manual. Pada Wrap, ini mengatur jarak utama antar item."
+                },
+                {
+                    "name": "runSpacing",
+                    "type": "double",
+                    "default": "0.0",
+                    "desc": "Jarak antar baris/kolom ketika item terlipat. HANYA berlaku jika isWrap bernilai true."
+                },
+                {
+                    "name": "separator",
+                    "type": "Widget?",
+                    "default": "null",
+                    "desc": "Widget kustom yang disisipkan di antara setiap children (misalnya: Divider atau pembatas kustom). Jika diisi, properti 'spacing' pada mode Flex akan tergantikan oleh ukuran separator ini."
+                },
+                {
+                    "name": "padding",
+                    "type": "EdgeInsetsGeometry?",
+                    "default": "null",
+                    "desc": "Bantalan bagian dalam dari keseluruhan layout. Otomatis membungkus konten dalam Container/Padding."
+                },
+                {
+                    "name": "mainAxisAlignment / crossAxisAlignment",
+                    "type": "Alignment",
+                    "default": "start / center",
+                    "desc": "Mengatur penjajaran standar bawaan Flex/Wrap (seperti MainAxisAlignment.start, CrossAxisAlignment.center)."
+                }
+            ],
+            "additionalInfo": {
+                "styling": "Integrasi Container: Jika padding atau margin diisi, widget secara otomatis akan dibungkus dengan Container tanpa perlu Anda menuliskannya secara manual di widget tree.",
+                "axis_sync": "Sinkronisasi Axis: Properti isRow bertindak sebagai 'Master Axis'. Ia akan mengatur arah Flex (Axis.horizontal/vertical), arah Wrap, dan arah gulir SingleChildScrollView sekaligus."
+            },
+            "methods": [],
+            "behaviors": [
+                {
+                    "name": "Smart Spacing Injection",
+                    "type": "Layout Rendering",
+                    "default": "",
+                    "desc": "Pada mode Flex (isWrap: false), widget mendeteksi ukuran array children dan secara cerdas menyisipkan jarak (spacing/separator) di antara elemen-elemennya tanpa menambahkannya di akhir elemen terakhir."
+                },
+                {
+                    "name": "Auto Anti-Overflow",
+                    "type": "Layout Rendering",
+                    "default": "",
+                    "desc": "Ketika isScrollable diatur ke true, sistem akan memberikan bounding scroll adaptif, sehingga UI tetap aman di berbagai ukuran layar kecil tanpa memunculkan pita kuning-hitam error."
+                },
+                {
+                    "name": "Seamless Wrap Transition",
+                    "type": "System Adjustment",
+                    "default": "",
+                    "desc": "Hanya dengan mengubah isWrap menjadi true, keseluruhan algoritma rendering berpindah dari sistem Flex yang kaku ke sistem Wrap yang dinamis, membagikan properti spacing ke mekanisme Wrap."
+                }
+            ],
+            "specialNotes": [
+                "⚠️ PERINGATAN SCROLLING: Jika Anda menggunakan `isScrollable: true`, pastikan LayoutFlexWidget TIDAK ditempatkan langsung di dalam parent yang juga bisa digulir (seperti ListView) pada arah (axis) yang sama, kecuali Anda telah membatasi tingginya secara eksplisit.",
+                "ℹ️ PRIORITAS PEMBATAS: Pada mode Flex, jika Anda mengisi prop `separator` dan `spacing` secara bersamaan, widget pembatas (separator) yang akan diprioritaskan untuk dirender."
+            ],
+            "code": "// 1. CONTOH SEBAGAI COLUMN CERDAS (Tanpa butuh SizedBox antar item)\nreturn LayoutFlexWidget(\n  spacing: 16.0,\n  padding: const EdgeInsets.all(20),\n  children: [\n    Text('Judul Utama'),\n    Text('Deskripsi di bawah judul'),\n    ButtonSubmit(),\n  ],\n);\n\n// 2. CONTOH SEBAGAI ROW ANTI-OVERFLOW (Bisa digeser horizontal jika mentok)\nreturn LayoutFlexWidget(\n  isRow: true,\n  isScrollable: true,\n  spacing: 12.0,\n  children: [\n    Icon(Icons.home),\n    Icon(Icons.star),\n    Icon(Icons.settings),\n    // ... puluhan icon lainnya tidak akan error overflow\n  ],\n);\n\n// 3. CONTOH SEBAGAI WRAP (Untuk membuat kategori/tags yang otomatis turun baris)\nreturn LayoutFlexWidget(\n  isWrap: true,\n  isRow: true,\n  spacing: 8.0,\n  runSpacing: 8.0,\n  children: [\n    Chip(label: Text('Flutter')),\n    Chip(label: Text('Dart')),\n    Chip(label: Text('Firebase')),\n    Chip(label: Text('Widget Cerdas')),\n  ],\n);"
+        },
+        {
             "id": "AlertWidget",
             "group": "Alert",
             "name": "Alert",
