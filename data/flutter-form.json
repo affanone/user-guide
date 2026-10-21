@@ -3477,13 +3477,13 @@
             "group": "Selection & Dropdown",
             "name": "Segment (SegmentedButton)",
             "icon": "fa-solid fa-layer-group",
-            "description": "Form input berbasis SegmentedButton material design. Berfungsi seperti Radio Group untuk memilih 1 opsi dari sedikit pilihan (2-4 opsi). Secara otomatis terintegrasi dengan ekosistem FormNode dan sinkronisasi 3 arah, serta mewarisi label, validasi error (shake), dan gaya form standar.",
+            "description": "Form input interaktif berbasis SegmentedButton material design tingkat lanjut. Berfungsi seperti Radio Group bergaya tombol modern untuk memilih opsi dari daftar pendek. Telah dilengkapi dengan sinkronisasi 3-arah, dukungan perataan penuh (block), kalkulasi kontras warna otomatis (Luminance), validasi getar (shake), serta adaptasi gaya perbatasan (border) yang presisi mengikuti state form (error, focus, disabled).",
             "mandatoryProps": [
                 {
                     "name": "items",
                     "type": "List<FormSelectItem<T>>",
                     "default": "",
-                    "desc": "Array objek FormSelectItem universal yang berisi nilai (value) dan label tampilan untuk setiap segmen."
+                    "desc": "Array objek FormSelectItem. Secara pintar merender label teks, namun juga mendukung 'icon' (ikon bawaan segmen), 'sublabel' (dirender sebagai Tooltip saat di-hover/ditahan), dan 'child' (menimpa teks label dengan widget kustom sepenuhnya)."
                 }
             ],
             "optionalProps": [
@@ -3527,60 +3527,102 @@
                     "name": "validator",
                     "type": "FormValidator<T?>?",
                     "default": "null",
-                    "desc": "Validasi item form, memicu efek shake jika gagal."
+                    "desc": "Fungsi validasi form. Jika gagal, akan memicu efek getar (shake) dan mengubah garis batas segmen menjadi merah."
                 },
                 {
                     "name": "showErrorMessage",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                    "desc": "Menentukan apakah teks pesan kesalahan merah ditampilkan di bawah form."
                 },
                 {
                     "name": "theme",
                     "type": "FormElementTheme?",
                     "default": "null",
-                    "desc": "Tema elemen form."
+                    "desc": "Tema warna dasar elemen form (jika activeColor tidak diatur)."
                 },
                 {
                     "name": "size",
                     "type": "FormElementSize?",
                     "default": "null",
-                    "desc": "Skala proporsional elemen form dan tinggi tombol segmen."
+                    "desc": "Skala proporsional yang mengatur tinggi segmen, ukuran font, dan ukuran ikon."
                 },
                 {
                     "name": "scale",
                     "type": "double?",
                     "default": "null",
-                    "desc": "Pengali skala manual untuk ukuran form."
+                    "desc": "Pengali skala manual untuk menyetel ukuran secara mikro."
                 },
                 {
                     "name": "enabled",
                     "type": "bool",
                     "default": "true",
-                    "desc": "Status hidup/mati (bisa diklik atau tidak) form."
+                    "desc": "Status hidup/mati form. Saat mati, warna akan menyesuaikan menjadi pudar (disabled state)."
                 },
                 {
                     "name": "allowEmpty",
                     "type": "bool",
                     "default": "false",
-                    "desc": "Menentukan apakah pengguna diizinkan untuk tidak memilih satupun segmen. Jika false, pilihan pertama akan otomatis terpilih jika belum ada nilai."
+                    "desc": "Jika true, user bisa membatalkan pilihan (unselect). Jika false, opsi pertama otomatis terpilih jika belum ada nilai."
                 },
                 {
                     "name": "multiSelect",
                     "type": "bool",
                     "default": "false",
-                    "desc": "(Dalam pengembangan) Mengizinkan pemilihan lebih dari 1 segmen sekaligus."
+                    "desc": "Mengizinkan pemilihan lebih dari 1 segmen sekaligus (Multiple Choice)."
+                },
+                {
+                    "name": "block",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Memaksa lebar segmen memanjang 100% memenuhi kontainer (expandedInsets) dan membagi lebar setiap tombol secara rata."
+                },
+                {
+                    "name": "showSelectedIcon",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menampilkan ikon centang (checkmark) animasi bawaan Material3 pada item yang sedang terpilih."
+                },
+                {
+                    "name": "noBackground",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Melenyapkan latar belakang (background) pada segmen yang tidak terpilih."
+                },
+                {
+                    "name": "noBorder",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Menghilangkan garis tepi (outline) luar dan sekat antar tombol segmen."
+                },
+                {
+                    "name": "noBorderRadius",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Kosmetik: Memaksa sudut segmen menjadi siku-siku tajam (menghapus radius)."
+                },
+                {
+                    "name": "activeColor",
+                    "type": "Color?",
+                    "default": "null",
+                    "desc": "Warna kustom khusus saat segmen terpilih (Selected/Active). Jika null, mengikuti warna form theme/utama."
+                },
+                {
+                    "name": "inactiveColor",
+                    "type": "Color?",
+                    "default": "null",
+                    "desc": "Warna latar belakang kustom khusus saat segmen tidak terpilih. Jika null, akan menggunakan warna isian standar form."
                 }
             ],
             "additionalInfo": {
-                "globalSizing": "Mendukung sistem ukuran (size) berbasis FormElementSize, yang secara otomatis menyesuaikan tinggi SegmentedButton agar sejajar dengan tinggi input teks lain (seperti kolom Cari).",
-                "globalDecoration": "Dibungkus menggunakan InputDecorator dari FormHelperWidget.decoration tanpa border dan background agar memiliki tampilan SegmentedButton murni, namun tetap mempertahankan Label atas dan Error Text bawah yang konsisten."
+                "intelligentContrast": "Sistem secara otomatis menghitung tingkat kecerahan (luminance) dari 'activeColor' atau 'theme'. Jika warna latar gelap, teks otomatis putih. Jika warna terang, teks otomatis gelap (black87).",
+                "errorHandling": "Meskipun SegmentedButton tidak memiliki border bawaan untuk status error, widget ini menyuntikkan resolusi status (WidgetStateProperty) yang mengubah garis tepi langsung pada SegmentedButton menjadi merah (FormStyle.error) saat validasi gagal."
             },
             "specialNotes": [
-                "Sangat disarankan untuk daftar opsi yang sangat sedikit (misalnya 2 sampai 4 opsi) dengan label teks yang pendek.",
-                "Menggunakan struktur FormSelectItem yang sama dengan Select/Select2, sehingga transisi UI (dari Select menjadi Segment) dapat dilakukan tanpa mengubah sumber data array."
+                "Properti 'sublabel' pada FormSelectItem akan secara otomatis dikonversi menjadi 'tooltip' yang muncul saat user menahan (long-press) atau mengarahkan mouse (hover) ke segmen.",
+                "Untuk desain aplikasi yang padat (seperti dashboard), biarkan 'block: true' agar lebar form konsisten dengan form input teks yang ada di atas/bawahnya."
             ],
-            "code": "FormHelperWidget.Segment<bool>(\n  label: 'Tipe Tagihan',\n  node: _nodeTipeTagihan,\n  items: [\n    FormSelectItem(false, 'Piutang'),\n    FormSelectItem(true, 'Write-off'),\n  ],\n)"
+            "code": "FormHelperWidget.Segment<bool>(\n  label: 'Status Tagihan',\n  node: _nodeStatus,\n  block: true,\n  showSelectedIcon: true,\n  activeColor: Colors.blueAccent,\n  items: [\n    FormSelectItem(false, 'Belum Lunas', icon: Icons.pending_actions),\n    FormSelectItem(true, 'Lunas', icon: Icons.check_circle_outline),\n  ],\n)"
         },
         {
             "id": "select",
