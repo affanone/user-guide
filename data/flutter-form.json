@@ -3580,7 +3580,7 @@
                 "Sangat disarankan untuk daftar opsi yang sangat sedikit (misalnya 2 sampai 4 opsi) dengan label teks yang pendek.",
                 "Menggunakan struktur FormSelectItem yang sama dengan Select/Select2, sehingga transisi UI (dari Select menjadi Segment) dapat dilakukan tanpa mengubah sumber data array."
             ],
-            "code": "FormHelperWidget.Segment<bool>(\n  label: 'Tipe Tagihan',\n  node: _nodeTipeTagihan,\n  items: [\n    FormSelectItem(value: false, label: 'Piutang'),\n    FormSelectItem(value: true, label: 'Write-off'),\n  ],\n)"
+            "code": "FormHelperWidget.Segment<bool>(\n  label: 'Tipe Tagihan',\n  node: _nodeTipeTagihan,\n  items: [\n    FormSelectItem(false, 'Piutang'),\n    FormSelectItem(true, 'Write-off'),\n  ],\n)"
         },
         {
             "id": "select",
