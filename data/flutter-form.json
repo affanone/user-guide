@@ -3473,6 +3473,116 @@
             "code": "FormHelperWidget.RangeSlider(\n label: 'Rentang Harga',\n node: *formCtrl.node('harga_range'),\n min: 0,\n max: 100000,\n values: const RangeValues(20000, 75000),\n step: 5000,\n validator: (range) {\n   if (range == null) return 'Rentang wajib dipilih';\n   return null;\n },\n valueTransformer: (range) => range,\n showValue: true,\n showMinMaxLabel: true,\n viewValue: (range) =>\n   'Rp ${range.start.toInt()} - Rp ${range.end.toInt()}',\n minLabelBuilder: (*) => '0',\n maxLabelBuilder: (_) => '100K',\n activeColor: Colors.green,\n)"
         },
         {
+            "id": "segment",
+            "group": "Selection & Dropdown",
+            "name": "Segment (SegmentedButton)",
+            "icon": "fa-solid fa-layer-group",
+            "description": "Form input berbasis SegmentedButton material design. Berfungsi seperti Radio Group untuk memilih 1 opsi dari sedikit pilihan (2-4 opsi). Secara otomatis terintegrasi dengan ekosistem FormNode dan sinkronisasi 3 arah, serta mewarisi label, validasi error (shake), dan gaya form standar.",
+            "mandatoryProps": [
+                {
+                    "name": "items",
+                    "type": "List<FormSelectItem<T>>",
+                    "default": "",
+                    "desc": "Array objek FormSelectItem universal yang berisi nilai (value) dan label tampilan untuk setiap segmen."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "key",
+                    "type": "Key?",
+                    "default": "null",
+                    "desc": "Kunci unik widget."
+                },
+                {
+                    "name": "label",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Label teks mengambang di atas form."
+                },
+                {
+                    "name": "message",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Teks pesan bantuan di bawah form."
+                },
+                {
+                    "name": "node",
+                    "type": "FormNode?",
+                    "default": "null",
+                    "desc": "Simpul reaktif penyimpanan nilai value yang terpilih sebagai String."
+                },
+                {
+                    "name": "value",
+                    "type": "T?",
+                    "default": "null",
+                    "desc": "Nilai bawaan terpilih awal."
+                },
+                {
+                    "name": "onChanged",
+                    "type": "ValueChanged<T?>?",
+                    "default": "null",
+                    "desc": "Penyadap yang bereaksi saat user memilih item dari segmen."
+                },
+                {
+                    "name": "validator",
+                    "type": "FormValidator<T?>?",
+                    "default": "null",
+                    "desc": "Validasi item form, memicu efek shake jika gagal."
+                },
+                {
+                    "name": "showErrorMessage",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Menentukan apakah pesan kesalahan validasi ditampilkan."
+                },
+                {
+                    "name": "theme",
+                    "type": "FormElementTheme?",
+                    "default": "null",
+                    "desc": "Tema elemen form."
+                },
+                {
+                    "name": "size",
+                    "type": "FormElementSize?",
+                    "default": "null",
+                    "desc": "Skala proporsional elemen form dan tinggi tombol segmen."
+                },
+                {
+                    "name": "scale",
+                    "type": "double?",
+                    "default": "null",
+                    "desc": "Pengali skala manual untuk ukuran form."
+                },
+                {
+                    "name": "enabled",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Status hidup/mati (bisa diklik atau tidak) form."
+                },
+                {
+                    "name": "allowEmpty",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Menentukan apakah pengguna diizinkan untuk tidak memilih satupun segmen. Jika false, pilihan pertama akan otomatis terpilih jika belum ada nilai."
+                },
+                {
+                    "name": "multiSelect",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "(Dalam pengembangan) Mengizinkan pemilihan lebih dari 1 segmen sekaligus."
+                }
+            ],
+            "additionalInfo": {
+                "globalSizing": "Mendukung sistem ukuran (size) berbasis FormElementSize, yang secara otomatis menyesuaikan tinggi SegmentedButton agar sejajar dengan tinggi input teks lain (seperti kolom Cari).",
+                "globalDecoration": "Dibungkus menggunakan InputDecorator dari FormHelperWidget.decoration tanpa border dan background agar memiliki tampilan SegmentedButton murni, namun tetap mempertahankan Label atas dan Error Text bawah yang konsisten."
+            },
+            "specialNotes": [
+                "Sangat disarankan untuk daftar opsi yang sangat sedikit (misalnya 2 sampai 4 opsi) dengan label teks yang pendek.",
+                "Menggunakan struktur FormSelectItem yang sama dengan Select/Select2, sehingga transisi UI (dari Select menjadi Segment) dapat dilakukan tanpa mengubah sumber data array."
+            ],
+            "code": "FormHelperWidget.Segment<bool>(\n  label: 'Tipe Tagihan',\n  node: _nodeTipeTagihan,\n  items: [\n    FormSelectItem(value: false, label: 'Piutang'),\n    FormSelectItem(value: true, label: 'Write-off'),\n  ],\n)"
+        },
+        {
             "id": "select",
             "group": "Selection & Dropdown",
             "name": "Select / Dropdown",
