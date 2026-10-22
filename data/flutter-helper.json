@@ -953,9 +953,75 @@
                 }
             ],
             "methods": [
-                "..."
+                {
+                    "name": "TextWidget.rich",
+                    "desc": "Konstruktor khusus untuk merender teks multi-warna dan multi-gaya dalam satu baris dengan menerima List<TextPart>."
+                },
+                {
+                    "name": "TextWidget.primary",
+                    "desc": "Konstruktor shorthand untuk merender teks dengan warna primary (NexoraTextColors.primary)."
+                },
+                {
+                    "name": "TextWidget.secondary",
+                    "desc": "Konstruktor shorthand untuk merender teks dengan warna secondary."
+                },
+                {
+                    "name": "TextWidget.danger",
+                    "desc": "Konstruktor shorthand untuk merender teks dengan warna danger (merah)."
+                },
+                {
+                    "name": "TextWidget.warning",
+                    "desc": "Konstruktor shorthand untuk merender teks dengan warna warning (kuning/oranye)."
+                },
+                {
+                    "name": "TextWidget.success",
+                    "desc": "Konstruktor shorthand untuk merender teks dengan warna success (hijau)."
+                },
+                {
+                    "name": "TextWidget.info",
+                    "desc": "Konstruktor shorthand untuk merender teks dengan warna info (biru)."
+                },
+                {
+                    "name": "TextWidget.white",
+                    "desc": "Konstruktor shorthand untuk merender teks dengan warna putih solid."
+                },
+                {
+                    "name": "TextWidget.black",
+                    "desc": "Konstruktor shorthand untuk merender teks dengan warna hitam solid."
+                },
+                {
+                    "name": "TextWidget.muted",
+                    "desc": "Konstruktor shorthand untuk merender teks dengan warna abu-abu (muted), sering digunakan untuk teks pendukung."
+                },
+                {
+                    "name": "TextWidget.h1",
+                    "desc": "Konstruktor tipografi untuk Heading 1. Otomatis menetapkan size = 32 dan bold = true."
+                },
+                {
+                    "name": "TextWidget.h2",
+                    "desc": "Konstruktor tipografi untuk Heading 2. Otomatis menetapkan size = 24 dan bold = true."
+                },
+                {
+                    "name": "TextWidget.subtitle",
+                    "desc": "Konstruktor tipografi untuk Subtitle. Otomatis menetapkan size = 18 dan bold = true."
+                },
+                {
+                    "name": "TextWidget.caption",
+                    "desc": "Konstruktor tipografi untuk Caption. Otomatis menetapkan size = 12 dan warna tipe muted."
+                },
+                {
+                    "name": "TextWidget.getColorByType",
+                    "desc": "Static method (Fungsi statis) untuk menerjemahkan nilai enum TextWidgetType menjadi representasi objek Color dari NexoraTextColors."
+                }
             ],
-            "additionalInfo": {},
+            "additionalInfo": {
+                "helperClasses": [
+                    {
+                        "name": "TextPart",
+                        "desc": "Kelas bantuan (helper) untuk mendefinisikan potongan teks beserta gayanya (warna, bold, size, font weight) di dalam TextWidget.rich()."
+                    }
+                ]
+            },
             "behaviors": [],
             "specialNotes": [
                 "Prioritas Formatting: Parameter shorthand (bold, italic, underline, strikethrough) memiliki prioritas yang lebih tinggi daripada pengaturan sejenis di dalam objek 'style'. Jika shorthand diaktifkan (true), ia akan meng-override nilai di dalam 'style'.",
