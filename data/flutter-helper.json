@@ -857,13 +857,13 @@
             "group": "Widget",
             "name": "Semantic Text",
             "icon": "fa-solid fa-palette",
-            "description": "Widget teks serbaguna dengan dukungan utility-shorthand untuk pemformatan cepat (bold, italic, dll) dan pewarnaan semantik bawaan.",
+            "description": "Widget teks serbaguna tingkat lanjut. Dilengkapi utility-shorthand, tipografi hierarki bawaan (h1, h2, dll), pewarnaan semantik, parser markdown sederhana (bold otomatis), dukungan selectable text, hingga Rich Text yang sangat ringkas.",
             "mandatoryProps": [
                 {
                     "name": "text",
                     "type": "String",
                     "default": "",
-                    "desc": "Teks utama yang akan dirender ke layar."
+                    "desc": "Teks utama yang akan dirender ke layar. (Tidak wajib jika menggunakan konstruktor .rich())"
                 }
             ],
             "optionalProps": [
@@ -907,7 +907,7 @@
                     "name": "color",
                     "type": "Color?",
                     "default": "null",
-                    "desc": "Menimpa (override) warna secara eksplisit."
+                    "desc": "Menimpa (override) warna secara eksplisit, mengabaikan parameter 'type'."
                 },
                 {
                     "name": "style",
@@ -925,13 +925,31 @@
                     "name": "maxLines",
                     "type": "int?",
                     "default": "null",
-                    "desc": "Membatasi jumlah baris maksimal teks yang ditampilkan."
+                    "desc": "Membatasi jumlah baris maksimal teks yang ditampilkan. Default pada TextWidget.rich() adalah 1."
                 },
                 {
                     "name": "overflow",
                     "type": "TextOverflow?",
                     "default": "null",
                     "desc": "Menentukan perilaku teks saat melebihi batas (contoh: TextOverflow.ellipsis)."
+                },
+                {
+                    "name": "selectable",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika true, merender SelectableText yang memungkinkan pengguna menyorot (highlight) dan menyalin teks ke clipboard."
+                },
+                {
+                    "name": "parseMarkdown",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "Jika true, teks yang diapit ganda bintang (**) akan otomatis dicetak tebal (bold). Contoh: 'Halo **Dunia**'."
+                },
+                {
+                    "name": "textParts",
+                    "type": "List<TextPart>?",
+                    "default": "null",
+                    "desc": "Eksklusif untuk konstruktor TextWidget.rich(). Menerima list of TextPart untuk membuat kalimat dengan kombinasi warna/styling yang berbeda tanpa perlu TextSpan manual."
                 }
             ],
             "methods": [
@@ -941,9 +959,11 @@
             "behaviors": [],
             "specialNotes": [
                 "Prioritas Formatting: Parameter shorthand (bold, italic, underline, strikethrough) memiliki prioritas yang lebih tinggi daripada pengaturan sejenis di dalam objek 'style'. Jika shorthand diaktifkan (true), ia akan meng-override nilai di dalam 'style'.",
-                "Kombinasi Dekorasi: Jika Anda mengaktifkan 'underline' dan 'strikethrough' secara bersamaan, widget ini cukup pintar untuk menggabungkannya menggunakan TextDecoration.combine() sehingga teks memiliki garis bawah sekaligus coretan."
+                "Kombinasi Dekorasi: Jika Anda mengaktifkan 'underline' dan 'strikethrough' secara bersamaan, widget ini cukup pintar untuk menggabungkannya menggunakan TextDecoration.combine() sehingga teks memiliki garis bawah sekaligus coretan.",
+                "Smart Fallback Constructor: Terdapat konstruktor tingkat tipografi seperti .h1(), .h2(), .subtitle(), dan .caption() yang secara otomatis mengatur ukuran (size) dan ketebalan (bold) bawaan.",
+                "Markdown vs Selectable: Fitur 'parseMarkdown' tidak dapat digabungkan dengan fitur 'selectable' secara bersamaan karena perbedaan struktur widget bawaan (Text.rich vs SelectableText)."
             ],
-            "code": "// 1. Format teks tebal & miring\nTextWidget.primary(\n  'Informasi Penting',\n  bold: true,\n  italic: true,\n  size: 16.0,\n)\n\n// 2. Format harga coret (Strikethrough)\nTextWidget.muted(\n  'Rp 150.000',\n  strikethrough: true,\n  italic: true,\n)\n\n// 3. Kombinasi Garis Bawah & Coret\nTextWidget.danger(\n  'Dilarang Masuk',\n  bold: true,\n  underline: true,\n  strikethrough: true,\n)"
+            "code": "// 1. Typography Hierarchy & Smart Markdown\nTextWidget.h1(\n  'Selamat Datang di **Nexora**',\n  parseMarkdown: true,\n)\n\n// 2. Selectable Copy Text\nTextWidget.info(\n  'Resi: JNE123456789',\n  selectable: true,\n)\n\n// 3. Multi-color Text with Truncate (Rich Text)\nTextWidget.rich(\n  [\n    TextPart('Total Item: ', bold: true),\n    TextPart('15 Pcs ', type: TextWidgetType.success),\n    TextPart('(~2 Reject)', type: TextWidgetType.danger),\n  ],\n  maxLines: 1,\n  overflow: TextOverflow.ellipsis,\n)\n\n// 4. Kombinasi Garis Bawah & Coret (Strikethrough)\nTextWidget.muted(\n  'Rp 150.000',\n  strikethrough: true,\n  underline: true,\n)"
         },
         {
             "id": "TableWidget",
