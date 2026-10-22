@@ -1128,7 +1128,72 @@
                     "Parameter `column` sangat berguna untuk merender Label/Judul secara dinamis. Misal: `Text('${column.text('C')}: ${row.text('C')}')` akan menghasilkan 'HARGA: 450000'."
                 ]
             },
-            "methods": [],
+            "methods": [
+                {
+                    "name": "TableTheme.minimal",
+                    "desc": "Static method. Mereturn preset TableStyle bergaya minimalis (tanpa outer border, tanpa radius, cell background bersih)."
+                },
+                {
+                    "name": "TableTheme.borderless",
+                    "desc": "Static method. Mereturn preset TableStyle default, tanpa border kotak luar namun tetap mempertahankan garis pemisah antar baris (divider)."
+                },
+                {
+                    "name": "TableTheme.standard",
+                    "desc": "Static method. Mereturn preset TableStyle gaya klasik (ada garis luar outerBorder dan radius lengkungan sudut 8.0)."
+                },
+                {
+                    "name": "TableTheme.bordered",
+                    "desc": "Static method. Mereturn preset TableStyle tegas dengan border luar tebal (1.5) serta garis kotak penuh di semua sisi sel (GridBorders true)."
+                },
+                {
+                    "name": "TableTheme.sharp",
+                    "desc": "Static method. Mereturn preset TableStyle formal kotak kaku, bersudut tajam tanpa border radius (0.0)."
+                },
+                {
+                    "name": "TableTheme.compact",
+                    "desc": "Static method. Mereturn preset TableStyle untuk kebutuhan kepadatan ekstra, otomatis mengatur TableSize menjadi xs."
+                },
+                {
+                    "name": "TableRowData.text(column)",
+                    "desc": "Mengekstrak nilai *string murni* dari sel pada baris data. Dapat menerima int index (0,1) maupun huruf Excel ('A','B'). Mengonversi otomatis format DateTime ('dd MMM yyyy HH:mm') dan Boolean ('Ya'/'Tidak')."
+                },
+                {
+                    "name": "TableRowData.widget(column)",
+                    "desc": "Mengekstrak nilai sel menjadi sebuah Widget UI utuh lengkap dengan padding, alignment, dan font style tabel. Berguna untuk merender status boolean menjadi ikon tabel."
+                },
+                {
+                    "name": "TableRowData.value(column)",
+                    "desc": "Mengekstrak nilai hibrida (mengembalikan Widget jika data asli adalah Widget/Boolean, dan mengembalikan teks murni jika data berupa string/angka/waktu)."
+                },
+                {
+                    "name": "TableRowData.getIndex()",
+                    "desc": "Mengambil indeks baris saat ini (dimulai dari 0). Alias dari properti .index."
+                },
+                {
+                    "name": "TableRowData.number",
+                    "desc": "Mengambil nomor urut baris (dimulai dari 1)."
+                },
+                {
+                    "name": "TableRowData.getLength()",
+                    "desc": "Mengambil total jumlah baris keseluruhan di dalam tabel. Sangat berguna untuk logika UI spesifik, seperti menambahkan jarak khusus jika baris yang dirender adalah baris terakhir (index == row.getLength() - 1)."
+                },
+                {
+                    "name": "TableColumnData.text(column)",
+                    "desc": "Serupa dengan metode baris, namun digunakan untuk menarik teks (label) murni dari baris Header/Judul Tabel."
+                },
+                {
+                    "name": "TableColumnData.widget(column)",
+                    "desc": "Menarik widget utuh dari baris Header/Judul Tabel yang sudah diwarnai dan memiliki ketebalan font header bawaan."
+                },
+                {
+                    "name": "TableColumnData.getLength()",
+                    "desc": "Mengambil total jumlah kolom keseluruhan di dalam tabel (sama dengan jumlah elemen sel di dalam satu baris horizontal)."
+                },
+                {
+                    "name": "TableStyle.copyWith()",
+                    "desc": "Fungsi untuk menduplikasi konfigurasi TableStyle yang sudah ada sambil menimpa parameter tertentu sesuai keinginan kustomisasi tingkat lanjut."
+                }
+            ],
             "behaviors": [
                 {
                     "name": "Smart Responsive Degradation (RowView)",
@@ -1170,12 +1235,13 @@
             "specialNotes": [
                 "WIDGET DI DALAM HEADER: Jika Anda menyisipkan widget multiline (seperti `Column`) sebagai label header kolom, pastikan menambahkan `mainAxisSize: MainAxisSize.min` pada Column tersebut. Anda juga WAJIB memperbesar parameter `headerHeight` via kustomisasi style (misal: `style: TableTheme.standard(context).copyWith(headerHeight: 70.0)`).",
                 "AKSES DATA PADA ROW VIEW: Saat membangun tampilan kustom pada `.rowView`, ambil nilai data via `row.text('B')` atau `row.widget('B')`. Untuk mengambil nama judul kolomnya, gunakan `column.text('B')` atau `column.widget('B')`.",
+                "AKSES TOTAL BARIS/KOLOM: Anda dapat menggunakan `row.getLength()` untuk mengetahui total seluruh data, atau `column.getLength()` untuk total seluruh kolom, mempermudah pembuatan logic seperti merender divider khusus pada item terakhir.",
                 "PERFORMA DATA BESAR: Karena framework dasar menggunakan rendering eager, untuk memuat lebih dari 50-100 baris data sangat direkomendasikan mengkombinasikan tabel ini dengan sistem Pagination dari backend/API.",
                 "PRIORITAS DEKORASI: Spesifikasi pada DataStyle menimpa ColumnStyle, dan ColumnStyle menimpa pengaturan root TableStyle.",
                 "PENGGUNAAN TEMA: Sangat dianjurkan memanggil pola turunan pabrik (factory) seperti TableTheme.bordered() dan mengatur aksen warna via TableColor beserta ukurannya lewat TableSize.",
                 "UKURAN TEXT PREDIKTIF: Widget menggunakan dart:ui TextPainter untuk pra-penghitungan ukuran lebar fisik font berdasarkan 50 sampel dari tumpukan data untuk menciptakan distribusi lebar kolom proporsional."
             ],
-            "code": "// ===========================================================================\n// CONTOH 1: TABEL BASIC DENGAN UKURAN DEFAULT (MD)\n// ===========================================================================\nTableWidget(\n  columns: const ['NO', 'NAMA', 'STATUS', 'TERDAFTAR'],\n  data: [\n    [1, 'Alice', true, DateTime.now()],\n    [2, 'Bob', false, DateTime.now().subtract(const Duration(days: 1))],\n    [3, 'Charlie', true, DateTime.now().subtract(const Duration(days: 3))],\n  ],\n  // Memanfaatkan preset TableTheme dengan warna dasar Success (Hijau Elegan)\n  style: TableTheme.standard(\n    context, \n    color: TableColor.success, \n    size: TableSize.md, // Ukuran proporsional standar\n  ),\n)\n\n// ===========================================================================\n// CONTOH 2: TABLE RESPONSIVE DENGAN ROWVIEW (Akses Header & Row)\n// ===========================================================================\nTableWidget(\n  columns: const ['ID', 'PELANGGAN', 'TOTAL', 'STATUS', 'AKSI'],\n  data: [\n    ['INV-001', 'PT. Maju Mundur', 15000000, true, IconButton(icon: Icon(Icons.print), onPressed: (){})],\n    ['INV-002', 'Budi Santoso', 450000, false, IconButton(icon: Icon(Icons.print), onPressed: (){})],\n  ],\n  style: TableTheme.borderless(context, striped: true),\n  \n  // Fitur sakti untuk mobile:\n  rowView: TableRowView(\n    breakpoint: Breakpoint.sm, // Jika layar di bawah ambang batas 'sm'\n    builder: (TableRowData row, TableColumnData column) {\n      // Merender bentuk daftar Card menggantikan baris tabel\n      return Card(\n        child: ListTile(\n          title: Text(row.text('B'), style: TextStyle(fontWeight: FontWeight.bold)), // Ambil nama pelanggan\n          // Menggabungkan Label Kolom C ('TOTAL') dengan Nilai Baris C ('15000000')\n          subtitle: Text('${column.text('C')}: Rp${row.text('C')}'), \n          leading: row.widget('D'), // Icon status bawaan engine tabel\n          trailing: row.widget('E'), // Widget tombol aksi\n        ),\n      );\n    },\n  ),\n)\n\n// ===========================================================================\n// CONTOH 3: TEMA MINIMAL, UKURAN COMPACT (SM), DENGAN EXCEL PARSER\n// ===========================================================================\nTableWidget(\n  columns: const ['ID', 'PRODUK', 'KATEGORI', 'HARGA', 'STOK'],\n  data: const [\n    ['P01', 'Keyboard', 'Elektronik', 450000, 15],\n    ['P02', 'Mouse', 'Elektronik', 200000, 0],\n    ['P03', 'Meja', 'Furnitur', 1200000, 5],\n  ],\n  // Memanfaatkan tema minimal dipadukan ukuran sm\n  style: TableTheme.minimal(\n    context, \n    color: TableColor.info,\n    size: TableSize.sm, \n    striped: false,   // Mematikan efek zebra\n    hoverable: true,  // Tetap menyalakan efek highlight kursor\n  ),\n  \n  // Penataan Lebar Berbasis Alfabet Excel\n  widthColumns: const [\n    WidthColumn(columnIndex: 'A', width: 60), // Kolom ID dibatasi kecil\n    WidthColumn(columnIndex: 'D-E', width: 120), // Rentang Harga sampai Stok\n  ],\n\n  // Gaya Keselarasan per Kolom\n  columnStyles: const [\n    ColumnStyle(\n      columnIndex: 'A,D,E', // Multiple kolom terpisah koma\n      alignment: Alignment.center,\n    ),\n  ],\n\n  // Manipulasi gaya sel murni pada sel tertentu menggunakan koordinat absolut\n  dataStyles: [\n    DataStyle(\n      range: 'E2', // Menargetkan baris mouse stok 0\n      backgroundColor: Colors.red.withOpacity(0.1),\n      textStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),\n    ),\n    const DataStyle(\n      range: 'B1-B3', // Bold semua nama produk\n      textStyle: TextStyle(fontWeight: FontWeight.bold),\n    )\n  ],\n)"
+            "code": "// ===========================================================================\n// CONTOH 1: TABEL BASIC DENGAN UKURAN DEFAULT (MD)\n// ===========================================================================\nTableWidget(\n  columns: const ['NO', 'NAMA', 'STATUS', 'TERDAFTAR'],\n  data: [\n    [1, 'Alice', true, DateTime.now()],\n    [2, 'Bob', false, DateTime.now().subtract(const Duration(days: 1))],\n    [3, 'Charlie', true, DateTime.now().subtract(const Duration(days: 3))],\n  ],\n  // Memanfaatkan preset TableTheme dengan warna dasar Success (Hijau Elegan)\n  style: TableTheme.standard(\n    context, \n    color: TableColor.success, \n    size: TableSize.md, // Ukuran proporsional standar\n  ),\n)\n\n// ===========================================================================\n// CONTOH 2: TABLE RESPONSIVE DENGAN ROWVIEW (Akses Header & Row)\n// ===========================================================================\nTableWidget(\n  columns: const ['ID', 'PELANGGAN', 'TOTAL', 'STATUS', 'AKSI'],\n  data: [\n    ['INV-001', 'PT. Maju Mundur', 15000000, true, IconButton(icon: Icon(Icons.print), onPressed: (){})],\n    ['INV-002', 'Budi Santoso', 450000, false, IconButton(icon: Icon(Icons.print), onPressed: (){})],\n  ],\n  style: TableTheme.borderless(context, striped: true),\n  \n  // Fitur sakti untuk mobile:\n  rowView: TableRowView(\n    breakpoint: Breakpoint.sm, // Jika layar di bawah ambang batas 'sm'\n    builder: (TableRowData row, TableColumnData column) {\n      // Merender bentuk daftar Card menggantikan baris tabel\n      return Card(\n        // margin dinamis: hapus margin bawah jika ini baris paling akhir\n        margin: EdgeInsets.only(bottom: row.getIndex() == row.getLength() - 1 ? 0 : 8),\n        child: ListTile(\n          title: Text(row.text('B'), style: TextStyle(fontWeight: FontWeight.bold)), // Ambil nama pelanggan\n          // Menggabungkan Label Kolom C ('TOTAL') dengan Nilai Baris C ('15000000')\n          subtitle: Text('${column.text('C')}: Rp${row.text('C')}'), \n          leading: row.widget('D'), // Icon status bawaan engine tabel\n          trailing: row.widget('E'), // Widget tombol aksi\n        ),\n      );\n    },\n  ),\n)\n\n// ===========================================================================\n// CONTOH 3: TEMA MINIMAL, UKURAN COMPACT (SM), DENGAN EXCEL PARSER\n// ===========================================================================\nTableWidget(\n  columns: const ['ID', 'PRODUK', 'KATEGORI', 'HARGA', 'STOK'],\n  data: const [\n    ['P01', 'Keyboard', 'Elektronik', 450000, 15],\n    ['P02', 'Mouse', 'Elektronik', 200000, 0],\n    ['P03', 'Meja', 'Furnitur', 1200000, 5],\n  ],\n  // Memanfaatkan tema minimal dipadukan ukuran sm\n  style: TableTheme.minimal(\n    context, \n    color: TableColor.info,\n    size: TableSize.sm, \n    striped: false,   // Mematikan efek zebra\n    hoverable: true,  // Tetap menyalakan efek highlight kursor\n  ),\n  \n  // Penataan Lebar Berbasis Alfabet Excel\n  widthColumns: const [\n    WidthColumn(columnIndex: 'A', width: 60), // Kolom ID dibatasi kecil\n    WidthColumn(columnIndex: 'D-E', width: 120), // Rentang Harga sampai Stok\n  ],\n\n  // Gaya Keselarasan per Kolom\n  columnStyles: const [\n    ColumnStyle(\n      columnIndex: 'A,D,E', // Multiple kolom terpisah koma\n      alignment: Alignment.center,\n    ),\n  ],\n\n  // Manipulasi gaya sel murni pada sel tertentu menggunakan koordinat absolut\n  dataStyles: [\n    DataStyle(\n      range: 'E2', // Menargetkan baris mouse stok 0\n      backgroundColor: Colors.red.withOpacity(0.1),\n      textStyle: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),\n    ),\n    const DataStyle(\n      range: 'B1-B3', // Bold semua nama produk\n      textStyle: TextStyle(fontWeight: FontWeight.bold),\n    )\n  ],\n)"
         },
         {
             "id": "AnimationWidget",
