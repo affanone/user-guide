@@ -6511,6 +6511,12 @@
                     "type": "bool",
                     "default": "false",
                     "desc": "Kosmetik: Memaksa form menjadi bersudut lancip."
+                },
+                {
+                    "name": "preventDeselect",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "true = chip yang sudah terpilih TIDAK bisa dibatalkan dengan mengetuknya lagi (pilihan wajib, onChanged tidak pernah mengirim null). false (bawaan) = ketuk ulang chip terpilih membatalkan pilihan (onChanged menerima null) — cocok untuk filter dengan opsi 'Semua' = null."
                 }
             ],
             "additionalInfo": {
@@ -6518,9 +6524,10 @@
                 "globalDecoration": "Semua widget memiliki style otomatis dari FormStyle dan FormHelperWidget.decoration."
             },
             "specialNotes": [
-                "Kini terintegrasi penuh dengan model data FormSelectItem, sehingga array data dapat dengan mudah dilempar ke komponen lain tanpa modifikasi."
+                "Kini terintegrasi penuh dengan model data FormSelectItem, sehingga array data dapat dengan mudah dilempar ke komponen lain tanpa modifikasi.",
+                "Pakai preventDeselect: true untuk pilihan yang wajib terisi (metode bayar, kategori, varian) agar chip terpilih tidak hilang saat diketuk ulang."
             ],
-            "code": "FormHelperWidget.ChoiceSingle<String>(\n  label: 'Ukuran',\n  node: _formCtrl.node('ukuran'),\n  items: const [\n    FormSelectItem('S', 'Small'),\n    FormSelectItem('M', 'Medium'),\n  ],\n)"
+            "code": "FormHelperWidget.ChoiceSingle<String>(\n  label: 'Ukuran',\n  node: _formCtrl.node('ukuran'),\n  items: const [\n    FormSelectItem('S', 'Small'),\n    FormSelectItem('M', 'Medium'),\n  ],\n)\n\n// Pilihan wajib (tidak bisa dibatalkan):\nFormHelperWidget.ChoiceSingle<String>(\n  items: const [\n    FormSelectItem('CASH', 'Tunai'),\n    FormSelectItem('QRIS', 'QRIS'),\n  ],\n  value: _method,\n  preventDeselect: true,\n  onChanged: (v) => setState(() => _method = v!),\n)"
         },
         {
             "id": "choice",
@@ -6662,6 +6669,12 @@
                     "type": "bool",
                     "default": "false",
                     "desc": "Ubah radius form menjadi kotak tajam."
+                },
+                {
+                    "name": "preventDeselect",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "true = pilihan TERAKHIR tidak bisa dibatalkan (minimal satu tetap terpilih); pilihan lain tetap bisa dibatalkan. false (bawaan) = semua pilihan bebas dibatalkan, termasuk sampai kosong."
                 }
             ],
             "additionalInfo": {
@@ -6670,7 +6683,8 @@
             },
             "specialNotes": [
                 "Tipe validator telah diperbaiki menjadi FormValidator<List<T>>? agar sesuai dengan sifat array dari data yang dikembalikan.",
-                "Kini terintegrasi penuh dengan model data FormSelectItem, sehingga array data dapat dengan mudah dilempar ke komponen lain tanpa modifikasi."
+                "Kini terintegrasi penuh dengan model data FormSelectItem, sehingga array data dapat dengan mudah dilempar ke komponen lain tanpa modifikasi.",
+                "Dengan preventDeselect: true, multi-select selalu menyisakan minimal satu pilihan."
             ],
             "code": "FormHelperWidget.Choice<int>(\n  label: 'Ekstrakurikuler',\n  node: _formCtrl.node('ekskul'),\n  items: const [\n    FormSelectItem(1, 'Futsal'),\n    FormSelectItem(2, 'Basket'),\n  ],\n)"
         },
