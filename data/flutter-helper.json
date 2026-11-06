@@ -4327,7 +4327,19 @@
                     "name": "toTimeAgo",
                     "type": "String Extension Method",
                     "default": "'-'",
-                    "desc": "Mengonversi Timestamp atau DateTime menjadi format waktu ala sosial media, seperti 'Baru saja', '5 menit yang lalu', atau '2 hari yang lalu'."
+                    "desc": "Mengonversi Timestamp atau DateTime menjadi format waktu ala sosial media, seperti 'Baru saja', '5 menit yang lalu', atau '2 hari yang lalu'. Parameter opsional `now` (DateTime) untuk menentukan titik acuan sendiri, misalnya di unit test. Cocok untuk daftar notifikasi / aktivitas."
+                },
+                {
+                    "name": "toElapsedShort",
+                    "type": "String Extension Method",
+                    "default": "",
+                    "desc": "[DURASI] Lama waktu berlalu sejak DateTime ini dalam format ringkas untuk label sempit (kartu antrean, timer dapur): 'Baru' (< 1 menit), '4 mnt', '1 j 05 mnt' — satuan menit tetap terlihat di atas 1 jam. Parameter opsional `now` sebagai titik acuan. Bedanya dengan toTimeAgo: toTimeAgo menjawab 'kapan', toElapsedShort menjawab 'sudah berapa lama'."
+                },
+                {
+                    "name": "toShortDuration",
+                    "type": "String Extension Method (Duration)",
+                    "default": "withSeconds: false",
+                    "desc": "[DURASI] Ekstensi pada Duration: '45 dtk', '4 mnt', '2 j 07 mnt'. Dengan withSeconds: true detik ikut tampil di bawah 1 jam ('3 mnt 20 dtk'), cocok untuk rata-rata durasi layanan. Durasi negatif dianggap 0."
                 },
                 {
                     "name": "toShortDate",
@@ -4432,7 +4444,7 @@
                 "Sangat disarankan: Pastikan kode initializeDateFormatting('id_ID', null) sudah dipanggil di level main() / saat aplikasi pertama kali dijalankan agar paket 'intl' dapat menerjemahkan format Indonesia tanpa error.",
                 "Untuk memakai kemampuan luar biasa ini di berbagai file UI, jangan lupa import file utilitas ini ya!"
             ],
-            "code": "// 1. PENGGUNAAN PADA OBJEK DATETIME\nDateTime waktuSkrg = DateTime.now();\nprint(waktuSkrg.toShortDate());       // ➔ 12 Jan 2024\nprint(waktuSkrg.toFullDate());        // ➔ 12 Januari 2024\nprint(waktuSkrg.toShortDateTime());   // ➔ 12 Jan 2024, 15:30\nprint(waktuSkrg.toFullDateTime());    // ➔ 12 Januari 2024, 15:30\nprint(waktuSkrg.toSmartTime());       // ➔ Kemarin, 15:30\nprint(waktuSkrg.toTimeAgo());         // ➔ 5 menit yang lalu\nprint(waktuSkrg.getGreeting());       // ➔ Selamat Sore\n\n// 2. PENGGUNAAN PADA FIRESTORE TIMESTAMP\n// (Sangat aman meski docMap['createdAt'] bernilai null)\nTimestamp? waktuData = docMap['createdAt'];\nDateTime? safeDate = waktuData.toDateTimeSafe();\nprint(waktuData.toShortDate());       // ➔ 12 Jan 2024\nprint(waktuData.toFullDate());        // ➔ 12 Januari 2024\nprint(waktuData.toShortDateTime());   // ➔ 12 Jan 2024, 15:30\nprint(waktuData.toFullDateTime());    // ➔ 12 Januari 2024, 15:30\n\n// 3. PENGGUNAAN PADA INTEGER\nprint(20240112.toDateFromYMD());      // ➔ DateTime(2024, 1, 12)\nprint(20240112.toTimestampFromYMD()); // ➔ Timestamp(seconds: 1705017600)\nprint(1.toIndonesianDay());           // ➔ Senin\nprint(12.toIndonesianMonth());        // ➔ Desember\nprint(1530.toTimeOfDayFromHM());      // ➔ TimeOfDay(15:30)\n\n// 4. PENGGUNAAN PADA STRING\nprint('2024-01-12'.toDateTime());     // ➔ DateTime(2024, 1, 12)\nprint('2024-01-12'.toTimestamp());    // ➔ Timestamp(seconds: 1705017600)"
+            "code": "// Waktu berlalu ringkas (label sempit / timer)\nDateTime mulai = DateTime.now().subtract(const Duration(minutes: 64));\nString lama = mulai.toElapsedShort();\n// Output: '1 j 04 mnt'\n\n// Durasi\nString rata2 = const Duration(minutes: 3, seconds: 20).toShortDuration(withSeconds: true);\n// Output: '3 mnt 20 dtk'\n\n// 1. PENGGUNAAN PADA OBJEK DATETIME\nDateTime waktuSkrg = DateTime.now();\nprint(waktuSkrg.toShortDate());       // ➔ 12 Jan 2024\nprint(waktuSkrg.toFullDate());        // ➔ 12 Januari 2024\nprint(waktuSkrg.toShortDateTime());   // ➔ 12 Jan 2024, 15:30\nprint(waktuSkrg.toFullDateTime());    // ➔ 12 Januari 2024, 15:30\nprint(waktuSkrg.toSmartTime());       // ➔ Kemarin, 15:30\nprint(waktuSkrg.toTimeAgo());         // ➔ 5 menit yang lalu\nprint(waktuSkrg.getGreeting());       // ➔ Selamat Sore\n\n// 2. PENGGUNAAN PADA FIRESTORE TIMESTAMP\n// (Sangat aman meski docMap['createdAt'] bernilai null)\nTimestamp? waktuData = docMap['createdAt'];\nDateTime? safeDate = waktuData.toDateTimeSafe();\nprint(waktuData.toShortDate());       // ➔ 12 Jan 2024\nprint(waktuData.toFullDate());        // ➔ 12 Januari 2024\nprint(waktuData.toShortDateTime());   // ➔ 12 Jan 2024, 15:30\nprint(waktuData.toFullDateTime());    // ➔ 12 Januari 2024, 15:30\n\n// 3. PENGGUNAAN PADA INTEGER\nprint(20240112.toDateFromYMD());      // ➔ DateTime(2024, 1, 12)\nprint(20240112.toTimestampFromYMD()); // ➔ Timestamp(seconds: 1705017600)\nprint(1.toIndonesianDay());           // ➔ Senin\nprint(12.toIndonesianMonth());        // ➔ Desember\nprint(1530.toTimeOfDayFromHM());      // ➔ TimeOfDay(15:30)\n\n// 4. PENGGUNAAN PADA STRING\nprint('2024-01-12'.toDateTime());     // ➔ DateTime(2024, 1, 12)\nprint('2024-01-12'.toTimestamp());    // ➔ Timestamp(seconds: 1705017600)"
         },
         {
             "id": "safe-fallback",
