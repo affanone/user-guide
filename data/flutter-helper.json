@@ -3744,25 +3744,25 @@
             "group": "Widget",
             "name": "Drift Pagination Widget",
             "icon": "fa-solid fa-pager",
-            "description": "Widget pembungkus (wrapper) dan state management terintegrasi yang dirancang presisi untuk menangani paginasi data reaktif dari database (seperti Drift) menggunakan metode offset dan limit. Menggunakan ListenableBuilder untuk efisiensi memori tingkat tinggi, widget ini memisahkan logika kueri data dari antarmuka, memberikan kontrol penuh atas navigasi halaman melalui DriftPaginationController.",
+            "description": "Paginasi yang mengambil data PER HALAMAN dari stream (mis. Drift LIMIT/OFFSET), hemat memori untuk tabel besar (berbeda dengan PagedList yang memotong data yang sudah ada di memori). Terdiri dari DriftPaginationController<T> (ChangeNotifier: halaman, limit, data, loading, error, navigasi) dan pembungkus DriftPaginationWidget<T> yang membuat/membuang controller dan membangun ulang UI lewat ListenableBuilder. Bisa dipakai manual (next/prev/goToPage + tombol buatan sendiri) atau memakai tampilan standar `control.paginationWidget(...)` = PaginationWidget yang sudah tersambung sehingga seragam dengan tabel lain.",
             "mandatoryProps": [
                 {
-                    "name": "totalData",
-                    "type": "int",
+                    "name": "builder",
+                    "type": "Widget Function(BuildContext context, DriftPaginationController<T> control, List<T> data)",
                     "default": "",
-                    "desc": "Jumlah total keseluruhan baris data dari kueri terkait. Nilai ini sangat wajib diinjeksi dari luar (parent) untuk menentukan presisi perhitungan jumlah halaman (pageCount) dan mencegah navigasi index out of bounds."
+                    "desc": "Membangun UI setiap kali halaman, data, loading atau error berubah. `control` untuk navigasi & status, `data` = isi halaman aktif."
                 },
                 {
                     "name": "streamFactory",
                     "type": "Stream<List<T>> Function(int offset, int limit)",
                     "default": "",
-                    "desc": "Fungsi utama yang memproduksi aliran data (Stream). Wajib menerima parameter 'offset' dan 'limit' yang dikalkulasi secara otomatis oleh internal controller."
+                    "desc": "Wajib bila controller tidak diisi. Menghasilkan stream data halaman; offset = (page - 1) * limit dihitung controller."
                 },
                 {
-                    "name": "builder",
-                    "type": "Widget Function(BuildContext context, DriftPaginationController<T> control, List<T> data)",
-                    "default": "",
-                    "desc": "Fungsi callback untuk membangun UI. Menyediakan akses langsung ke instance 'control' (untuk mengeksekusi navigasi dan membaca status) beserta array 'data' yang siap dirender."
+                    "name": "totalData",
+                    "type": "int",
+                    "default": "0",
+                    "desc": "Jumlah seluruh baris (mis. dari query COUNT di induk). Dasar pageCount, hasMore, dan angka total/rentang di paginationWidget. Nilai baru dari induk diteruskan otomatis (updateTotalData)."
                 }
             ],
             "optionalProps": [
@@ -3770,47 +3770,63 @@
                     "name": "initialLimit",
                     "type": "int",
                     "default": "15",
-                    "desc": "Batas jumlah item per halaman saat controller pertama kali diinisialisasi."
+                    "desc": "Jumlah data per halaman awal."
                 },
                 {
                     "name": "initialPage",
                     "type": "int",
                     "default": "1",
-                    "desc": "Indeks halaman awal saat widget pertama kali dimuat ke dalam memory."
+                    "desc": "Halaman awal."
+                },
+                {
+                    "name": "controller",
+                    "type": "DriftPaginationController<T>?",
+                    "default": "null",
+                    "desc": "Controller dari luar (paging dikendalikan induk). Bila diisi, streamFactory/totalData/initialPage/initialLimit diabaikan dan controller TIDAK dibuang widget (pemiliknya yang dispose)."
                 }
             ],
             "additionalInfo": {
-                "dependencies": "Flutter (ChangeNotifier, ListenableBuilder)",
-                "use_case": "Membangun tabel administratif atau daftar data yang berlapis halaman (paginated) dari SQLite/Drift, dengan indikator pemuatan bawaan dan kontrol navigasi eksplisit (next, prev, goToPage)."
+                "dependencies": "Flutter (ChangeNotifier, ListenableBuilder), pagination_widget.dart",
+                "use_case": "Tabel/daftar besar dari SQLite/Drift yang diambil per halaman (LIMIT/OFFSET) dengan tampilan paginasi standar atau navigasi buatan sendiri.",
+                "getters": "page, limit, data, isLoading, isEmpty, error, pageCount (0 bila tanpa data), hasMore",
+                "paginationWidget_options": "showPageNumbers (false), infoPosition (null = ikut aturan FAB), hasFloatingButton (false), alignment (null = ikut aturan FAB), size (PaginationSize.sm), theme (primary), visiblePagesCount (2), hideWhenEmpty (true), padding (EdgeInsets.only(top: 16)), key"
             },
             "methods": [
                 {
+                    "name": "paginationWidget({showPageNumbers, infoPosition, hasFloatingButton, alignment, size, theme, visiblePagesCount, hideWhenEmpty, padding, key})",
+                    "desc": "Mengembalikan PaginationWidget yang sudah tersambung: currentPage = page, totalPages = pageCount (minimal 1), totalItems = totalData, perPage = limit, onPageChanged = goToPage. hasFloatingButton true → blok tengah + info topCenter; false → rata kanan + info leftCenter; infoPosition/alignment mengesampingkan aturan itu. Tanpa data → SizedBox.shrink (hideWhenEmpty)."
+                },
+                {
                     "name": "next()",
-                    "desc": "Berpindah ke halaman selanjutnya secara aman dengan memvalidasi ketersediaan data melalui getter hasMore."
+                    "desc": "Ke halaman berikutnya bila hasMore."
                 },
                 {
                     "name": "prev()",
-                    "desc": "Berpindah mundur ke halaman sebelumnya jika nilai _page saat ini lebih besar dari 1."
+                    "desc": "Ke halaman sebelumnya bila page > 1."
                 },
                 {
                     "name": "goToPage(int p)",
-                    "desc": "Melompat langsung ke halaman spesifik 'p', dilengkapi validasi yang memblokir eksekusi jika 'p' melebihi batas pageCount maksimal."
+                    "desc": "Lompat ke halaman p; diabaikan bila p sama, < 1, atau > pageCount."
                 },
                 {
                     "name": "refresh()",
-                    "desc": "Membatalkan stream lama dan memuat ulang kueri data pada posisi halaman dan limit yang sedang aktif saat ini."
+                    "desc": "Memuat ulang halaman & limit aktif."
                 },
                 {
                     "name": "reset()",
-                    "desc": "Mengembalikan state _page ke posisi 1 dan segera memuat ulang koneksi aliran data."
+                    "desc": "Kembali ke halaman 1 lalu memuat ulang."
                 },
                 {
                     "name": "changeLimit(int newLimit)",
-                    "desc": "Mengubah kapasitas batas data (_limit), otomatis melakukan reset halaman ke 1 untuk mencegah anomali offset, lalu memicu _fetchData()."
+                    "desc": "Ganti jumlah per halaman; halaman kembali ke 1."
                 },
                 {
                     "name": "updateTotalData(int newTotal)",
-                    "desc": "Memperbarui properti totalData secara reaktif tanpa perlu membongkar (dispose) stream utama jika ada perubahan jumlah baris di level database."
+                    "desc": "Perbarui jumlah data. Bila halaman aktif melebihi pageCount baru (data dihapus/tersaring), jatuh ke halaman terakhir yang masih ada lalu memuat ulang."
+                },
+                {
+                    "name": "updateStream(newFactory, {int? totalData})",
+                    "desc": "Ganti sumber data (mis. kata kunci / saringan berubah), opsional sekaligus total baru; halaman kembali ke 1 lalu memuat ulang."
                 }
             ],
             "behaviors": [
@@ -3818,108 +3834,149 @@
                     "name": "Otomatisasi Offset",
                     "type": "Logic Evaluation",
                     "default": "",
-                    "desc": "Kalkulasi titik mulai baca data: (_page - 1) * _limit dijalankan otomatis secara terpusat di dalam _fetchData(), membebaskan parent dari perhitungan manual yang rentan salah."
+                    "desc": "Offset (page - 1) * limit dihitung terpusat di controller; induk hanya menyediakan query LIMIT/OFFSET."
                 },
                 {
-                    "name": "Pembersihan Memori Otomatis (Memory Leak Prevention)",
+                    "name": "Siklus Hidup Controller",
                     "type": "Lifecycle Management",
                     "default": "",
-                    "desc": "Setiap terjadi transisi perpindahan halaman atau pembaruan limit, _dataSubscription lama dibatalkan (cancel) terlebih dahulu sebelum membuat listen stream baru. Controller ini juga otomatis men-dispose semua langganan aktif saat widget dihancurkan."
+                    "desc": "Controller milik widget dibuat di initState dan dibuang di dispose; controller dari luar tidak dibuang. Langganan stream lama selalu dibatalkan sebelum halaman baru diambil."
                 },
                 {
-                    "name": "Reaktivitas Terpusat",
+                    "name": "Sinkron Jumlah Data dari Induk",
                     "type": "State Management",
                     "default": "",
-                    "desc": "Semua transisi status seperti _isLoading, _error, dan pemuatan array data diproses melalui notifyListeners(), sehingga meminimalisir penggunaan setState konvensional dan menjaga UI tetap efisien."
+                    "desc": "Saat induk membangun ulang dengan totalData berbeda, didUpdateWidget memanggil updateTotalData sehingga info & batas halaman ikut benar tanpa membuat controller baru."
+                },
+                {
+                    "name": "Paginasi Tersembunyi Saat Kosong",
+                    "type": "UI Render",
+                    "default": "",
+                    "desc": "paginationWidget tidak menampilkan apa pun bila totalData 0 (hideWhenEmpty), sehingga tidak muncul info `1 / 0`."
                 }
             ],
             "specialNotes": [
-                "Anda wajib menyuntikkan (inject) nilai totalData dari sumber kueri agregasi (seperti COUNT) yang berada di luar hierarki komponen ini agar mekanisme pageCount dapat bekerja presisi.",
-                "Gunakan tipe generik secara eksplisit (contoh: DriftPaginationWidget<UserModel>) untuk menghindari kesalahan casting tipe (dynamic) pada parameter callback builder.",
-                "Terdapat file konfigurasi standar acuan yang dapat diperiksa bernama prompt.txt. Refer to this file by its name verbatim jika ada instruksi arsitektur tambahan yang perlu disinkronisasi."
+                "totalData wajib berasal dari query hitung (COUNT) di luar widget, dengan saringan yang SAMA dengan streamFactory; kalau tidak, jumlah halaman dan rentang salah.",
+                "Pakai tipe generik eksplisit, mis. DriftPaginationWidget<StaffModel>, agar `data` di builder bertipe benar.",
+                "Untuk keseragaman UI pakai `control.paginationWidget(...)` (aturan FAB sama dengan PagedTableFooter); tombol buatan sendiri tetap bisa memakai next/prev/goToPage.",
+                "Saringan berubah → `control.updateStream(...)` (kembali ke halaman 1); jangan membuat DriftPaginationWidget baru setiap ketikan.",
+                "Data sudah ada utuh di memori (daftar kecil/sedang) → cukup PagedList + PagedTableFooter."
             ],
-            "code": "DriftPaginationWidget<StaffModel>(\n  initialLimit: 10,\n  initialPage: 1,\n  totalData: totalRowsFromParent, // Wajib diisi\n  streamFactory: (offset, limit) => database.staffDao.watchStaff(limit: limit, offset: offset),\n  builder: (context, control, data) {\n    if (control.isLoading && data.isEmpty) return const Center(child: CircularProgressIndicator());\n    if (control.isEmpty) return const Center(child: Text('Data tidak ditemukan'));\n\n    return Column(\n      children: [\n        Expanded(\n          child: ListView.builder(\n            itemCount: data.length,\n            itemBuilder: (_, index) => ListTile(title: Text(data[index].name)),\n          ),\n        ),\n        Row(\n          mainAxisAlignment: MainAxisAlignment.center,\n          children: [\n            IconButton(\n              icon: const Icon(Icons.arrow_back),\n              onPressed: control.page > 1 ? control.prev : null,\n            ),\n            Text('Hal ${control.page} dari ${control.pageCount}'),\n            IconButton(\n              icon: const Icon(Icons.arrow_forward),\n              onPressed: control.hasMore ? control.next : null,\n            ),\n          ],\n        )\n      ],\n    );\n  },\n)"
+            "code": "// 1. Tampilan standar (seragam dengan tabel lain)\nDriftPaginationWidget<StaffModel>(\n  initialLimit: 10,\n  totalData: totalRowsFromParent, // dari query COUNT\n  streamFactory: (offset, limit) =>\n      database.staffDao.watchStaff(limit: limit, offset: offset),\n  builder: (context, control, data) {\n    if (control.isLoading && data.isEmpty) return LoadingWidget.widget();\n    if (control.isEmpty) return const EmptyWidget(message: 'Data tidak ditemukan');\n    return Column(\n      children: [\n        Expanded(\n          child: ListView.builder(\n            itemCount: data.length,\n            itemBuilder: (_, i) => ListTile(title: Text(data[i].name)),\n          ),\n        ),\n        // Halaman punya FAB \"Tambah\" -> tengah, info di atas tombol\n        control.paginationWidget(hasFloatingButton: true),\n      ],\n    );\n  },\n)\n\n// 2. Opsi tampilan\ncontrol.paginationWidget(\n  showPageNumbers: true, // tampilan lama (tombol nomor)\n)\ncontrol.paginationWidget(\n  infoPosition: PaginationInfoPosition.rightCenter,\n  alignment: Alignment.centerLeft,\n  size: PaginationSize.md,\n)\n\n// 3. Paging manual (tombol sendiri) tetap bisa\nbuilder: (context, control, data) => Row(\n  mainAxisAlignment: MainAxisAlignment.center,\n  children: [\n    IconButton(\n      icon: const Icon(Icons.arrow_back),\n      onPressed: control.page > 1 ? control.prev : null,\n    ),\n    Text('Hal ${control.page} dari ${control.pageCount}'),\n    IconButton(\n      icon: const Icon(Icons.arrow_forward),\n      onPressed: control.hasMore ? control.next : null,\n    ),\n  ],\n)\n\n// 4. Controller dipegang induk (mis. untuk pencarian)\nlate final _control = DriftPaginationController<StaffModel>(\n  streamFactory: (o, l) => db.staffDao.watchStaff(offset: o, limit: l),\n  totalData: 0,\n  initialLimit: 20,\n);\n\nDriftPaginationWidget<StaffModel>(\n  controller: _control,\n  builder: (context, control, data) => ...,\n)\n\nvoid _onSearch(String q, int total) => _control.updateStream(\n  (o, l) => db.staffDao.watchStaff(query: q, offset: o, limit: l),\n  totalData: total,\n);\n\n@override\nvoid dispose() {\n  _control.dispose(); // controller dari luar dibuang pemiliknya\n  super.dispose();\n}"
         },
         {
             "id": "PaginationWidget",
             "group": "Widget",
             "name": "Pagination Bar",
             "icon": "fa-solid fa-angles-right",
-            "description": "Widget navigasi pagination modern dengan kontrol tata letak mandiri (shrink-wrap) yang fleksibel. Mengusung sistem kalkulasi sliding window yang cerdas untuk mengontrol rentang nomor halaman, tombol navigasi pinned (First, Prev, Next, Last), sistem penskalaan ukuran proporsional (xs hingga xl), serta theming warna preset. Dilengkapi dukungan scrollable drag horizontal berbasis deteksi platform (mouse drag di Desktop/Web dan native touch di Mobile) serta adaptasi penuh terhadap Dark & Light mode.",
+            "description": "Widget navigasi pagination dengan DUA tampilan. Tampilan ringkas (bawaan, showPageNumbers: false) menampilkan teks info dinamis `halaman / rentang / total` (contoh `2 / 11-20 / 500`) dan empat tombol navigasi First («), Previous (‹), Next (›), Last (») yang rapat, sama besar, sudut membulat, latar abu muda dan ikon abu tua; letak teks info diatur lewat infoPosition (9 posisi). Tampilan lama (showPageNumbers: true) menampilkan deretan tombol nomor halaman bergeser (sliding window) di antara tombol navigasi, tanpa teks info, persis seperti versi sebelumnya. Keduanya mendukung skala ukuran (xs–xl), Dark & Light mode, dan shrink-wrap (MainAxisSize.min). File yang sama memuat helper PagedList & PagedTableFooter untuk paginasi tabel sisi klien.",
             "mandatoryProps": [
                 {
                     "name": "currentPage",
                     "type": "int",
-                    "desc": "Nomor halaman aktif saat ini (1-based index). Digunakan sebagai acuan penanda visual tombol aktif serta menentukan status disabled pada tombol navigasi First (<<) dan Previous (<)."
+                    "desc": "Nomor halaman aktif (dimulai 1). Ditampilkan tebal di teks info (tampilan ringkas) atau sebagai tombol aktif (tampilan lama); menentukan status nonaktif tombol First & Previous."
                 },
                 {
                     "name": "totalPages",
                     "type": "int",
-                    "desc": "Total keseluruhan halaman yang tersedia. Menjadi batas atas kalkulasi pagination serta menentukan status disabled pada tombol navigasi Next (>) dan Last (>>)."
+                    "desc": "Jumlah halaman. Batas atas navigasi; menentukan status nonaktif tombol Next & Last. Dihitung pemanggil dari total data, misalnya `(totalItems / perPage).ceil()`, minimal 1."
                 },
                 {
                     "name": "onPageChanged",
                     "type": "ValueChanged<int>",
-                    "desc": "Fungsi callback yang akan dipicu saat pengguna berpindah halaman (menekan nomor halaman atau tombol arah navigasi). Mengembalikan nilai integer halaman tujuan."
+                    "desc": "Dipanggil dengan nomor halaman tujuan saat tombol ditekan. Widget tidak menyimpan halaman sendiri: pemanggil wajib memperbarui currentPage (setState / controller) lalu memuat data halaman itu."
                 }
             ],
             "optionalProps": [
                 {
+                    "name": "showPageNumbers",
+                    "type": "bool",
+                    "default": "false",
+                    "desc": "false = tampilan ringkas (teks info + 4 tombol, tanpa tombol nomor). true = tampilan lama: tombol nomor halaman di antara tombol navigasi, tanpa teks info, tidak ada perubahan apa pun dari versi sebelumnya."
+                },
+                {
+                    "name": "infoPosition",
+                    "type": "PaginationInfoPosition",
+                    "default": "PaginationInfoPosition.topCenter",
+                    "desc": "Letak teks info terhadap kelompok tombol (hanya tampilan ringkas). Pola `{sisi}{perataan}`: topLeft / topCenter / topRight (di atas tombol, rata kiri / tengah / kanan); leftTop / leftCenter / leftBottom (di kiri tombol, teks rata kanan, sejajar atas / tengah / bawah); rightTop / rightCenter / rightBottom (di kanan tombol, teks rata kiri). Posisi left* / right* otomatis pindah ke topCenter bila lebar wadah tidak cukup."
+                },
+                {
+                    "name": "totalItems",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Jumlah seluruh data (angka ketiga, `500`). Bersama perPage membentuk rentang `11-20`. Bila totalItems atau perPage kosong, info hanya `halaman / jumlah halaman` (contoh `3 / 7`)."
+                },
+                {
+                    "name": "perPage",
+                    "type": "int?",
+                    "default": "null",
+                    "desc": "Jumlah data per halaman, dipakai menghitung rentang. Rentang halaman terakhir dibatasi totalItems (contoh 23 data, 10 per halaman, halaman 3 → `3 / 21-23 / 23`)."
+                },
+                {
                     "name": "visiblePagesCount",
                     "type": "int",
                     "default": "2",
-                    "desc": "Jumlah tombol halaman yang ditampilkan di sisi kiri dan kanan dari halaman aktif. Mengontrol lebar jendela nomor halaman (windowing) agar antarmuka tidak sesak saat total halaman berjumlah puluhan atau ratusan."
+                    "desc": "Hanya tampilan lama: jumlah tombol nomor di kiri dan kanan halaman aktif (lebar sliding window)."
                 },
                 {
                     "name": "size",
                     "type": "PaginationSize",
                     "default": "PaginationSize.md",
-                    "desc": "Mengatur skala dimensi fisik komponen (`xs`, `sm`, `md`, `lg`, `xl`). Menyesuaikan ukuran kotak tombol (28px - 56px), ukuran font angka (12px - 20px), serta jarak gap antar tombol secara proporsional."
+                    "desc": "Skala `xs`, `sm`, `md`, `lg`, `xl`: kotak tombol 28–56 px, font 12–20 px, jarak antartombol 2–10 px. Berlaku untuk kedua tampilan."
                 },
                 {
                     "name": "theme",
                     "type": "PaginationTheme",
                     "default": "PaginationTheme.primary",
-                    "desc": "Menentukan preset palet warna untuk tombol halaman aktif (`primary`, `secondary`, `success`, `info`, `warning`, `danger`, `dark`, `light`)."
+                    "desc": "Hanya tampilan lama: warna tombol nomor aktif (`primary`, `secondary`, `success`, `info`, `warning`, `danger`, `dark`, `light`). Tampilan ringkas memakai warna netral (onSurface) agar tidak bersaing dengan tombol aksi."
                 }
             ],
             "additionalInfo": {
-                "styling": "Secara otomatis mendeteksi Brightness tema (Dark / Light mode). Warna border dan latar tombol non-aktif (disabled) menggunakan opasitas adaptif terhadap onSurface untuk menjamin kontras yang nyaman dan tidak menyilaukan pada mode gelap. Warna latar tombol aktif menggunakan palet tema yang dipilih dengan warna teks putih kontras.",
-                "layout": "Komponen menggunakan ukuran minimal (`MainAxisSize.min`) sehingga tidak memaksa ekspansi ke seluruh lebar layar. Sangat fleksibel untuk ditempatkan di dalam kontainer apa pun, seperti `Center()`, `Align(alignment: Alignment.centerRight)`, atau diletakkan sejajar di dalam `Row` footer tabel."
+                "styling": "Tampilan ringkas: tombol berlatar onSurface 5% (gelap 8%) dengan garis tipis, ikon onSurface 60% (nonaktif 25%), sudut membulat 30% ukuran tombol, tooltip (Halaman pertama / sebelumnya / berikutnya / terakhir). Angka halaman aktif tebal warna onSurface, sisa info onSurface 60%. Tampilan lama tidak berubah: tombol aktif berwarna theme dengan teks putih.",
+                "layout": "Shrink-wrap (MainAxisSize.min): bungkus dengan `Center`, `Align(alignment: Alignment.centerRight)`, dsb. untuk menentukan letak blok. Posisi samping mengukur lebar teks info (TextPainter, mengikuti skala huruf sistem) lewat LayoutBuilder; tidak muat → topCenter, sehingga bebas overflow di HP.",
+                "enum": "PaginationInfoPosition { topLeft, topCenter, topRight, leftTop, leftCenter, leftBottom, rightTop, rightCenter, rightBottom }",
+                "helpers": "PagedList<T>.of(semuaData, page:, perPage: 30) memotong data di memori (items, currentPage, totalPages, totalItems, perPage; halaman yang hilang karena data berkurang jatuh ke halaman terakhir). PagedTableFooter(paged:, onPageChanged:, hasFloatingButton:) = footer tabel standar: hasFloatingButton true → blok tengah + info topCenter; false → rata kanan + info leftCenter; tersembunyi bila tanpa data."
             },
-            "methods": [],
+            "methods": [
+                {
+                    "name": "PaginationWidget.rangeOf({page, perPage, totalItems})",
+                    "desc": "Static. Mengembalikan record `(awal, akhir)` 1-based untuk halaman tersebut; akhir dibatasi totalItems; tanpa data atau halaman di luar batas → `(0, 0)`. Contoh rangeOf(page: 2, perPage: 10, totalItems: 500) = (11, 20)."
+                }
+            ],
             "behaviors": [
                 {
-                    "name": "Intelligent Sliding Window",
-                    "type": "Algorithm",
+                    "name": "Info Dinamis",
+                    "type": "Data Binding",
                     "default": "",
-                    "desc": "Menghitung indeks batas `awal` dan `akhir` halaman secara dinamis berdasarkan posisi `currentPage` dan `visiblePagesCount`, memastikan distribusi nomor halaman tetap seimbang dan relevan."
+                    "desc": "Teks info dihitung dari currentPage, perPage & totalItems setiap build (bukan hardcode); berubah otomatis saat halaman atau jumlah data berubah."
                 },
                 {
-                    "name": "Platform-Aware Drag Scroll",
-                    "type": "Gesture Handling",
+                    "name": "Fallback Posisi Samping",
+                    "type": "Responsive Layout",
                     "default": "",
-                    "desc": "Menerapkan `_DragScrollBehavior` khusus yang hanya menginjeksi mouse drag pada platform Desktop (Windows/macOS/Linux) dan Web. Platform Mobile (Android/iOS) tetap menggunakan touch handler native murni guna mencegah beban komputasi berlebih."
-                },
-                {
-                    "name": "Proportional Spacing Scaling",
-                    "type": "Layout Strategy",
-                    "default": "",
-                    "desc": "Jarak jeda horizontal (`_gap`) antar tombol dihitung dinamis berdasarkan enum `size` (mulai dari 2.0px pada ukuran `xs` hingga 10.0px pada `xl`) untuk menjaga keharmonisan visual tata letak."
+                    "desc": "Untuk left* / right*: bila lebar teks info + jarak + 4 tombol melebihi lebar wadah, info dipindah ke atas tombol (topCenter)."
                 },
                 {
                     "name": "Redundant Event Prevention",
                     "type": "Event Filter",
                     "default": "",
-                    "desc": "Menolak eksekusi `onPageChanged` apabila pengguna menekan tombol halaman yang sedang aktif atau tombol navigasi yang berada dalam kondisi non-aktif (disabled)."
+                    "desc": "onPageChanged tidak dipanggil untuk halaman yang sama, di luar 1..totalPages, atau dari tombol nonaktif."
+                },
+                {
+                    "name": "Intelligent Sliding Window (tampilan lama)",
+                    "type": "Algorithm",
+                    "default": "",
+                    "desc": "Rentang tombol nomor dihitung dari currentPage & visiblePagesCount agar seimbang; deretan nomor dibungkus ScrollView horizontal (drag mouse di desktop/web, sentuh di mobile) sehingga bebas overflow."
                 }
             ],
             "specialNotes": [
-                "Positioning: Karena widget bersifat shrink-to-fit (MainAxisSize.min), bungkus widget dengan `Center(child: ...)` jika ingin ditaruh di tengah layar, atau gunakan `Align(alignment: Alignment.centerRight, ...)` untuk diletakkan di sudut kanan.",
-                "State Update: Selalu perbarui variabel halaman aktif Anda di dalam callback `onPageChanged` (misal via `setState` atau state management) dan jalankan pemanggilan fetching data/API ulang.",
-                "Responsive Safety: Tombol First/Prev dan Next/Last tetap diam di posisi terluar (pinned), sedangkan deretan nomor di tengah terbungkus Flexible ScrollView sehingga bebas dari error RenderFlex Overflow pada layar sempit."
+                "Aturan letak (dipakai di seluruh aplikasi): halaman yang punya tombol mengambang (FAB, mis. Tambah) → blok di tengah, info topCenter; halaman tanpa FAB → blok rata kanan, info leftCenter. Untuk tabel cukup `PagedTableFooter(hasFloatingButton: <kondisi yang sama dengan FAB>)`.",
+                "Selalu isi totalItems & perPage bila tersedia agar info menampilkan rentang & total; tanpa keduanya info hanya `halaman / jumlah halaman`.",
+                "Mekanisme halaman sepenuhnya milik pemanggil: perbarui currentPage di onPageChanged lalu muat ulang data. Widget tidak melakukan query.",
+                "Pakai showPageNumbers: true hanya bila tombol nomor halaman memang diminta (tampilan lama, tanpa teks info).",
+                "Data per halaman langsung dari database (LIMIT/OFFSET) → gunakan DriftPaginationWidget + `control.paginationWidget(...)` yang sudah tersambung ke widget ini."
             ],
-            "code": "// 1. Penggunaan Dasar dengan Alignment Tengah\nCenter(\n  child: PaginationWidget(\n    currentPage: _currentPage,\n    totalPages: 25,\n    onPageChanged: (page) {\n      setState(() => _currentPage = page);\n    },\n  ),\n)\n\n// 2. Mode Ringkas (Ukuran XS / SM untuk Tabel Kompak)\nPaginationWidget(\n  currentPage: _currentPage,\n  totalPages: 10,\n  size: PaginationSize.sm,\n  visiblePagesCount: 1, // Menampilkan 1 nomor di kiri & kanan saja\n  onPageChanged: (page) => _fetchData(page),\n)\n\n// 3. Mode Tema Kustom (Contoh: Notifikasi Berhasil / Sukses)\nPaginationWidget(\n  currentPage: _currentPage,\n  totalPages: 15,\n  size: PaginationSize.md,\n  theme: PaginationTheme.success,\n  onPageChanged: (page) => _fetchData(page),\n)\n\n// 4. Implementasi pada Footer Tabel Responsif (Pojok Kanan)\nContainer(\n  padding: const EdgeInsets.all(16.0),\n  child: Row(\n    mainAxisAlignment: MainAxisAlignment.spaceBetween,\n    children: [\n      Text('Menampilkan halaman $_currentPage dari 50'),\n      PaginationWidget(\n        currentPage: _currentPage,\n        totalPages: 50,\n        size: PaginationSize.md,\n        visiblePagesCount: 2,\n        theme: PaginationTheme.primary,\n        onPageChanged: (page) {\n          setState(() => _currentPage = page);\n          _loadBatchData(page);\n        },\n      ),\n    ],\n  ),\n)"
+            "code": "// 1. Tampilan ringkas (bawaan): info \"2 / 11-20 / 500\" di atas 4 tombol\nCenter(\n  child: PaginationWidget(\n    currentPage: _page,\n    totalPages: (_total / _perPage).ceil(),\n    totalItems: _total,\n    perPage: _perPage,\n    size: PaginationSize.sm,\n    onPageChanged: (p) => setState(() => _page = p),\n  ),\n)\n\n// 2. Info di kiri tombol, blok rata kanan (halaman tanpa FAB)\nAlign(\n  alignment: Alignment.centerRight,\n  child: PaginationWidget(\n    currentPage: _page,\n    totalPages: pages,\n    totalItems: _total,\n    perPage: _perPage,\n    infoPosition: PaginationInfoPosition.leftCenter,\n    size: PaginationSize.sm,\n    onPageChanged: (p) => setState(() => _page = p),\n  ),\n)\n\n// 3. Tampilan lama: tombol nomor halaman, tanpa teks info\nPaginationWidget(\n  currentPage: _page,\n  totalPages: 15,\n  showPageNumbers: true,\n  visiblePagesCount: 1,\n  theme: PaginationTheme.success,\n  onPageChanged: (p) => setState(() => _page = p),\n)\n\n// 4. Tabel dari data di memori: PagedList + PagedTableFooter\nfinal paged = PagedList.of(semuaBaris, page: _page); // 30 per halaman\nColumn(\n  children: [\n    Expanded(child: TabelSaya(rows: paged.items)),\n    PagedTableFooter(\n      paged: paged,\n      hasFloatingButton: bolehTambah, // sama dengan kondisi FAB\n      onPageChanged: (p) => setState(() => _page = p),\n    ),\n  ],\n)\n\n// 5. Rentang tanpa widget\nfinal (awal, akhir) = PaginationWidget.rangeOf(page: 3, perPage: 10, totalItems: 23);\n// awal = 21, akhir = 23"
         },
         {
             "id": "EmptyWidget",
