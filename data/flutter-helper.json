@@ -3789,12 +3789,12 @@
                 "dependencies": "Flutter (ChangeNotifier, ListenableBuilder), pagination_widget.dart",
                 "use_case": "Tabel/daftar besar dari SQLite/Drift yang diambil per halaman (LIMIT/OFFSET) dengan tampilan paginasi standar atau navigasi buatan sendiri.",
                 "getters": "page, limit, data, isLoading, isEmpty, error, pageCount (0 bila tanpa data), hasMore",
-                "paginationWidget_options": "showPageNumbers (false), infoPosition (null = ikut aturan FAB), hasFloatingButton (false), alignment (null = ikut aturan FAB), size (PaginationSize.sm), theme (primary), visiblePagesCount (2), hideWhenEmpty (true), padding (EdgeInsets.only(top: 16)), key"
+                "paginationWidget_options": "showPageNumbers (false), infoPosition (PaginationInfoPosition.leftCenter), alignment (Alignment.centerRight), size (PaginationSize.sm), theme (primary), visiblePagesCount (2), hideWhenEmpty (true), padding (EdgeInsets.only(top: 16)), key"
             },
             "methods": [
                 {
-                    "name": "paginationWidget({showPageNumbers, infoPosition, hasFloatingButton, alignment, size, theme, visiblePagesCount, hideWhenEmpty, padding, key})",
-                    "desc": "Mengembalikan PaginationWidget yang sudah tersambung: currentPage = page, totalPages = pageCount (minimal 1), totalItems = totalData, perPage = limit, onPageChanged = goToPage. hasFloatingButton true → blok tengah + info topCenter; false → rata kanan + info leftCenter; infoPosition/alignment mengesampingkan aturan itu. Tanpa data → SizedBox.shrink (hideWhenEmpty)."
+                    "name": "paginationWidget({showPageNumbers, infoPosition, alignment, size, theme, visiblePagesCount, hideWhenEmpty, padding, key})",
+                    "desc": "Mengembalikan PaginationWidget yang sudah tersambung: currentPage = page, totalPages = pageCount (minimal 1), totalItems = totalData, perPage = limit, onPageChanged = goToPage. Bawaan sama dengan PagedTableFooter (rata kanan, info di kiri); semua letak diatur lewat infoPosition / alignment / padding. Tanpa data → SizedBox.shrink (hideWhenEmpty)."
                 },
                 {
                     "name": "next()",
@@ -3858,11 +3858,11 @@
             "specialNotes": [
                 "totalData wajib berasal dari query hitung (COUNT) di luar widget, dengan saringan yang SAMA dengan streamFactory; kalau tidak, jumlah halaman dan rentang salah.",
                 "Pakai tipe generik eksplisit, mis. DriftPaginationWidget<StaffModel>, agar `data` di builder bertipe benar.",
-                "Untuk keseragaman UI pakai `control.paginationWidget(...)` (aturan FAB sama dengan PagedTableFooter); tombol buatan sendiri tetap bisa memakai next/prev/goToPage.",
+                "Untuk keseragaman UI pakai `control.paginationWidget(...)`; tombol buatan sendiri tetap bisa memakai next/prev/goToPage. Letak di halaman adalah urusan halaman, bukan komponen paginasi. Halaman dengan FAB Tambah di pojok kanan bawah: taruh paginasi di baris terakhir badan, bungkus FabAlignedWidget(enabled: <kondisi FAB>) dengan infoPosition topCenter & padding EdgeInsets.zero → sejajar di kiri FAB. Tanpa FAB: bawaan (rata kanan, info leftCenter).",
                 "Saringan berubah → `control.updateStream(...)` (kembali ke halaman 1); jangan membuat DriftPaginationWidget baru setiap ketikan.",
                 "Data sudah ada utuh di memori (daftar kecil/sedang) → cukup PagedList + PagedTableFooter."
             ],
-            "code": "// 1. Tampilan standar (seragam dengan tabel lain)\nDriftPaginationWidget<StaffModel>(\n  initialLimit: 10,\n  totalData: totalRowsFromParent, // dari query COUNT\n  streamFactory: (offset, limit) =>\n      database.staffDao.watchStaff(limit: limit, offset: offset),\n  builder: (context, control, data) {\n    if (control.isLoading && data.isEmpty) return LoadingWidget.widget();\n    if (control.isEmpty) return const EmptyWidget(message: 'Data tidak ditemukan');\n    return Column(\n      children: [\n        Expanded(\n          child: ListView.builder(\n            itemCount: data.length,\n            itemBuilder: (_, i) => ListTile(title: Text(data[i].name)),\n          ),\n        ),\n        // Halaman punya FAB \"Tambah\" -> tengah, info di atas tombol\n        control.paginationWidget(hasFloatingButton: true),\n      ],\n    );\n  },\n)\n\n// 2. Opsi tampilan\ncontrol.paginationWidget(\n  showPageNumbers: true, // tampilan lama (tombol nomor)\n)\ncontrol.paginationWidget(\n  infoPosition: PaginationInfoPosition.rightCenter,\n  alignment: Alignment.centerLeft,\n  size: PaginationSize.md,\n)\n\n// 3. Paging manual (tombol sendiri) tetap bisa\nbuilder: (context, control, data) => Row(\n  mainAxisAlignment: MainAxisAlignment.center,\n  children: [\n    IconButton(\n      icon: const Icon(Icons.arrow_back),\n      onPressed: control.page > 1 ? control.prev : null,\n    ),\n    Text('Hal ${control.page} dari ${control.pageCount}'),\n    IconButton(\n      icon: const Icon(Icons.arrow_forward),\n      onPressed: control.hasMore ? control.next : null,\n    ),\n  ],\n)\n\n// 4. Controller dipegang induk (mis. untuk pencarian)\nlate final _control = DriftPaginationController<StaffModel>(\n  streamFactory: (o, l) => db.staffDao.watchStaff(offset: o, limit: l),\n  totalData: 0,\n  initialLimit: 20,\n);\n\nDriftPaginationWidget<StaffModel>(\n  controller: _control,\n  builder: (context, control, data) => ...,\n)\n\nvoid _onSearch(String q, int total) => _control.updateStream(\n  (o, l) => db.staffDao.watchStaff(query: q, offset: o, limit: l),\n  totalData: total,\n);\n\n@override\nvoid dispose() {\n  _control.dispose(); // controller dari luar dibuang pemiliknya\n  super.dispose();\n}"
+            "code": "// 1. Tampilan standar (seragam dengan tabel lain)\nDriftPaginationWidget<StaffModel>(\n  initialLimit: 10,\n  totalData: totalRowsFromParent, // dari query COUNT\n  streamFactory: (offset, limit) =>\n      database.staffDao.watchStaff(limit: limit, offset: offset),\n  builder: (context, control, data) {\n    if (control.isLoading && data.isEmpty) return LoadingWidget.widget();\n    if (control.isEmpty) return const EmptyWidget(message: 'Data tidak ditemukan');\n    return Column(\n      children: [\n        Expanded(\n          child: ListView.builder(\n            itemCount: data.length,\n            itemBuilder: (_, i) => ListTile(title: Text(data[i].name)),\n          ),\n        ),\n        // Halaman punya FAB \"Tambah\" -> sejajar di kiri FAB\n        FabAlignedWidget(\n          child: control.paginationWidget(\n            infoPosition: PaginationInfoPosition.topCenter,\n            padding: EdgeInsets.zero,\n          ),\n        ),\n      ],\n    );\n  },\n)\n\n// 2. Opsi tampilan\ncontrol.paginationWidget(\n  showPageNumbers: true, // tampilan lama (tombol nomor)\n)\ncontrol.paginationWidget(\n  infoPosition: PaginationInfoPosition.rightCenter,\n  alignment: Alignment.centerLeft,\n  size: PaginationSize.md,\n)\n\n// 3. Paging manual (tombol sendiri) tetap bisa\nbuilder: (context, control, data) => Row(\n  mainAxisAlignment: MainAxisAlignment.center,\n  children: [\n    IconButton(\n      icon: const Icon(Icons.arrow_back),\n      onPressed: control.page > 1 ? control.prev : null,\n    ),\n    Text('Hal ${control.page} dari ${control.pageCount}'),\n    IconButton(\n      icon: const Icon(Icons.arrow_forward),\n      onPressed: control.hasMore ? control.next : null,\n    ),\n  ],\n)\n\n// 4. Controller dipegang induk (mis. untuk pencarian)\nlate final _control = DriftPaginationController<StaffModel>(\n  streamFactory: (o, l) => db.staffDao.watchStaff(offset: o, limit: l),\n  totalData: 0,\n  initialLimit: 20,\n);\n\nDriftPaginationWidget<StaffModel>(\n  controller: _control,\n  builder: (context, control, data) => ...,\n)\n\nvoid _onSearch(String q, int total) => _control.updateStream(\n  (o, l) => db.staffDao.watchStaff(query: q, offset: o, limit: l),\n  totalData: total,\n);\n\n@override\nvoid dispose() {\n  _control.dispose(); // controller dari luar dibuang pemiliknya\n  super.dispose();\n}"
         },
         {
             "id": "PaginationWidget",
@@ -3935,7 +3935,7 @@
                 "styling": "Tampilan ringkas: tombol berlatar onSurface 5% (gelap 8%) dengan garis tipis, ikon onSurface 60% (nonaktif 25%), sudut membulat 30% ukuran tombol, tooltip (Halaman pertama / sebelumnya / berikutnya / terakhir). Angka halaman aktif tebal warna onSurface, sisa info onSurface 60%. Tampilan lama tidak berubah: tombol aktif berwarna theme dengan teks putih.",
                 "layout": "Shrink-wrap (MainAxisSize.min): bungkus dengan `Center`, `Align(alignment: Alignment.centerRight)`, dsb. untuk menentukan letak blok. Posisi samping mengukur lebar teks info (TextPainter, mengikuti skala huruf sistem) lewat LayoutBuilder; tidak muat → topCenter, sehingga bebas overflow di HP.",
                 "enum": "PaginationInfoPosition { topLeft, topCenter, topRight, leftTop, leftCenter, leftBottom, rightTop, rightCenter, rightBottom }",
-                "helpers": "PagedList<T>.of(semuaData, page:, perPage: 30) memotong data di memori (items, currentPage, totalPages, totalItems, perPage; halaman yang hilang karena data berkurang jatuh ke halaman terakhir). PagedTableFooter(paged:, onPageChanged:, hasFloatingButton:) = footer tabel standar: hasFloatingButton true → blok tengah + info topCenter; false → rata kanan + info leftCenter; tersembunyi bila tanpa data."
+                "helpers": "PagedList<T>.of(semuaData, page:, perPage: 30) memotong data di memori (items, currentPage, totalPages, totalItems, perPage; halaman yang hilang karena data berkurang jatuh ke halaman terakhir). PagedTableFooter(paged:, onPageChanged:, infoPosition: leftCenter, alignment: Alignment.centerRight, padding: EdgeInsets.only(top: 16)) = footer tabel standar, tersembunyi bila tanpa data."
             },
             "methods": [
                 {
@@ -3970,13 +3970,80 @@
                 }
             ],
             "specialNotes": [
-                "Aturan letak (dipakai di seluruh aplikasi): halaman yang punya tombol mengambang (FAB, mis. Tambah) → blok di tengah, info topCenter; halaman tanpa FAB → blok rata kanan, info leftCenter. Untuk tabel cukup `PagedTableFooter(hasFloatingButton: <kondisi yang sama dengan FAB>)`.",
+                "Letak di halaman adalah urusan halaman, bukan komponen paginasi. Halaman dengan FAB Tambah di pojok kanan bawah: taruh paginasi di baris terakhir badan, bungkus FabAlignedWidget(enabled: <kondisi FAB>) dengan infoPosition topCenter & padding EdgeInsets.zero → sejajar di kiri FAB. Tanpa FAB: bawaan (rata kanan, info leftCenter).",
                 "Selalu isi totalItems & perPage bila tersedia agar info menampilkan rentang & total; tanpa keduanya info hanya `halaman / jumlah halaman`.",
                 "Mekanisme halaman sepenuhnya milik pemanggil: perbarui currentPage di onPageChanged lalu muat ulang data. Widget tidak melakukan query.",
                 "Pakai showPageNumbers: true hanya bila tombol nomor halaman memang diminta (tampilan lama, tanpa teks info).",
                 "Data per halaman langsung dari database (LIMIT/OFFSET) → gunakan DriftPaginationWidget + `control.paginationWidget(...)` yang sudah tersambung ke widget ini."
             ],
-            "code": "// 1. Tampilan ringkas (bawaan): info \"2 / 11-20 / 500\" di atas 4 tombol\nCenter(\n  child: PaginationWidget(\n    currentPage: _page,\n    totalPages: (_total / _perPage).ceil(),\n    totalItems: _total,\n    perPage: _perPage,\n    size: PaginationSize.sm,\n    onPageChanged: (p) => setState(() => _page = p),\n  ),\n)\n\n// 2. Info di kiri tombol, blok rata kanan (halaman tanpa FAB)\nAlign(\n  alignment: Alignment.centerRight,\n  child: PaginationWidget(\n    currentPage: _page,\n    totalPages: pages,\n    totalItems: _total,\n    perPage: _perPage,\n    infoPosition: PaginationInfoPosition.leftCenter,\n    size: PaginationSize.sm,\n    onPageChanged: (p) => setState(() => _page = p),\n  ),\n)\n\n// 3. Tampilan lama: tombol nomor halaman, tanpa teks info\nPaginationWidget(\n  currentPage: _page,\n  totalPages: 15,\n  showPageNumbers: true,\n  visiblePagesCount: 1,\n  theme: PaginationTheme.success,\n  onPageChanged: (p) => setState(() => _page = p),\n)\n\n// 4. Tabel dari data di memori: PagedList + PagedTableFooter\nfinal paged = PagedList.of(semuaBaris, page: _page); // 30 per halaman\nColumn(\n  children: [\n    Expanded(child: TabelSaya(rows: paged.items)),\n    PagedTableFooter(\n      paged: paged,\n      hasFloatingButton: bolehTambah, // sama dengan kondisi FAB\n      onPageChanged: (p) => setState(() => _page = p),\n    ),\n  ],\n)\n\n// 5. Rentang tanpa widget\nfinal (awal, akhir) = PaginationWidget.rangeOf(page: 3, perPage: 10, totalItems: 23);\n// awal = 21, akhir = 23"
+            "code": "// 1. Tampilan ringkas (bawaan): info \"2 / 11-20 / 500\" di atas 4 tombol\nCenter(\n  child: PaginationWidget(\n    currentPage: _page,\n    totalPages: (_total / _perPage).ceil(),\n    totalItems: _total,\n    perPage: _perPage,\n    size: PaginationSize.sm,\n    onPageChanged: (p) => setState(() => _page = p),\n  ),\n)\n\n// 2. Info di kiri tombol, blok rata kanan (halaman tanpa FAB)\nAlign(\n  alignment: Alignment.centerRight,\n  child: PaginationWidget(\n    currentPage: _page,\n    totalPages: pages,\n    totalItems: _total,\n    perPage: _perPage,\n    infoPosition: PaginationInfoPosition.leftCenter,\n    size: PaginationSize.sm,\n    onPageChanged: (p) => setState(() => _page = p),\n  ),\n)\n\n// 3. Tampilan lama: tombol nomor halaman, tanpa teks info\nPaginationWidget(\n  currentPage: _page,\n  totalPages: 15,\n  showPageNumbers: true,\n  visiblePagesCount: 1,\n  theme: PaginationTheme.success,\n  onPageChanged: (p) => setState(() => _page = p),\n)\n\n// 4. Tabel dari data di memori: PagedList + PagedTableFooter\nfinal paged = PagedList.of(semuaBaris, page: _page); // 30 per halaman\nColumn(\n  children: [\n    Expanded(child: TabelSaya(rows: paged.items)),\n    PagedTableFooter( // rata kanan, info di kiri\n      paged: paged,\n      onPageChanged: (p) => setState(() => _page = p),\n    ),\n  ],\n)\n\n// 4b. Halaman dengan FAB Tambah: sejajar di kiri FAB\nColumn(\n  children: [\n    Expanded(child: TabelSaya(rows: paged.items)),\n    FabAlignedWidget(\n      enabled: bolehTambah, // sama dengan kondisi FAB\n      child: PagedTableFooter(\n        paged: paged,\n        infoPosition: bolehTambah\n            ? PaginationInfoPosition.topCenter\n            : PaginationInfoPosition.leftCenter,\n        padding: EdgeInsets.zero,\n        onPageChanged: (p) => setState(() => _page = p),\n      ),\n    ),\n  ],\n)\n\n// 5. Rentang tanpa widget\nfinal (awal, akhir) = PaginationWidget.rangeOf(page: 3, perPage: 10, totalItems: 23);\n// awal = 21, akhir = 23"
+        },
+        {
+            "id": "FabAlignedWidget",
+            "group": "Widget",
+            "name": "FAB Aligned Widget",
+            "icon": "fa-solid fa-grip-lines",
+            "description": "Widget tata letak yang menaruh isinya SEJAJAR di sebelah kiri tombol mengambang (FAB) pojok kanan bawah, satu baris dengan FAB, bukan di atasnya. Barisnya setinggi FAB (56 px), isi di tengah vertikal dan rata kanan, berhenti 12 px sebelum FAB; ruang FAB selalu dicadangkan sehingga isi halaman tidak tertutup FAB. Dipakai di baris terakhir badan halaman, mis. paginasi di halaman yang punya FAB Tambah. Isinya bebas (paginasi, total, tombol, dll.).",
+            "mandatoryProps": [
+                {
+                    "name": "child",
+                    "type": "Widget",
+                    "default": "",
+                    "desc": "Isi yang disejajarkan dengan FAB, mis. PagedTableFooter / control.paginationWidget(...)."
+                }
+            ],
+            "optionalProps": [
+                {
+                    "name": "enabled",
+                    "type": "bool",
+                    "default": "true",
+                    "desc": "Isi dengan kondisi yang SAMA dengan FAB (mis. izin tambah). false → child apa adanya, hanya diberi jarak atas topGap."
+                },
+                {
+                    "name": "topGap",
+                    "type": "double",
+                    "default": "16",
+                    "desc": "Jarak dari isi di atasnya."
+                },
+                {
+                    "name": "gap",
+                    "type": "double",
+                    "default": "12",
+                    "desc": "Jarak child ke FAB."
+                },
+                {
+                    "name": "bodyEndPadding",
+                    "type": "double",
+                    "default": "20",
+                    "desc": "Padding kanan badan halaman (bawaan BodyWidget.fillPadding). Dipakai menghitung ruang FAB dari tepi isi: endInset = 56 + gap - (bodyEndPadding - 16)."
+                }
+            ],
+            "additionalInfo": {
+                "dependencies": "flutter/material.dart",
+                "constants": "FabAlignedWidget.fabSize = 56 (FAB standar), FabAlignedWidget.fabMargin = 16 (margin endFloat)",
+                "use_case": "Paginasi / ringkasan di halaman daftar yang punya FAB Tambah, agar sejajar rapi dengan FAB dan tidak tertimpa."
+            },
+            "methods": [],
+            "behaviors": [
+                {
+                    "name": "Sejajar FAB",
+                    "type": "Layout",
+                    "default": "",
+                    "desc": "Baris minimal setinggi FAB; child di tengah vertikal (segaris dengan tengah FAB) dan rata kanan sampai gap sebelum FAB."
+                },
+                {
+                    "name": "Cadangan Ruang FAB",
+                    "type": "Layout",
+                    "default": "",
+                    "desc": "Saat enabled, ruang baris FAB tetap dicadangkan walau child kosong (mis. paginasi tersembunyi karena tanpa data)."
+                }
+            ],
+            "specialNotes": [
+                "Syarat: FAB standar 56 px di FloatingActionButtonLocation.endFloat (bawaan Scaffold) dan padding bawah badan = 16 (bawaan BodyWidget.fillPadding). JANGAN memakai floatButtonBottom (ruang di atas FAB) bersama widget ini.",
+                "Taruh di LUAR area gulir (baris terakhir Column badan, setelah Expanded), bukan di dalam ListView, agar selalu sejajar FAB.",
+                "Untuk paginasi: infoPosition topCenter + padding EdgeInsets.zero agar tinggi blok ≈ tinggi FAB."
+            ],
+            "code": "Scaffold(\n  floatingActionButton: bolehTambah\n      ? FloatingActionButton(onPressed: _tambah, child: const Icon(Icons.add))\n      : null,\n  body: BodyWidget.fill(\n    Column(\n      children: [\n        Expanded(child: TabelSaya(rows: paged.items)),\n        FabAlignedWidget(\n          enabled: bolehTambah,\n          child: PagedTableFooter(\n            paged: paged,\n            infoPosition: bolehTambah\n                ? PaginationInfoPosition.topCenter\n                : PaginationInfoPosition.leftCenter,\n            padding: EdgeInsets.zero,\n            onPageChanged: (p) => setState(() => _page = p),\n          ),\n        ),\n      ],\n    ),\n  ), // padding bawaan, BUKAN floatButtonBottom\n)"
         },
         {
             "id": "EmptyWidget",
