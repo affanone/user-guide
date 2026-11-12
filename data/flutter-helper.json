@@ -22,6 +22,12 @@
             ],
             "optionalProps": [
                 {
+                    "name": "subtitle",
+                    "type": "String?",
+                    "default": "null",
+                    "desc": "Baris kedua berupa teks kecil di bawah title (mis. nama cabang aktif). Otomatis disembunyikan saat mode pencarian aktif (digantikan search field), dan menambah tinggi AppBar (preferredSize & toolbarHeight) secara dinamis."
+                },
+                {
                     "name": "actions",
                     "type": "List<Widget>?",
                     "default": "null",
@@ -91,7 +97,7 @@
                     "name": "preferredSize",
                     "type": "Size",
                     "default": "",
-                    "desc": "Overridden getter untuk menghitung ukuran ideal AppBar. Secara dinamis menjumlahkan tinggi kToolbarHeight (standar) dengan tinggi widget bottom (jika ada)."
+                    "desc": "Overridden getter untuk menghitung ukuran ideal AppBar. Secara dinamis menjumlahkan tinggi kToolbarHeight (standar), tinggi ekstra baris subtitle (jika ada), dan tinggi widget bottom (jika ada)."
                 }
             ],
             "behaviors": [
@@ -117,12 +123,13 @@
                     "name": "Dynamic Sizing",
                     "type": "Layout Rendering",
                     "default": "",
-                    "desc": "Mencegah error 'RenderFlex' pada bagian atas layar saat menambahkan TabBar, karena `preferredSize` selalu dihitung akurat menyertakan ukuran `bottom`."
+                    "desc": "Mencegah error 'RenderFlex' pada bagian atas layar saat menambahkan TabBar atau subtitle, karena `preferredSize` & `toolbarHeight` selalu dihitung akurat menyertakan ukuran `bottom` dan `subtitle`."
                 }
             ],
             "specialNotes": [
                 "Tidak perlu menambahkan manual icon 'Search' ke dalam parameter `actions`. Sistem akan menampilkannya dengan cerdas apabila logic pencarian terdeteksi.",
-                "Saat mode cari aktif, 'leading' otomatis berubah menjadi tombol panah kembali (Back) untuk membatalkan pencarian tanpa perlu menutup halaman."
+                "Saat mode cari aktif, 'leading' otomatis berubah menjadi tombol panah kembali (Back) untuk membatalkan pencarian tanpa perlu menutup halaman.",
+                "'subtitle' WAJIB tersembunyi otomatis saat mode cari aktif (digantikan search field) — bukan ditumpuk/ditampilkan bersamaan."
             ],
             "code": "// CONTOH 1: AppBar Biasa + Actions kustom\nreturn Scaffold(\n  appBar: AppBarWidget(\n    title: 'Dashboard',\n    centerTitle: true,\n    actions: [\n      IconButton(icon: Icon(Icons.notifications), onPressed: () {}),\n    ],\n  ),\n);\n\n// CONTOH 2: AppBar dengan Fitur Pencarian Debounce & TabBar (Bottom)\nreturn Scaffold(\n  appBar: AppBarWidget(\n    title: 'Daftar Pengguna',\n    hintText: 'Cari nama karyawan...',\n    onSearchChanged: (query) {\n      // Dipanggil 500ms setelah user berhenti mengetik\n      print('Mencari data: $query');\n    },\n    onSearchClosed: () {\n      print('Pencarian dibatalkan, reset list');\n    },\n    bottom: const TabBar(\n      tabs: [\n        Tab(text: 'Aktif'),\n        Tab(text: 'Nonaktif'),\n      ],\n    ),\n  ),\n);"
         },
