@@ -3483,7 +3483,7 @@
                     "name": "items",
                     "type": "List<FormSelectItem<T>>",
                     "default": "",
-                    "desc": "Array objek FormSelectItem. Secara pintar merender label teks, namun juga mendukung 'icon' (ikon bawaan segmen), 'sublabel' (dirender sebagai Tooltip saat di-hover/ditahan), dan 'child' (menimpa teks label dengan widget kustom sepenuhnya)."
+                    "desc": "Array objek FormSelectItem. Secara pintar merender label teks, namun juga mendukung 'icon' (ikon bawaan segmen), 'sublabel' (dirender sebagai Tooltip saat di-hover/ditahan), dan 'child' (menimpa teks label dengan widget kustom sepenuhnya). Ketiganya diisi lewat FormSelectItem.custom(value, {label, sublabel, child, icon}); label opsional (bawaan: isi value)."
                 }
             ],
             "optionalProps": [
@@ -3622,7 +3622,7 @@
                 "Properti 'sublabel' pada FormSelectItem akan secara otomatis dikonversi menjadi 'tooltip' yang muncul saat user menahan (long-press) atau mengarahkan mouse (hover) ke segmen.",
                 "Untuk desain aplikasi yang padat (seperti dashboard), biarkan 'block: true' agar lebar form konsisten dengan form input teks yang ada di atas/bawahnya."
             ],
-            "code": "FormHelperWidget.Segment<bool>(\n  label: 'Status Tagihan',\n  node: _nodeStatus,\n  block: true,\n  showSelectedIcon: true,\n  activeColor: Colors.blueAccent,\n  items: [\n    FormSelectItem(false, 'Belum Lunas', icon: Icons.pending_actions),\n    FormSelectItem(true, 'Lunas', icon: Icons.check_circle_outline),\n  ],\n)"
+            "code": "FormHelperWidget.Segment<bool>(\n  label: 'Status Tagihan',\n  node: _nodeStatus,\n  block: true,\n  showSelectedIcon: true,\n  activeColor: Colors.blueAccent,\n  items: [\n    FormSelectItem.custom(false, label: 'Belum Lunas', icon: Icons.pending_actions),\n    FormSelectItem.custom(true, label: 'Lunas', icon: Icons.check_circle_outline),\n  ],\n)"
         },
         {
             "id": "select",
@@ -3635,7 +3635,7 @@
                     "name": "items",
                     "type": "List<FormSelectItem<T>>",
                     "default": "",
-                    "desc": "Daftar pilihan dropdown yang menggunakan model universal FormSelectItem. Memudahkan pertukaran komponen antara Select, Select2, dan SelectMultiple tanpa mengubah struktur data."
+                    "desc": "Daftar pilihan dropdown yang menggunakan model universal FormSelectItem. Memudahkan pertukaran komponen antara Select, Select2, dan SelectMultiple tanpa mengubah struktur data. Label opsional (bawaan: isi value); 'child' (mis. ikon) lewat FormSelectItem.custom dan tampil di daftar MAUPUN pada item yang sedang terpilih."
                 }
             ],
             "optionalProps": [
@@ -3766,9 +3766,11 @@
             },
             "specialNotes": [
                 "Menggunakan tipe generik <T> mutlak. Jika node digunakan, tipe data T harus selaras dengan parsing node (misalnya int atau String).",
-                "Kini terintegrasi penuh dengan model data FormSelectItem, sehingga dapat saling bertukar tipe UI (ke Select2 atau SelectMultiple) tanpa perlu merombak sumber data array."
+                "Kini terintegrasi penuh dengan model data FormSelectItem, sehingga dapat saling bertukar tipe UI (ke Select2 atau SelectMultiple) tanpa perlu merombak sumber data array.",
+                "Model FormSelectItem: FormSelectItem(value, [label]) — label OPSIONAL, bila dikosongkan otomatis memakai isi value (value non-String di-toString(), mis. FormSelectItem(5) berlabel '5'). Untuk tampilan sendiri pakai FormSelectItem.custom(value, {label, sublabel, child, icon}); label di .custom tetap opsional (bawaan: isi value) dan dipakai untuk pencarian serta kolom teks. Catatan: bentuk lama FormSelectItem(v, 'Label', child: ...) tidak lagi valid, pindahkan ke .custom.",
+                "Item dengan 'child' ditampilkan apa adanya pada item terpilih (rata kiri); tanpa 'child' yang tampil adalah teks label. displayBuilder (bila diberikan) tetap menimpa tampilan item terpilih."
             ],
-            "code": "FormHelperWidget.Select<int>(\n  label: 'Kategori',\n  node: _formCtrl.node('kategori'),\n  items: [\n    FormSelectItem(1, 'Makanan'),\n    FormSelectItem(2, 'Minuman'),\n  ],\n  displayBuilder: (val) => val == 1 ? 'Food' : 'Drink',\n  validator: (val) => val == null ? 'Pilih kategori!' : null,\n)"
+            "code": "FormHelperWidget.Select<int>(\n  label: 'Kategori',\n  node: _formCtrl.node('kategori'),\n  items: [\n    FormSelectItem(1, 'Makanan'),\n    FormSelectItem(2, 'Minuman'),\n    FormSelectItem(3), // label otomatis '3'\n    FormSelectItem.custom(4, child: Icon(Icons.percent)), // tanpa label, tampil ikon\n  ],\n  displayBuilder: (val) => val == 1 ? 'Food' : 'Drink',\n  validator: (val) => val == null ? 'Pilih kategori!' : null,\n)"
         },
         {
             "id": "select2",
@@ -3781,7 +3783,7 @@
                     "name": "items",
                     "type": "List<FormSelectItem<T>>",
                     "default": "",
-                    "desc": "Array objek FormSelectItem universal yang berisi nilai (value) dan label tampilan."
+                    "desc": "Array objek FormSelectItem universal yang berisi nilai (value) dan label tampilan (label opsional, bawaan isi value). 'child' dari FormSelectItem.custom dipakai di daftar pilihan; kolom teks di atas tetap menampilkan label, dan pencarian memakai label."
                 }
             ],
             "optionalProps": [
@@ -3927,7 +3929,7 @@
                     "name": "items",
                     "type": "List<FormSelectItem<T>>",
                     "default": "",
-                    "desc": "Array objek FormSelectItem universal yang berisi nilai (value) dan label tampilan."
+                    "desc": "Array objek FormSelectItem universal yang berisi nilai (value) dan label tampilan (label opsional, bawaan isi value). 'child' dari FormSelectItem.custom dipakai di daftar pilihan; kolom teks di atas tetap menampilkan label, dan pencarian memakai label."
                 }
             ],
             "optionalProps": [
@@ -5096,7 +5098,7 @@
                     "name": "items",
                     "type": "List<FormSelectItem<T>>",
                     "default": "",
-                    "desc": "Array pilihan yang dibungkus dalam FormSelectItem universal (memuat value, label, sublabel, atau child)."
+                    "desc": "Array pilihan yang dibungkus dalam FormSelectItem universal (memuat value, label, sublabel, atau child). Label opsional (bawaan: isi value); sublabel/child lewat FormSelectItem.custom."
                 }
             ],
             "optionalProps": [
@@ -6388,7 +6390,7 @@
                     "name": "items",
                     "type": "List<FormSelectItem<T>>",
                     "default": "",
-                    "desc": "Array pilihan yang dibungkus dalam FormSelectItem universal (mendukung value, label, sublabel, dan injeksi widget anak)."
+                    "desc": "Array pilihan yang dibungkus dalam FormSelectItem universal (mendukung value, label, sublabel, dan injeksi widget anak). Label opsional (bawaan: isi value); sublabel/child lewat FormSelectItem.custom."
                 }
             ],
             "optionalProps": [
