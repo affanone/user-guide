@@ -2157,6 +2157,12 @@
                     "desc": "Warna tema utama yang akan diaplikasikan pada garis aksen vertikal kiri, warna ikon, dan teks tombol aksi interaksi."
                 },
                 {
+                    "name": "margin",
+                    "type": "EdgeInsetsGeometry",
+                    "default": "EdgeInsets.only(bottom: 16)",
+                    "desc": "Jarak luar widget. Bawaan hanya bawah 16 (kiri, atas, kanan = 0); ubah bila perlu, mis. EdgeInsets.only(top: 8, bottom: 24). Margin berada di dalam area yang ikut menciut, jadi saat tips ditutup jaraknya ikut hilang — atur jarak lewat parameter ini, bukan SizedBox di luar widget (akan menggantung setelah tips ditutup)."
+                },
+                {
                     "name": "showDismissButton",
                     "type": "bool",
                     "default": "true",
